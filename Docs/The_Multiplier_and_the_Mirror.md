@@ -1,4 +1,4 @@
-# The Multiplier and the Mirror
+﻿# The Multiplier and the Mirror
 
 *A framework for understanding what LLMs amplify, what they reflect, and what they erode*
 
@@ -48,7 +48,8 @@ In practice, they don't. An engineer who can't evaluate quality doesn't produce 
 
 This behavior is captured by a **multiplicative** model, borrowed from production economics (the Cobb-Douglas form):
 
-$$O = M \times F \quad \text{where} \quad F = \prod_{i} f_i^{w_i} \qquad (1)$$
+![O = M \times F \quad \text{where} \quad F = \prod_{i} f_i^{w_i} \qquad (1)](math/display-01.svg)
+<!-- $O = M \times F \quad \text{where} \quad F = \prod_{i} f_i^{w_i} \qquad (1)$ -->
 
 The components $f_i$ include domain expertise, architectural judgment, taste, clarity of specification, debugging intuition, calibrated uncertainty (knowing what you don't know), and intrinsic motivation. The exponents $w_i$ (which sum to 1) represent how much each component matters for a given task.
 
@@ -68,7 +69,8 @@ The **deep layer** — structural intuition about how complex systems behave und
 
 These layers matter for the dynamics of force over time, for the F→M transfer, and for the barbell effect in labor markets. Each layer interacts differently with the LLM:
 
-$$M_{\text{effective}}^{\text{surface}} \gg M_{\text{effective}}^{\text{middle}} > M_{\text{effective}}^{\text{deep}} \approx 1 \qquad (1a)$$
+![M_{\text{effective}}^{\text{surface}} \gg M_{\text{effective}}^{\text{middle}} > M_{\text{effective}}^{\text{deep}} \approx 1 \qquad (1a)](math/display-02.svg)
+<!-- $M_{\text{effective}}^{\text{surface}} \gg M_{\text{effective}}^{\text{middle}} > M_{\text{effective}}^{\text{deep}} \approx 1 \qquad (1a)$ -->
 
 **In plain language**: the LLM is an almost perfect substitute for the surface layer (high $M$), a partial substitute for the middle layer (moderate $M$), and barely a substitute at all for the deep layer ($M \approx 1$). This hierarchy will recur throughout the framework.
 
@@ -103,7 +105,8 @@ graph TD
 
 There's a natural tendency to treat the LLM as a fixed number. But in practice, the substance multiplier varies enormously by domain and task type. We extend equation (1):
 
-$$O = \sum_{d} M_s(d) \times F(d) \qquad (2)$$
+![O = \sum_{d} M_s(d) \times F(d) \qquad (2)](math/display-03.svg)
+<!-- $O = \sum_{d} M_s(d) \times F(d) \qquad (2)$ -->
 
 Where $M_s(d)$ is the substance multiplier for domain $d$.
 
@@ -113,7 +116,8 @@ In mirror terms: the mirror's fidelity varies by what you're reflecting. Simple,
 
 This has a corollary that rarely gets discussed. If the multiplier varies by domain, then whoever decides *where the LLM gets better* is implicitly deciding *which skills become more economically valuable*:
 
-$$\frac{\partial V_s}{\partial I_p} = \frac{\partial M_s(d)}{\partial I_p} \times \bar{F}_s \qquad (3)$$
+![\frac{\partial V_s}{\partial I_p} = \frac{\partial M_s(d)}{\partial I_p} \times \bar{F}_s \qquad (3)](math/display-04.svg)
+<!-- $\frac{\partial V_s}{\partial I_p} = \frac{\partial M_s(d)}{\partial I_p} \times \bar{F}_s \qquad (3)$ -->
 
 Where $V_s$ is the market value of skill $s$ and $I_p$ is the LLM provider's investment in training capability for domain $d$.
 
@@ -127,15 +131,18 @@ Equation (3) will matter again when we consider sovereignty — the provider's i
 
 From equation (1), if the LLM multiplies force, and force varies between individuals, then the LLM doesn't just increase average output. It *amplifies the spread*:
 
-$$\text{Var}(O) = M^2 \times \text{Var}(F) \qquad (4)$$
+![\text{Var}(O) = M^2 \times \text{Var}(F) \qquad (4)](math/display-05.svg)
+<!-- $\text{Var}(O) = M^2 \times \text{Var}(F) \qquad (4)$ -->
 
-$$\Delta O = M \times (F_{\text{high}} - F_{\text{low}}) \qquad (5)$$
+![\Delta O = M \times (F_{\text{high}} - F_{\text{low}}) \qquad (5)](math/display-06.svg)
+<!-- $\Delta O = M \times (F_{\text{high}} - F_{\text{low}}) \qquad (5)$ -->
 
 **In plain language**: the variance in output between your best and worst people grows as the *square* of the multiplier's power. A pre-existing 3x gap between a strong and weak engineer becomes a 9x gap at $M = 3$ and a 15x gap at $M = 5$.
 
 Equation (4) actually understates the problem. The mirror metaphor makes transparent why: high-force engineers *extract more from the tool*. They place sharp, well-formed questions in front of the mirror and get sharp, well-formed reflections back. Their effective $M$ is higher than a low-force engineer's. If $M$ correlates positively with $F$:
 
-$$\text{Var}(O) > M^2 \times \text{Var}(F) \qquad (4a)$$
+![\text{Var}(O) > M^2 \times \text{Var}(F) \qquad (4a)](math/display-07.svg)
+<!-- $\text{Var}(O) > M^2 \times \text{Var}(F) \qquad (4a)$ -->
 
 **In plain language**: equation (4) is a lower bound. Because high-force engineers also extract a higher effective $M$ from the same tool, the true output variance is even larger than $M^2$ would predict. The actual divergence is worse than the simple model suggests.
 
@@ -147,7 +154,8 @@ This is the opposite of what most organizations expect. The implicit assumption 
 
 The variance amplification produces a specific distributional signature in labor markets. The middle hollows out while both ends retain or gain value. Let $V(F)$ be the market value of composite force $F$:
 
-$$V(F) \to \begin{cases} V_{\text{high}} \cdot F & \text{if } F > F_{\text{threshold}} \quad \text{(judgment layer)} \\ V_{\text{new}} & \text{if orchestration skill is high} \quad \text{(LLM operation)} \\ \varepsilon & \text{if } F \in [F_{\text{low}}, F_{\text{threshold}}] \quad \text{(commoditized middle)} \end{cases} \qquad (6)$$
+![V(F) \to \begin{cases} V_{\text{high}} \cdot F & \text{if } F > F_{\text{threshold}} \quad \text{(judgment layer)} \\ V_{\text{new}} & \text{if orchestration skill is high} \quad \text{(LLM operation)} \\ \varepsilon & \text{if } F \in \[F_{\text{low}}, F_{\text{threshold}}\] \quad \text{(commoditized middle)} \end{cases} \qquad (6)](math/display-08.svg)
+<!-- $V(F) \to \begin{cases} V_{\text{high}} \cdot F & \text{if } F > F_{\text{threshold}} \quad \text{(judgment layer)} \\ V_{\text{new}} & \text{if orchestration skill is high} \quad \text{(LLM operation)} \\ \varepsilon & \text{if } F \in [F_{\text{low}}, F_{\text{threshold}}] \quad \text{(commoditized middle)} \end{cases} \qquad (6)$ -->
 
 **In plain language**: the market splits into three tiers. At the top, judgment and taste gain premium. At the bottom, a new kind of value emerges in LLM orchestration. In the middle, competent-but-undistinguished execution is commoditized.
 
@@ -161,17 +169,21 @@ This isn't a new pattern. Photography didn't eliminate painters — it eliminate
 
 Historically, creation was expensive and evaluation was relatively cheap. LLMs invert this:
 
-$$C_{\text{create}} \to \varepsilon \quad \text{(near zero)}$$
+![C_{\text{create}} \to \varepsilon \quad \text{(near zero)}](math/display-09.svg)
+<!-- $C_{\text{create}} \to \varepsilon \quad \text{(near zero)}$ -->
 
-$$C_{\text{evaluate}} \geq C_{\text{evaluate}}^{\text{pre-LLM}} \quad \text{(unchanged or higher)}$$
+![C_{\text{evaluate}} \geq C_{\text{evaluate}}^{\text{pre-LLM}} \quad \text{(unchanged or higher)}](math/display-10.svg)
+<!-- $C_{\text{evaluate}} \geq C_{\text{evaluate}}^{\text{pre-LLM}} \quad \text{(unchanged or higher)}$ -->
 
-$$\text{Throughput} = \frac{\text{Budget}_{\text{eval}}}{C_{\text{evaluate}}} \qquad (7)$$
+![\text{Throughput} = \frac{\text{Budget}_{\text{eval}}}{C_{\text{evaluate}}} \qquad (7)](math/display-11.svg)
+<!-- $\text{Throughput} = \frac{\text{Budget}_{\text{eval}}}{C_{\text{evaluate}}} \qquad (7)$ -->
 
 **In plain language**: a developer can generate thousands of lines of plausible code in minutes. But determining whether that code is correct, secure, and aligned with requirements still demands deep human judgment. Possibly more judgment, because the mirror's presentation channel ($M_p$) adds a uniform polish that makes defects harder to spot — hand-written bad code often looks bad, but LLM-generated bad code looks professional.
 
 This creates a genuine organizational paradox:
 
-$$\text{Optimal allocation: } F_{\text{high}} \to \text{evaluation} \implies F_{\text{high}} \not\to \text{creation} \qquad (7a)$$
+![\text{Optimal allocation: } F_{\text{high}} \to \text{evaluation} \implies F_{\text{high}} \not\to \text{creation} \qquad (7a)](math/display-12.svg)
+<!-- $\text{Optimal allocation: } F_{\text{high}} \to \text{evaluation} \implies F_{\text{high}} \not\to \text{creation} \qquad (7a)$ -->
 
 **In plain language**: your most valuable people need to spend *more* time reviewing others' AI-augmented output and *less* time doing their own creation, even though their own creation yields the highest return. As we will see, the F→M transfer introduces a *third* competing demand on these same people.
 
@@ -183,9 +195,11 @@ $$\text{Optimal allocation: } F_{\text{high}} \to \text{evaluation} \implies F_{
 
 The framework so far has assumed force is positive. This is where we need the additive model. An engineer who is confident, fast, and *systematically wrong* doesn't just have low force — they have force in the wrong direction:
 
-$$F_{\text{directed}} = \sum_{i} w_i \cdot f_i \qquad \text{where some } f_i < 0 \qquad (8)$$
+![F_{\text{directed}} = \sum_{i} w_i \cdot f_i \qquad \text{where some } f_i < 0 \qquad (8)](math/display-13.svg)
+<!-- $F_{\text{directed}} = \sum_{i} w_i \cdot f_i \qquad \text{where some } f_i < 0 \qquad (8)$ -->
 
-$$D = M \times |F_{\text{negative}}| \times \tau \qquad (9)$$
+![D = M \times |F_{\text{negative}}| \times \tau \qquad (9)](math/display-14.svg)
+<!-- $D = M \times |F_{\text{negative}}| \times \tau \qquad (9)$ -->
 
 **In plain language**: the blast radius of bad judgment scales directly with $M$. Pre-LLM, a negative-force individual was rate-limited by execution speed. The LLM removes that governor.
 
@@ -199,7 +213,8 @@ Negative force (equation 8) is dangerous. But there is a subtler failure mode: *
 
 The substance/presentation split makes this precise. The epistemic gap arises from the mismatch between the two channels:
 
-$$\Delta_{\text{epistemic}}(i) = C_{\text{apparent}}(i) - C_{\text{warranted}}(i) \propto \frac{M_p}{M_s(d) \cdot F_i} \qquad (10)$$
+![\Delta_{\text{epistemic}}(i) = C_{\text{apparent}}(i) - C_{\text{warranted}}(i) \propto \frac{M_p}{M_s(d) \cdot F_i} \qquad (10)](math/display-15.svg)
+<!-- $\Delta_{\text{epistemic}}(i) = C_{\text{apparent}}(i) - C_{\text{warranted}}(i) \propto \frac{M_p}{M_s(d) \cdot F_i} \qquad (10)$ -->
 
 **In plain language**: the epistemic gap is widest when the presentation multiplier ($M_p$) is high relative to the substance multiplier ($M_s$) and the user's force ($F_i$). The output looks brilliant ($M_p$ is always large). The output *is* brilliant only when $M_s \cdot F_i$ is also large. For a low-force user working on a novel problem (low $M_s$), the gap between how the output looks and what it's actually worth is enormous.
 
@@ -221,7 +236,8 @@ The mirror explains *why* passive reliance is so seductive. Mirrors are flatteri
 
 How force changes over time:
 
-$$\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)$$
+![\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)](math/display-16.svg)
+<!-- $\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)$ -->
 
 Where:
 - $S(t)$ = productive struggle (effortful problem-solving, failure, debugging)
@@ -243,11 +259,14 @@ The mirror interpretation of each term: $\alpha \cdot S$ is learning without the
 
 The atrophy dynamics operate differently on each layer, and these differences matter:
 
-$$\frac{df_{\text{surface}}}{dt} = -\beta_s \cdot R \qquad (11a)$$
+![\frac{df_{\text{surface}}}{dt} = -\beta_s \cdot R \qquad (11a)](math/display-17.svg)
+<!-- $\frac{df_{\text{surface}}}{dt} = -\beta_s \cdot R \qquad (11a)$ -->
 
-$$\frac{df_{\text{middle}}}{dt} = \alpha_m \cdot S + \gamma_m \cdot E \cdot f_{\text{middle}} - \beta_m \cdot R \qquad (11b)$$
+![\frac{df_{\text{middle}}}{dt} = \alpha_m \cdot S + \gamma_m \cdot E \cdot f_{\text{middle}} - \beta_m \cdot R \qquad (11b)](math/display-18.svg)
+<!-- $\frac{df_{\text{middle}}}{dt} = \alpha_m \cdot S + \gamma_m \cdot E \cdot f_{\text{middle}} - \beta_m \cdot R \qquad (11b)$ -->
 
-$$\frac{df_{\text{deep}}}{dt} = \alpha_d \cdot S - \beta_d \cdot R \qquad \text{where } \beta_d \ll \beta_s \qquad (11c)$$
+![\frac{df_{\text{deep}}}{dt} = \alpha_d \cdot S - \beta_d \cdot R \qquad \text{where } \beta_d \ll \beta_s \qquad (11c)](math/display-19.svg)
+<!-- $\frac{df_{\text{deep}}}{dt} = \alpha_d \cdot S - \beta_d \cdot R \qquad \text{where } \beta_d \ll \beta_s \qquad (11c)$ -->
 
 **In plain language**: the surface layer erodes fast under LLM dependence, but its loss is benign — the LLM substitutes for it fully (equation 1a). Why memorize what the mirror can always show you? The middle layer is the critical battleground — this is where the tipping point (equation 14, below) operates, where the $\gamma_m \cdot E \cdot f_{\text{middle}}$ term determines whether judgment compounds or atrophies. The deep layer barely changes in the short run, but it's the hardest to rebuild once lost, because it was built through years of direct experience no language model can replicate.
 
@@ -261,21 +280,25 @@ The trap is that short-term output $O(t) = M \times F(t)$ can increase even as $
 
 Equation (11) describes force atrophy at the individual level. Scale it up and you get something more alarming.
 
-$$K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t) \times (1 - \delta) + T(t) \qquad (12)$$
+![K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t) \times (1 - \delta) + T(t) \qquad (12)](math/display-20.svg)
+<!-- $K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t) \times (1 - \delta) + T(t) \qquad (12)$ -->
 
-$$T(t) = \phi \times W(t) \times F_{\text{senior}}(t) \qquad (12a)$$
+![T(t) = \phi \times W(t) \times F_{\text{senior}}(t) \qquad (12a)](math/display-21.svg)
+<!-- $T(t) = \phi \times W(t) \times F_{\text{senior}}(t) \qquad (12a)$ -->
 
 **In plain language**: the stock of tacit knowledge in an organization next year equals what survives natural attrition ($K$ reduced by $\delta$ from retirements and turnover) plus whatever gets transmitted from seniors to juniors ($T$). The transmission rate depends on three things multiplied together: a coupling constant ($\phi$), the volume of work seniors and juniors do together ($W$), and how much force the seniors actually carry ($F_{\text{senior}}$). If any of those three approaches zero, transmission stops.
 
 The LLM reduces $W(t)$:
 
-$$W(t) = W_0 \cdot e^{-\psi \cdot M} \qquad (12b)$$
+![W(t) = W_0 \cdot e^{-\psi \cdot M} \qquad (12b)](math/display-22.svg)
+<!-- $W(t) = W_0 \cdot e^{-\psi \cdot M} \qquad (12b)$ -->
 
 **In plain language**: shared work declines exponentially with the multiplier's power — the first increments of $M$ eliminate the most delegable tasks (high-volume, well-specified work that was the traditional vehicle for junior learning), with diminishing returns thereafter. $W(t)$ approaches zero asymptotically but never goes negative.
 
 The knowledge pipeline breaks when transmission can no longer offset decay:
 
-$$T(t) < \delta \cdot K_{\text{tacit}}(t) \implies K_{\text{tacit}} \to 0 \text{ over time} \qquad (13)$$
+![T(t) < \delta \cdot K_{\text{tacit}}(t) \implies K_{\text{tacit}} \to 0 \text{ over time} \qquad (13)](math/display-23.svg)
+<!-- $T(t) < \delta \cdot K_{\text{tacit}}(t) \implies K_{\text{tacit}} \to 0 \text{ over time} \qquad (13)$ -->
 
 **In plain language**: there is a critical threshold where the rate of knowledge leaving the organization (through retirements, turnover, and memory decay) exceeds the rate of knowledge being passed to the next generation. Once crossed, the tacit knowledge stock enters irreversible decline. You won't notice it's broken for years — the seniors who carry the knowledge are still there, still producing.
 
@@ -287,7 +310,8 @@ Note the compounding dependencies. $F_{\text{senior}}$ in equation (12a) is subj
 
 Equation (11) has a structural feature that determines long-term trajectories. The term $\gamma \cdot E(t) \cdot F(t)$ is multiplicative with existing force, creating two stable equilibria:
 
-$$F^* = \frac{\beta \cdot R + \sigma \cdot M_{\text{absorbed}}}{\gamma \cdot E} \qquad (14)$$
+![F^* = \frac{\beta \cdot R + \sigma \cdot M_{\text{absorbed}}}{\gamma \cdot E} \qquad (14)](math/display-24.svg)
+<!-- $F^* = \frac{\beta \cdot R + \sigma \cdot M_{\text{absorbed}}}{\gamma \cdot E} \qquad (14)$ -->
 
 **In plain language**: there is a threshold level of force. Above it, the LLM accelerates your growth — you're strong enough to use it as a sparring partner, and learning compounds. Below it, the LLM accelerates your decline — you default to passive reliance, and atrophy compounds.
 
@@ -299,7 +323,8 @@ The mirror makes this bifurcation vivid. Above $F^*$, the mirror functions like 
 
 There is strong reason to believe force-building and force-decay are not symmetric:
 
-$$\left|\frac{dF}{dt}\right|_{\text{decay}} > \left|\frac{dF}{dt}\right|_{\text{recovery}} \quad \text{for the same distance from } F^* \qquad (14a)$$
+![\left|\frac{dF}{dt}\right|_{\text{decay}} > \left|\frac{dF}{dt}\right|_{\text{recovery}} \quad \text{for the same distance from } F^* \qquad (14a)](math/display-25.svg)
+<!-- $\left|\frac{dF}{dt}\right|_{\text{decay}} > \left|\frac{dF}{dt}\right|_{\text{recovery}} \quad \text{for the same distance from } F^* \qquad (14a)$ -->
 
 **In plain language**: falling below the tipping point isn't just entering a decay trajectory. It's entering a trajectory that's harder to escape than it was to enter. The first time you struggle through a debugging session, there's first-contact novelty that aids encoding. Re-learning after atrophy lacks that novelty, feels more tedious, and competes against the knowledge that the LLM shortcut exists. $F^*$ is a cliff, not a hill.
 
@@ -331,7 +356,8 @@ An engineer who entered the workforce in 2024 faces a structurally different sit
 
 The initial force of a cohort entering in year $c$ is bounded by the struggle available in that environment:
 
-$$F_{\text{initial}}(c) = F_{\text{max}} \cdot \left(\frac{S_{\text{available}}(c)}{S_{\text{pre-LLM}}}\right)^\rho \qquad (32)$$
+![F_{\text{initial}}(c) = F_{\text{max}} \cdot \left(\frac{S_{\text{available}}(c)}{S_{\text{pre-LLM}}}\right)^\rho \qquad (32)](math/display-26.svg)
+<!-- $F_{\text{initial}}(c) = F_{\text{max}} \cdot \left(\frac{S_{\text{available}}(c)}{S_{\text{pre-LLM}}}\right)^\rho \qquad (32)$ -->
 
 Where $S_{\text{available}}(c)$ is the productive struggle available to new engineers in year $c$, which declines as $M(t)$ grows — more powerful LLMs smooth over more friction.
 
@@ -374,17 +400,21 @@ The tipping point at $F^*$ doesn't just sort engineers into two groups — it pu
 
 Equations (11) and (14) together produce the inequality consequences. For a high-force individual above $F^*$:
 
-$$\frac{dF_H}{dt} = \alpha \cdot S_0 + \gamma \cdot M \cdot F_H \qquad (15a)$$
+![\frac{dF_H}{dt} = \alpha \cdot S_0 + \gamma \cdot M \cdot F_H \qquad (15a)](math/display-27.svg)
+<!-- $\frac{dF_H}{dt} = \alpha \cdot S_0 + \gamma \cdot M \cdot F_H \qquad (15a)$ -->
 
 For a low-force individual below $F^*$:
 
-$$\frac{dF_L}{dt} = \max\!\left(\alpha \cdot S_0 - \beta \cdot M,\; -\kappa \cdot F_L\right) \qquad (15b)$$
+![\frac{dF_L}{dt} = \max\!\left(\alpha \cdot S_0 - \beta \cdot M,\; -\kappa \cdot F_L\right) \qquad (15b)](math/display-28.svg)
+<!-- $\frac{dF_L}{dt} = \max\!\left(\alpha \cdot S_0 - \beta \cdot M,\; -\kappa \cdot F_L\right) \qquad (15b)$ -->
 
 Where $S_0$ is the baseline learning rate from non-LLM experience, and the $\max$ function ensures that force approaches zero asymptotically rather than going negative — when force is very low, decay is bounded by the proportional term $-\kappa F_L$. (Force can go *directionally* negative via equation 8, but the *magnitude* of force in the multiplicative model floors at zero.)
 
-$$\frac{d}{dt}(F_H - F_L) = \gamma \cdot M \cdot F_H + \beta \cdot M > 0 \qquad (16)$$
+![\frac{d}{dt}(F_H - F_L) = \gamma \cdot M \cdot F_H + \beta \cdot M > 0 \qquad (16)](math/display-29.svg)
+<!-- $\frac{d}{dt}(F_H - F_L) = \gamma \cdot M \cdot F_H + \beta \cdot M > 0 \qquad (16)$ -->
 
-$$\frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16a)$$
+![\frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16a)](math/display-30.svg)
+<!-- $\frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16a)$ -->
 
 **In plain language**: the high-force individual's growth rate includes a compounding engine. The low-force individual faces a drag term that scales with $M$. The gap widens *faster over time*. This is the Matthew Effect in mathematical form.
 
@@ -452,7 +482,8 @@ These seven loops interact. Multiple positive feedback mechanisms, few natural b
 
 Most organizations distribute AI tooling uniformly — every engineer gets the same Copilot subscription, the same model access, the same seat license. This feels equitable. The force multiplier model says it is also deeply suboptimal.
 
-$$\Delta O_j = (M - 1) \times F_j \qquad (17)$$
+![\Delta O_j = (M - 1) \times F_j \qquad (17)](math/display-31.svg)
+<!-- $\Delta O_j = (M - 1) \times F_j \qquad (17)$ -->
 
 **In plain language**: the marginal return of giving the LLM to person $j$ is proportional to that person's existing force. A 10x engineer who gains a 3x multiplier produces 30 units of additional output. A 1.5x engineer with the same multiplier produces 4.5 units. The delta between those returns is enormous, and it widens as $M$ grows. Per equation (4a), high-force individuals also extract a higher effective $M$ from the same tool — they place sharper questions before the mirror and get sharper reflections back. The rational allocation strategy is to concentrate the multiplier on your strongest people first. Uniform distribution is equitable but leaves the largest returns on the table.
 
@@ -460,9 +491,11 @@ $$\Delta O_j = (M - 1) \times F_j \qquad (17)$$
 
 One of the core functions of engineering management is assessment — knowing who can handle what, who's growing, who's struggling, who can be trusted with critical-path work. That assessment has historically relied on observable output: code quality, design document clarity, debugging speed, the questions someone asks in architecture reviews. The presentation multiplier $M_p$ corrupts nearly all of these signals.
 
-$$\text{SNR}_{\text{assessment}} = \frac{\text{Var}(F_{\text{true}})}{\text{Var}(F_{\text{true}}) + M_p^2 \cdot \text{Var}(\varepsilon_{\text{LLM}}) + \text{Var}(\eta)} \qquad (18)$$
+![\text{SNR}_{\text{assessment}} = \frac{\text{Var}(F_{\text{true}})}{\text{Var}(F_{\text{true}}) + M_p^2 \cdot \text{Var}(\varepsilon_{\text{LLM}}) + \text{Var}(\eta)} \qquad (18)](math/display-32.svg)
+<!-- $\text{SNR}_{\text{assessment}} = \frac{\text{Var}(F_{\text{true}})}{\text{Var}(F_{\text{true}}) + M_p^2 \cdot \text{Var}(\varepsilon_{\text{LLM}}) + \text{Var}(\eta)} \qquad (18)$ -->
 
-$$\lim_{M_p \to \infty} \text{SNR} = 0$$
+![\lim_{M_p \to \infty} \text{SNR} = 0](math/display-33.svg)
+<!-- $\lim_{M_p \to \infty} \text{SNR} = 0$ -->
 
 **In plain language**: the signal-to-noise ratio for assessing true capability through output artifacts approaches zero as the presentation multiplier grows. Note that $M_p$ — not $M_s$ — drives the collapse. The mirror polishes everyone's output identically along the presentation channel, collapsing the visible difference between deep understanding and shallow borrowing. The design doc might be LLM-polished. The code might be LLM-generated. The architecture questions in a review might be LLM-suggested. The map between artifact and ability has been scrambled. To assess true force, evaluate *substance* (where $M_s$ varies and $F$ matters) rather than *presentation* (where $M_p$ always dominates).
 
@@ -472,9 +505,11 @@ The consequences of misassessment are severe in both directions. Overestimate so
 
 Once organizations recognize the legibility crisis (equation 18) and try to measure force directly — through live coding exercises, architectural interviews, or structured assessments — Goodhart's Law activates: when a measure becomes a target, it ceases to be a good measure.
 
-$$F_{\text{measured}} = F_{\text{true}} + \delta_{\text{gaming}}(M_p) \qquad (19)$$
+![F_{\text{measured}} = F_{\text{true}} + \delta_{\text{gaming}}(M_p) \qquad (19)](math/display-34.svg)
+<!-- $F_{\text{measured}} = F_{\text{true}} + \delta_{\text{gaming}}(M_p) \qquad (19)$ -->
 
-$$\frac{\partial \delta_{\text{gaming}}}{\partial M_p} > 0$$
+![\frac{\partial \delta_{\text{gaming}}}{\partial M_p} > 0](math/display-35.svg)
+<!-- $\frac{\partial \delta_{\text{gaming}}}{\partial M_p} > 0$ -->
 
 **In plain language**: the amount by which people can inflate their measured force by using LLMs to game the assessment grows with the presentation multiplier $M_p$. Engineers will use LLMs to prepare for force-assessment exercises, to polish design docs, to simulate architectural sophistication in interviews. The LLM becomes simultaneously the thing that makes force important (equation 1), the thing that makes force hard to measure (equation 18), and the tool people use to game the measurement (equation 19). The mirror makes everyone look good; Goodhart's Law means everyone *uses* the mirror to look good when being assessed. The metric fails precisely when it matters most.
 
@@ -484,13 +519,15 @@ The leaders who navigate this will shift assessment from output inspection to *p
 
 When creation cost approaches zero (per equation 7), a constraint that was historically buried deep in the organizational stack rises to the surface: the speed at which the organization can decide *what to build*. Execution used to buffer decision-making — you had weeks or months of build time during which you could refine your thinking, course-correct, gather feedback. When build time compresses from months to days, that buffer vanishes.
 
-$$\text{Throughput} = \min(R_{\text{decision}},\; M \times R_{\text{execution}}) \qquad (20)$$
+![\text{Throughput} = \min(R_{\text{decision}},\; M \times R_{\text{execution}}) \qquad (20)](math/display-36.svg)
+<!-- $\text{Throughput} = \min(R_{\text{decision}},\; M \times R_{\text{execution}}) \qquad (20)$ -->
 
 **In plain language**: the total output of an organization is limited by whichever is slower: the speed of deciding what to build, or the speed of building it. Pre-LLM, execution was almost always the bottleneck. Post-LLM, as $M$ grows, decision-making becomes the constraint.
 
 The opportunity cost of indecision also scales with the multiplier:
 
-$$\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)$$
+![\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)](math/display-37.svg)
+<!-- $\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)$ -->
 
 **In plain language**: every hour spent debating what to build wastes $M$ times more potential output than it did before. An organization that takes two weeks to align on a feature spec is now burning five to ten times more idle execution capacity than it was pre-LLM. The companies that win won't be the ones with the best engineers or the best AI tools. They'll be the ones that can *decide what to build* fastest and with the highest accuracy. Strategic clarity becomes the binding constraint — a fundamentally different organizational capability than what most tech companies have optimized for.
 
@@ -500,7 +537,8 @@ $$\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_
 
 When the multiplier is available to everyone — when every company can subscribe to the same models, the same APIs, the same tooling — execution-based competitive advantages erode. The advantage can no longer be "we have more engineers" or "we ship faster." It reduces to something simpler and harder to buy: the difference in force between workforces.
 
-$$A = M \times (F_{\text{firm}} - F_{\text{competitor}}) \qquad (22)$$
+![A = M \times (F_{\text{firm}} - F_{\text{competitor}}) \qquad (22)](math/display-38.svg)
+<!-- $A = M \times (F_{\text{firm}} - F_{\text{competitor}}) \qquad (22)$ -->
 
 **In plain language**: when both you and your competitor have the same mirror, the only remaining competitive advantage is the difference in force between your workforces. "We have 500 engineers" stops being a moat and starts being overhead. The advantage reduces to force density — not how many people you have, but how capable they are per capita.
 
@@ -514,7 +552,8 @@ The paradox: the force multiplier devalues what it multiplies and increases the 
 
 Engineers are people, and intrinsic motivation $f_{\text{mot}}$ is a component of force in equation (1). In the Cobb-Douglas form, its decay has structural consequences — it enters as $f_{\text{mot}}^{w_{\text{mot}}}$, which pulls down the *entire* force product, not just the motivation slice:
 
-$$f_{\text{mot}}(t) = f_{\text{mot}}(0) \times e^{-\lambda \cdot A(t)} \qquad (23)$$
+![f_{\text{mot}}(t) = f_{\text{mot}}(0) \times e^{-\lambda \cdot A(t)} \qquad (23)](math/display-39.svg)
+<!-- $f_{\text{mot}}(t) = f_{\text{mot}}(0) \times e^{-\lambda \cdot A(t)} \qquad (23)$ -->
 
 Where $A(t)$ is accumulated autonomy loss. This feeds back into equation (11) through the multiplicative structure of equation (1): declining $f_{\text{mot}}$ reduces $F$, which reduces the $\gamma E F$ term, which shifts the balance toward atrophy, which further reduces $F$. The feedback is mediated by the Cobb-Douglas form.
 
@@ -530,17 +569,20 @@ Throughout the framework, $F$ and $M$ have been treated as coupled but with the 
 
 Every time a senior engineer's code review preferences train a code-review model, every time an expert's evaluation judgments become RLHF signal, every time an organization builds a retrieval system around its best practitioners' documentation — force is flowing from $F$ into $M$. The rate of this flow can be formalized:
 
-$$\frac{dM_{\text{absorbed}}}{dt} = \sum_i \eta_i \cdot f_{i,\text{high}} \cdot \tau_{\text{extract}} \qquad (26)$$
+![\frac{dM_{\text{absorbed}}}{dt} = \sum_i \eta_i \cdot f_{i,\text{high}} \cdot \tau_{\text{extract}} \qquad (26)](math/display-40.svg)
+<!-- $\frac{dM_{\text{absorbed}}}{dt} = \sum_i \eta_i \cdot f_{i,\text{high}} \cdot \tau_{\text{extract}} \qquad (26)$ -->
 
 Where $\eta_i$ is the transfer efficiency for force component $i$ — the fraction of each layer that can be encoded into model weights. This varies by layer, connecting directly to equation (1a):
 
-$$\eta_{\text{surface}} \approx 1, \qquad \eta_{\text{middle}} \approx 0.3\text{-}0.6, \qquad \eta_{\text{deep}} \approx 0 \qquad (26a)$$
+![\eta_{\text{surface}} \approx 1, \qquad \eta_{\text{middle}} \approx 0.3\text{-}0.6, \qquad \eta_{\text{deep}} \approx 0 \qquad (26a)](math/display-41.svg)
+<!-- $\eta_{\text{surface}} \approx 1, \qquad \eta_{\text{middle}} \approx 0.3\text{-}0.6, \qquad \eta_{\text{deep}} \approx 0 \qquad (26a)$ -->
 
 **In plain language**: the rate at which the model absorbs human expertise is the sum across all force layers of (how transferable that layer is) × (how much force the expert has in that layer) × (how much time is spent on extraction activities). The surface layer transfers almost completely — standard patterns, API behaviors, common failure modes. The middle layer transfers partially — the model can learn *some* evaluative patterns and preferences. The deep layer barely transfers at all — contextual judgment, the sense of when rules don't apply, taste in genuine ambiguity. This knowledge is relational and situational in ways that resist encoding.
 
 This transfer has a ceiling:
 
-$$\lim_{t \to \infty} M_{\text{absorbed}} = M_0 + \sum_i \eta_i \cdot f_{i,\text{explicit}} \qquad (27)$$
+![\lim_{t \to \infty} M_{\text{absorbed}} = M_0 + \sum_i \eta_i \cdot f_{i,\text{explicit}} \qquad (27)](math/display-42.svg)
+<!-- $\lim_{t \to \infty} M_{\text{absorbed}} = M_0 + \sum_i \eta_i \cdot f_{i,\text{explicit}} \qquad (27)$ -->
 
 **In plain language**: no matter how long the transfer runs, the model converges to a maximum that includes all the explicit, articulable knowledge of the experts — and none of the tacit residual. The model can absorb what experts can articulate. It cannot absorb what they cannot. The transfer captures what was least durable anyway (surface) and leaves behind what was most irreplaceable (deep).
 
@@ -548,7 +590,8 @@ $$\lim_{t \to \infty} M_{\text{absorbed}} = M_0 + \sum_i \eta_i \cdot f_{i,\text
 
 Equation (7a) established that high-force individuals face a paradox: needed for creation *and* evaluation. The F→M transfer introduces a third competing demand on these same scarce people — teaching the model.
 
-$$\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau_{\text{extract}} \qquad (28)$$
+![\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau_{\text{extract}} \qquad (28)](math/display-43.svg)
+<!-- $\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau_{\text{extract}} \qquad (28)$ -->
 
 **In plain language**: the total working time of a high-force individual is now split three ways: time spent building (where the multiplier on their output is highest), time spent reviewing others' LLM-augmented work (where they're the bottleneck-clearing evaluator), and time spent teaching the model (creating training data, doing RLHF evaluations, building knowledge systems). Every hour spent on one is an hour not spent on the others. Organizations now face a three-way optimization with no slack.
 
@@ -556,7 +599,8 @@ $$\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau
 
 Organizations pursuing F→M transfer often frame it as risk mitigation: "We can't have critical knowledge locked in one person's head. Let's encode it in the model." This sounds prudent. But it rests on a false equivalence between what the model captured and what the expert knew.
 
-$$K_{\text{tacit}} \neq K_{\text{model}} \qquad (29)$$
+![K_{\text{tacit}} \neq K_{\text{model}} \qquad (29)](math/display-44.svg)
+<!-- $K_{\text{tacit}} \neq K_{\text{model}} \qquad (29)$ -->
 
 **In plain language**: what's in the model is $K_{\text{explicit}}$ — the articulable, documentable portion of the expert's knowledge. What's in the tacit stock is $K_{\text{tacit}}$ — the contextual, relational, situational judgment that resists encoding. These are different knowledge *types*, not different amounts of the same type. The transfer doesn't reduce $\delta$ (the decay rate in equation 12) — it only creates the illusion that $K_{\text{tacit}}$ no longer needs active transmission. Before the transfer, the organization knew it had a bus factor problem and might have taken steps to mitigate it. After the transfer, it believes it has solved it. It has solved only the legible portion and created a false confidence that masks the tacit residual.
 
@@ -564,7 +608,8 @@ $$K_{\text{tacit}} \neq K_{\text{model}} \qquad (29)$$
 
 Here is perhaps the deepest consequence of the F→M coupling. The deeper the transfer succeeds — the more capability the model absorbs — the more it undermines the conditions for maintaining the human force it depends on. Successful transfer raises $F^*$ (equation 14) by increasing $M_{\text{absorbed}}$ in the numerator:
 
-$$F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}} \qquad (30)$$
+![F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}} \qquad (30)](math/display-45.svg)
+<!-- $F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}} \qquad (30)$ -->
 
 **In plain language**: a successful knowledge transfer to the model can *raise* the threshold below which force atrophy becomes self-reinforcing. More engineers fall below $F^*$ not because they got weaker, but because the threshold moved upward. They *were* above $F^*$ when the model was a simple amplifier. They fall below it when the model becomes a competent-seeming colleague, because the behavioral shift — less struggle, less deliberate engagement — pushes them into the atrophy basin. The *better* the transfer works, the more it undermines conditions for maintaining human force. A partially successful transfer might be *safer* than a very successful one.
 
@@ -572,7 +617,8 @@ $$F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}} \qquad (30)$$
 
 The loops close. The mirror's quality depends on what has been reflected into it — and the workforce that generates that reflection is the same workforce being degraded by the atrophy dynamics of equation (11).
 
-$$\text{Quality}(M_{t+1}) = g\!\left(\text{Quality}(M_t),\; \bar{F}_{\text{annotators}}(t)\right) \qquad (31)$$
+![\text{Quality}(M_{t+1}) = g\!\left(\text{Quality}(M_t),\; \bar{F}_{\text{annotators}}(t)\right) \qquad (31)](math/display-46.svg)
+<!-- $\text{Quality}(M_{t+1}) = g\!\left(\text{Quality}(M_t),\; \bar{F}_{\text{annotators}}(t)\right) \qquad (31)$ -->
 
 **In plain language**: the next generation of the model is only as good as the current generation plus the quality of human judgment feeding into its training pipeline. If the average force of the people generating training signal ($\bar{F}_{\text{annotators}}$) is declining — as equations (15b) and (16) predict — then model quality improvement decelerates or reverses. The mirror's fidelity degrades not because of a flaw in the training methodology, but because the *human signal* that the methodology depends on has been hollowed out.
 
@@ -584,7 +630,8 @@ This is the strongest argument for why $M(t)$ may not grow exponentially (equati
 
 Throughout this framework, $M$ has been treated as static within any given analysis. But $M$ is itself a function of time — each model generation is meaningfully more capable than the last, and this growth interacts with every dynamic the framework has identified.
 
-$$M(t) = M_0 \cdot e^{\mu t} \qquad (25)$$
+![M(t) = M_0 \cdot e^{\mu t} \qquad (25)](math/display-47.svg)
+<!-- $M(t) = M_0 \cdot e^{\mu t} \qquad (25)$ -->
 
 **In plain language**: the LLM's capability grows exponentially over time — each model generation is meaningfully more powerful than the last. The growth rate $\mu$ is subject to the data quality constraint of equation (31): if the human signal feeding training pipelines degrades, the exponent may slow or stall. But until that constraint binds, $M$ accelerates. Most dynamics are *convex* in $M$:
 
@@ -605,9 +652,11 @@ The problems compound *faster* as the technology improves. And the F→M transfe
 
 The framework has a geopolitical dimension that falls directly out of equations (3) and (1). If LLMs are multipliers and force is human capital, then a nation's return on AI investment is bounded by its existing talent base — and its continued access to the multiplier itself. Equation (3) established that the provider's training priorities reshape which skills have economic value. At the national level, this creates a dependency that most policy discussions have not yet grappled with.
 
-$$E[\text{national capability}] = \sum_{i \in \text{workforce}} F_i \times M \times P(\text{access}) \qquad (24)$$
+![E\[\text{national capability}\] = \sum_{i \in \text{workforce}} F_i \times M \times P(\text{access}) \qquad (24)](math/display-48.svg)
+<!-- $E[\text{national capability}] = \sum_{i \in \text{workforce}} F_i \times M \times P(\text{access}) \qquad (24)$ -->
 
-$$\sum_{i} F_i \times 1 \geq \text{minimum viable capability} \qquad (24a)$$
+![\sum_{i} F_i \times 1 \geq \text{minimum viable capability} \qquad (24a)](math/display-49.svg)
+<!-- $\sum_{i} F_i \times 1 \geq \text{minimum viable capability} \qquad (24a)$ -->
 
 **In plain language**: a nation's expected technical capability (equation 24) is the sum of its workforce's force, amplified by the multiplier, discounted by the probability that access to the multiplier continues. If the multiplier is provided by a foreign entity subject to sanctions or regulation, $P(\text{access}) < 1$. Equation (24a) is the sovereign resilience test: the workforce must be viable *without the multiplier*. If $F$ has atrophied while relying on a foreign $M$, the nation fails this test precisely when it matters most — when access is cut.
 
@@ -629,7 +678,8 @@ The counter-argument isn't wrong. It's incomplete. The floor-raising is immediat
 
 Across every level — individuals, teams, firms, industries, nations — the force multiplier amplifies existing capability differences and accelerates their divergence:
 
-$$\frac{d}{dt}(F_H - F_L) > 0 \quad \text{and} \quad \frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16, 16a)$$
+![\frac{d}{dt}(F_H - F_L) > 0 \quad \text{and} \quad \frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16, 16a)](math/display-50.svg)
+<!-- $\frac{d}{dt}(F_H - F_L) > 0 \quad \text{and} \quad \frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16, 16a)$ -->
 
 The cohort discontinuity adds a generational step-down. The F→M transfer adds a terminal question: does a new equilibrium emerge?
 
