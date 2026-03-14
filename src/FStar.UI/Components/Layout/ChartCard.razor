@@ -1,0 +1,47 @@
+<div class="chart-card">
+    <div class="chart-card-header">
+        <h3 class="chart-card-title">@Title</h3>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <p class="chart-card-description">@Description</p>
+        }
+    </div>
+    @if (TheoryContent is not null)
+    {
+        <div class="chart-card-tabs">
+            <button class="tab @(_activeTab == Tab.Chart ? "active" : "")"
+                    @onclick="@(() => _activeTab = Tab.Chart)">Chart</button>
+            <button class="tab @(_activeTab == Tab.Theory ? "active" : "")"
+                    @onclick="@(() => _activeTab = Tab.Theory)">Theory</button>
+        </div>
+    }
+    <div class="chart-card-content">
+        @if (_activeTab == Tab.Chart || TheoryContent is null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <div class="theory-content">
+                @TheoryContent
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private enum Tab { Chart, Theory }
+    private Tab _activeTab = Tab.Chart;
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? TheoryContent { get; set; }
+}

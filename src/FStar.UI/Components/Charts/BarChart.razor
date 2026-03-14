@@ -1,0 +1,279 @@
+@using FStar.UI.Models
+@using System.Globalization
+
+<svg class="bar-chart"
+     role="img"
+     aria-label="@GetAriaLabel()"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @RenderAxisLabels()
+
+    @if (StackedBars is not null && StackedBars.Count > 0)
+    {
+        @RenderStackedBars()
+    }
+    else if (EffectiveBars.Count > 0)
+    {
+        @RenderSimpleBars()
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public string? XLabel { get; set; }
+    [Parameter] public string? YLabel { get; set; }
+    [Parameter] public IReadOnlyList<BarItem> Bars { get; set; } = Array.Empty<BarItem>();
+    [Parameter] public BarOrientation Orientation { get; set; } = BarOrientation.Vertical;
+    [Parameter] public IReadOnlyList<BarStack>? StackedBars { get; set; }
+
+    private const int MarginTop = 20;
+    private const int MarginRight = 20;
+    private const int MarginBottom = 50;
+    private const int MarginLeft = 60;
+    private const double BarPadding = 0.2;
+
+    private int PlotAreaTop => MarginTop;
+    private int PlotAreaWidth => Width - MarginLeft - MarginRight;
+    private int PlotAreaHeight => Height - MarginTop - MarginBottom;
+
+    private IReadOnlyList<BarItem> EffectiveBars => Bars ?? Array.Empty<BarItem>();
+
+    private (double min, double max) GetValueRange()
+    {
+        double minVal = 0;
+        double maxVal = 0;
+
+        if (StackedBars is not null && StackedBars.Count > 0)
+        {
+            foreach (var stack in StackedBars)
+            {
+                double positiveSum = 0, negativeSum = 0;
+                foreach (var seg in stack.Segments)
+                {
+                    if (seg.Value >= 0) positiveSum += seg.Value;
+                    else negativeSum += seg.Value;
+                }
+                maxVal = Math.Max(maxVal, positiveSum);
+                minVal = Math.Min(minVal, negativeSum);
+            }
+        }
+        else
+        {
+            foreach (var bar in EffectiveBars)
+            {
+                maxVal = Math.Max(maxVal, bar.Value);
+                minVal = Math.Min(minVal, bar.Value);
+            }
+        }
+
+        if (Math.Abs(maxVal - minVal) < 1e-10)
+        {
+            maxVal = maxVal == 0 ? 1 : maxVal * 1.1;
+        }
+
+        return (minVal, maxVal);
+    }
+
+    private double ScaleValue(double value, double minVal, double maxVal, int axisLength)
+    {
+        double range = maxVal - minVal;
+        if (range == 0) range = 1;
+        return (value - minVal) / range * axisLength;
+    }
+
+    private string F(double v) => v.ToString("F2", CultureInfo.InvariantCulture);
+
+    private void AddTextElement(
+        Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder,
+        string x, string y, string content,
+        string textAnchor = "middle", string fontSize = "12", string fill = "var(--text-primary, #333)",
+        string? dominantBaseline = null, string? transform = null)
+    {
+        builder.OpenElement(0, "text");
+        builder.AddAttribute(1, "x", x);
+        builder.AddAttribute(2, "y", y);
+        builder.AddAttribute(3, "text-anchor", textAnchor);
+        builder.AddAttribute(4, "font-size", fontSize);
+        builder.AddAttribute(5, "fill", fill);
+        if (dominantBaseline is not null)
+            builder.AddAttribute(6, "dominant-baseline", dominantBaseline);
+        if (transform is not null)
+            builder.AddAttribute(7, "transform", transform);
+        builder.AddContent(8, content);
+        builder.CloseElement();
+    }
+
+    private RenderFragment RenderAxisLabels() => builder =>
+    {
+        if (!string.IsNullOrEmpty(YLabel))
+        {
+            var cx = F(MarginLeft / 2.0);
+            var cy = F(PlotAreaTop + PlotAreaHeight / 2.0);
+            AddTextElement(builder, cx, cy, YLabel,
+                dominantBaseline: "central",
+                transform: $"rotate(-90, {cx}, {cy})");
+        }
+
+        if (!string.IsNullOrEmpty(XLabel))
+        {
+            AddTextElement(builder,
+                F(MarginLeft + PlotAreaWidth / 2.0),
+                F(Height - 5),
+                XLabel);
+        }
+    };
+
+    private RenderFragment RenderSimpleBars() => builder =>
+    {
+        var bars = EffectiveBars;
+        int count = bars.Count;
+        if (count == 0) return;
+
+        var (minVal, maxVal) = GetValueRange();
+        double zeroOffset = ScaleValue(0, minVal, maxVal,
+            Orientation == BarOrientation.Vertical ? PlotAreaHeight : PlotAreaWidth);
+
+        if (Orientation == BarOrientation.Vertical)
+        {
+            double slotWidth = (double)PlotAreaWidth / count;
+            double barWidth = slotWidth * (1 - BarPadding);
+            double padding = slotWidth * BarPadding / 2;
+
+            for (int i = 0; i < count; i++)
+            {
+                var bar = bars[i];
+                double scaledVal = ScaleValue(bar.Value, minVal, maxVal, PlotAreaHeight);
+                double x = MarginLeft + i * slotWidth + padding;
+                double y, h;
+
+                if (bar.Value >= 0)
+                {
+                    h = scaledVal - zeroOffset;
+                    y = PlotAreaTop + PlotAreaHeight - zeroOffset - h;
+                }
+                else
+                {
+                    h = zeroOffset - scaledVal;
+                    y = PlotAreaTop + PlotAreaHeight - zeroOffset;
+                }
+
+                builder.OpenElement(0, "rect");
+                builder.AddAttribute(1, "x", F(x));
+                builder.AddAttribute(2, "y", F(y));
+                builder.AddAttribute(3, "width", F(barWidth));
+                builder.AddAttribute(4, "height", F(Math.Abs(h)));
+                builder.AddAttribute(5, "fill", bar.Color);
+                builder.CloseElement();
+
+                AddTextElement(builder,
+                    F(x + barWidth / 2), F(PlotAreaTop + PlotAreaHeight + 16),
+                    bar.Label, fontSize: "10", fill: "var(--text-muted, #666)");
+            }
+        }
+        else
+        {
+            double slotHeight = (double)PlotAreaHeight / count;
+            double barHeight = slotHeight * (1 - BarPadding);
+            double padding = slotHeight * BarPadding / 2;
+
+            for (int i = 0; i < count; i++)
+            {
+                var bar = bars[i];
+                double scaledVal = ScaleValue(bar.Value, minVal, maxVal, PlotAreaWidth);
+                double y = PlotAreaTop + i * slotHeight + padding;
+                double x, w;
+
+                if (bar.Value >= 0)
+                {
+                    w = scaledVal - zeroOffset;
+                    x = MarginLeft + zeroOffset;
+                }
+                else
+                {
+                    w = zeroOffset - scaledVal;
+                    x = MarginLeft + scaledVal;
+                }
+
+                builder.OpenElement(0, "rect");
+                builder.AddAttribute(1, "x", F(x));
+                builder.AddAttribute(2, "y", F(y));
+                builder.AddAttribute(3, "width", F(Math.Abs(w)));
+                builder.AddAttribute(4, "height", F(barHeight));
+                builder.AddAttribute(5, "fill", bar.Color);
+                builder.CloseElement();
+
+                AddTextElement(builder,
+                    F(MarginLeft - 5), F(y + barHeight / 2),
+                    bar.Label, textAnchor: "end", fontSize: "10", fill: "var(--text-muted, #666)",
+                    dominantBaseline: "central");
+            }
+        }
+    };
+
+    private RenderFragment RenderStackedBars() => builder =>
+    {
+        if (StackedBars is null || StackedBars.Count == 0) return;
+
+        int count = StackedBars.Count;
+        var (minVal, maxVal) = GetValueRange();
+
+        double slotWidth = (double)PlotAreaWidth / count;
+        double barWidth = slotWidth * (1 - BarPadding);
+        double padding = slotWidth * BarPadding / 2;
+        double zeroOffset = ScaleValue(0, minVal, maxVal, PlotAreaHeight);
+
+        for (int i = 0; i < count; i++)
+        {
+            var stack = StackedBars[i];
+            double posAccum = 0;
+            double negAccum = 0;
+
+            foreach (var seg in stack.Segments)
+            {
+                double scaledSeg = ScaleValue(Math.Abs(seg.Value), 0, maxVal - minVal, PlotAreaHeight);
+                double x = MarginLeft + i * slotWidth + padding;
+                double y, h;
+
+                if (seg.Value >= 0)
+                {
+                    double scaledAccum = ScaleValue(posAccum, 0, maxVal - minVal, PlotAreaHeight);
+                    h = scaledSeg;
+                    y = PlotAreaTop + PlotAreaHeight - zeroOffset - scaledAccum - h;
+                    posAccum += seg.Value;
+                }
+                else
+                {
+                    double scaledAccum = ScaleValue(Math.Abs(negAccum), 0, maxVal - minVal, PlotAreaHeight);
+                    h = scaledSeg;
+                    y = PlotAreaTop + PlotAreaHeight - zeroOffset + scaledAccum;
+                    negAccum += seg.Value;
+                }
+
+                builder.OpenElement(0, "rect");
+                builder.AddAttribute(1, "x", F(x));
+                builder.AddAttribute(2, "y", F(y));
+                builder.AddAttribute(3, "width", F(barWidth));
+                builder.AddAttribute(4, "height", F(h));
+                builder.AddAttribute(5, "fill", seg.Color);
+                builder.CloseElement();
+            }
+
+            AddTextElement(builder,
+                F(MarginLeft + i * slotWidth + padding + barWidth / 2),
+                F(PlotAreaTop + PlotAreaHeight + 16),
+                stack.Category, fontSize: "10", fill: "var(--text-muted, #666)");
+        }
+    };
+
+    private string GetAriaLabel()
+    {
+        var label = "Bar chart";
+        if (!string.IsNullOrEmpty(XLabel) && !string.IsNullOrEmpty(YLabel))
+            label += $": {XLabel} vs {YLabel}";
+        return label;
+    }
+}

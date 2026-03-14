@@ -1,0 +1,242 @@
+@using FStar.UI.Models
+@using Microsoft.AspNetCore.Components
+@using System.Globalization
+
+<svg class="line-chart"
+     role="img"
+     aria-label="@GetAriaLabel()"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @* Axes *@
+    <line x1="@MarginLeft" y1="@MarginTop" x2="@MarginLeft" y2="@PlotBottom"
+          stroke="var(--text-secondary, #333)" stroke-width="1" />
+    <line x1="@MarginLeft" y1="@PlotBottom" x2="@PlotRight" y2="@PlotBottom"
+          stroke="var(--text-secondary, #333)" stroke-width="1" />
+
+    @* Grid lines *@
+    @if (ShowGrid)
+    {
+        @foreach (var tick in YTicks)
+        {
+            var y = ScaleY(tick);
+            <line x1="@MarginLeft" y1="@y" x2="@PlotRight" y2="@y"
+                  stroke="var(--border-color, #e5e7eb)" stroke-width="1" stroke-dasharray="4,4" />
+        }
+        @foreach (var tick in XTicks)
+        {
+            var x = ScaleX(tick);
+            <line x1="@x" y1="@MarginTop" x2="@x" y2="@PlotBottom"
+                  stroke="var(--border-color, #e5e7eb)" stroke-width="1" stroke-dasharray="4,4" />
+        }
+    }
+
+    @* X-axis ticks and labels *@
+    @foreach (var tick in XTicks)
+    {
+        var x = ScaleX(tick);
+        <line x1="@x" y1="@PlotBottom" x2="@x" y2="@(PlotBottom + 5)"
+              stroke="var(--text-secondary, #333)" stroke-width="1" />
+        @SvgText(x, PlotBottom + 18, FormatTick(tick), "middle", 11, "var(--text-muted, #666)")
+    }
+
+    @* Y-axis ticks and labels *@
+    @foreach (var tick in YTicks)
+    {
+        var y = ScaleY(tick);
+        <line x1="@(MarginLeft - 5)" y1="@y" x2="@MarginLeft" y2="@y"
+              stroke="var(--text-secondary, #333)" stroke-width="1" />
+        @SvgText(MarginLeft - 8, y + 4, FormatTick(tick), "end", 11, "var(--text-muted, #666)")
+    }
+
+    @* Axis labels *@
+    @if (!string.IsNullOrEmpty(XLabel))
+    {
+        @SvgText((MarginLeft + PlotRight) / 2.0, Height - 4, XLabel, "middle", 13, "var(--text-primary, #333)")
+    }
+    @if (!string.IsNullOrEmpty(YLabel))
+    {
+        var cy = (MarginTop + PlotBottom) / 2.0;
+        @((MarkupString)$"<text x=\"14\" y=\"{Fmt(cy)}\" text-anchor=\"middle\" font-size=\"13\" fill=\"var(--text-primary, #333)\" transform=\"rotate(-90, 14, {Fmt(cy)})\">{System.Net.WebUtility.HtmlEncode(YLabel)}</text>")
+    }
+
+    @* Series polylines and dots *@
+    @if (Series is not null)
+    {
+        @foreach (var series in Series)
+        {
+            if (series.Points is null || series.Points.Count == 0)
+                continue;
+
+            if (series.Points.Count == 1)
+            {
+                var px = ScaleX(series.Points[0].X);
+                var py = ScaleY(series.Points[0].Y);
+                <circle cx="@px" cy="@py" r="4" fill="@series.Color" />
+            }
+            else
+            {
+                var pointsAttr = string.Join(" ",
+                    series.Points.Select(p => $"{Fmt(ScaleX(p.X))},{Fmt(ScaleY(p.Y))}"));
+
+                <polyline points="@pointsAttr"
+                          fill="none"
+                          stroke="@series.Color"
+                          stroke-width="@series.StrokeWidth.ToString(CultureInfo.InvariantCulture)" />
+
+                @if (series.ShowDots)
+                {
+                    @foreach (var pt in series.Points)
+                    {
+                        var cx = ScaleX(pt.X);
+                        var cy = ScaleY(pt.Y);
+                        <circle cx="@cx" cy="@cy" r="3" fill="@series.Color" />
+                    }
+                }
+            }
+        }
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public string? XLabel { get; set; }
+    [Parameter] public string? YLabel { get; set; }
+    [Parameter] public IReadOnlyList<ChartSeries>? Series { get; set; }
+    [Parameter] public double? XMin { get; set; }
+    [Parameter] public double? XMax { get; set; }
+    [Parameter] public double? YMin { get; set; }
+    [Parameter] public double? YMax { get; set; }
+    [Parameter] public bool ShowGrid { get; set; } = true;
+
+    private const int MarginLeft = 60;
+    private const int MarginRight = 20;
+    private const int MarginTop = 20;
+    private const int MarginBottom = 40;
+
+    private int PlotRight => Width - MarginRight;
+    private int PlotBottom => Height - MarginBottom;
+    private double PlotWidth => PlotRight - MarginLeft;
+    private double PlotHeight => PlotBottom - MarginTop;
+
+    private double DataXMin { get; set; }
+    private double DataXMax { get; set; }
+    private double DataYMin { get; set; }
+    private double DataYMax { get; set; }
+
+    private List<double> XTicks { get; set; } = new();
+    private List<double> YTicks { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        ComputeBounds();
+        ComputeTicks();
+    }
+
+    private static MarkupString SvgText(double x, double y, string content, string anchor, int fontSize, string fill)
+    {
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+        return (MarkupString)$"<text x=\"{Fmt(x)}\" y=\"{Fmt(y)}\" text-anchor=\"{anchor}\" font-size=\"{fontSize}\" fill=\"{fill}\">{encoded}</text>";
+    }
+
+    private static string Fmt(double value)
+    {
+        return value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    private void ComputeBounds()
+    {
+        var allPoints = (Series ?? Array.Empty<ChartSeries>())
+            .Where(s => s.Points is not null)
+            .SelectMany(s => s.Points)
+            .ToList();
+
+        if (allPoints.Count == 0)
+        {
+            DataXMin = XMin ?? 0;
+            DataXMax = XMax ?? 1;
+            DataYMin = YMin ?? 0;
+            DataYMax = YMax ?? 1;
+        }
+        else
+        {
+            DataXMin = XMin ?? allPoints.Min(p => p.X);
+            DataXMax = XMax ?? allPoints.Max(p => p.X);
+            DataYMin = YMin ?? allPoints.Min(p => p.Y);
+            DataYMax = YMax ?? allPoints.Max(p => p.Y);
+        }
+
+        // Handle same min/max (single point or flat line)
+        if (Math.Abs(DataXMax - DataXMin) < 1e-12)
+        {
+            DataXMin -= 1;
+            DataXMax += 1;
+        }
+
+        if (Math.Abs(DataYMax - DataYMin) < 1e-12)
+        {
+            DataYMin -= 1;
+            DataYMax += 1;
+        }
+    }
+
+    private void ComputeTicks()
+    {
+        XTicks = GenerateTicks(DataXMin, DataXMax, 5);
+        YTicks = GenerateTicks(DataYMin, DataYMax, 5);
+    }
+
+    private static List<double> GenerateTicks(double min, double max, int desiredCount)
+    {
+        var range = max - min;
+        if (range <= 0) return new List<double> { min };
+
+        var rawStep = range / desiredCount;
+        var magnitude = Math.Pow(10, Math.Floor(Math.Log10(rawStep)));
+        var normalized = rawStep / magnitude;
+
+        double step;
+        if (normalized <= 1.5) step = 1 * magnitude;
+        else if (normalized <= 3.5) step = 2 * magnitude;
+        else if (normalized <= 7.5) step = 5 * magnitude;
+        else step = 10 * magnitude;
+
+        var ticks = new List<double>();
+        var start = Math.Ceiling(min / step) * step;
+
+        for (var t = start; t <= max + step * 0.001; t += step)
+        {
+            ticks.Add(t);
+        }
+
+        return ticks;
+    }
+
+    private double ScaleX(double value)
+    {
+        var ratio = (value - DataXMin) / (DataXMax - DataXMin);
+        return MarginLeft + ratio * PlotWidth;
+    }
+
+    private double ScaleY(double value)
+    {
+        var ratio = (value - DataYMin) / (DataYMax - DataYMin);
+        return PlotBottom - ratio * PlotHeight; // SVG Y is inverted
+    }
+
+    private static string FormatTick(double value)
+    {
+        return Math.Abs(value) < 1e-10 ? "0" : value.ToString("G4", CultureInfo.InvariantCulture);
+    }
+
+    private string GetAriaLabel()
+    {
+        var label = "Line chart";
+        if (!string.IsNullOrEmpty(XLabel) && !string.IsNullOrEmpty(YLabel))
+            label += $": {XLabel} vs {YLabel}";
+        return label;
+    }
+}

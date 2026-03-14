@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+
+<div class="app-container">
+    <NavMenu />
+    <main class="main-content">
+        @Body
+    </main>
+</div>
+
+<button class="hamburger" @onclick="ToggleNav">&#9776;</button>
+<button class="theme-toggle" @onclick="ToggleTheme">@(_isDark ? "Light" : "Dark")</button>
+
+@code {
+    private bool _isDark;
+    private bool _navOpen;
+
+    private async Task ToggleTheme()
+    {
+        _isDark = !_isDark;
+        await JS.InvokeVoidAsync("setTheme", _isDark ? "dark" : "light");
+    }
+
+    private async Task ToggleNav()
+    {
+        _navOpen = !_navOpen;
+        await JS.InvokeVoidAsync("toggleSidebar", _navOpen);
+    }
+}

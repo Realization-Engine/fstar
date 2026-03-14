@@ -1,0 +1,145 @@
+@using FStar.UI.Models
+@using System.Globalization
+
+<svg class="waterfall-chart"
+     role="img"
+     aria-label="@GetAriaLabel()"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @if (Items is not null && Items.Count > 0)
+    {
+        var (minVal, maxVal) = GetValueRange();
+        var count = Items.Count;
+        var slotWidth = (double)PlotAreaWidth / count;
+        var barWidth = slotWidth * 0.7;
+        var padding = slotWidth * 0.15;
+        double runningTotal = 0;
+
+        @* Baseline line *@
+        var baselineY = ScaleValue(0, minVal, maxVal);
+        <line x1="@MarginLeft" y1="@F(baselineY)" x2="@(Width - MarginRight)" y2="@F(baselineY)"
+              stroke="var(--text-muted, #999)" stroke-width="1" stroke-dasharray="4,4" />
+
+        @for (int i = 0; i < count; i++)
+        {
+            var item = Items[i];
+            var x = MarginLeft + i * slotWidth + padding;
+            double rectY, rectHeight;
+            string fill;
+
+            if (item.IsTotal)
+            {
+                fill = "#2563eb";
+                if (runningTotal >= 0)
+                {
+                    rectY = ScaleValue(runningTotal, minVal, maxVal);
+                    rectHeight = ScaleValue(0, minVal, maxVal) - rectY;
+                }
+                else
+                {
+                    rectY = ScaleValue(0, minVal, maxVal);
+                    rectHeight = ScaleValue(runningTotal, minVal, maxVal) - rectY;
+                }
+            }
+            else
+            {
+                var prevTotal = runningTotal;
+                runningTotal += item.Value;
+
+                if (item.Value >= 0)
+                {
+                    fill = "#16a34a";
+                    rectY = ScaleValue(runningTotal, minVal, maxVal);
+                    rectHeight = ScaleValue(prevTotal, minVal, maxVal) - rectY;
+                }
+                else
+                {
+                    fill = "#dc2626";
+                    rectY = ScaleValue(prevTotal, minVal, maxVal);
+                    rectHeight = ScaleValue(runningTotal, minVal, maxVal) - rectY;
+                }
+            }
+
+            <rect x="@F(x)" y="@F(rectY)" width="@F(barWidth)" height="@F(Math.Max(rectHeight, 0.5))" fill="@fill" />
+
+            @* Label *@
+            @SvgText(item.Label, x + barWidth / 2, PlotBottom + 16, "middle", "10")
+        }
+    }
+
+    @* Y-axis label *@
+    @if (!string.IsNullOrEmpty(YLabel))
+    {
+        var cy = MarginTop + PlotAreaHeight / 2.0;
+        @((MarkupString)$"<text x=\"14\" y=\"{F(cy)}\" text-anchor=\"middle\" font-size=\"13\" fill=\"var(--text-primary, #333)\" transform=\"rotate(-90, 14, {F(cy)})\">{System.Net.WebUtility.HtmlEncode(YLabel)}</text>")
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public IReadOnlyList<WaterfallItem>? Items { get; set; }
+    [Parameter] public string? YLabel { get; set; }
+
+    private const int MarginTop = 20;
+    private const int MarginRight = 20;
+    private const int MarginBottom = 50;
+    private const int MarginLeft = 60;
+
+    private int PlotAreaWidth => Width - MarginLeft - MarginRight;
+    private int PlotAreaHeight => Height - MarginTop - MarginBottom;
+    private int PlotBottom => Height - MarginBottom;
+
+    private string F(double v) => v.ToString("F2", CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(string content, double x, double y, string anchor = "middle", string fontSize = "12")
+    {
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+        return (MarkupString)$"<text x=\"{x.ToString("F2", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("F2", CultureInfo.InvariantCulture)}\" text-anchor=\"{anchor}\" font-size=\"{fontSize}\" fill=\"var(--text-primary, #333)\">{encoded}</text>";
+    }
+
+    private (double min, double max) GetValueRange()
+    {
+        if (Items is null || Items.Count == 0) return (0, 1);
+
+        double minVal = 0, maxVal = 0, running = 0;
+        foreach (var item in Items)
+        {
+            if (!item.IsTotal)
+            {
+                running += item.Value;
+            }
+            minVal = Math.Min(minVal, running);
+            maxVal = Math.Max(maxVal, running);
+        }
+
+        if (Math.Abs(maxVal - minVal) < 1e-10)
+        {
+            maxVal = maxVal == 0 ? 1 : maxVal * 1.1;
+        }
+
+        // Add padding
+        var range = maxVal - minVal;
+        minVal -= range * 0.1;
+        maxVal += range * 0.1;
+
+        return (minVal, maxVal);
+    }
+
+    private double ScaleValue(double value, double minVal, double maxVal)
+    {
+        var ratio = (value - minVal) / (maxVal - minVal);
+        return MarginTop + PlotAreaHeight * (1 - ratio);
+    }
+
+    private string GetAriaLabel()
+    {
+        var label = "Waterfall chart";
+        if (!string.IsNullOrEmpty(YLabel))
+            label += $": {YLabel}";
+        return label;
+    }
+}

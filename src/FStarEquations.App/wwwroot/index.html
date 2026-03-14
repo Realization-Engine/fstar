@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>F* Visual Test Harness</title>
+    <base href="/" />
+    <link rel="preload" id="webassembly" />
+    <link rel="stylesheet" href="css/Site.css" />
+    <link href="FStarEquations.App.styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="lib/katex/katex.min.css">
+    <script src="lib/katex/katex.min.js"></script>
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">&#x2716;</span>
+    </div>
+    <script>
+        window.setTheme = function(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        };
+        window.toggleSidebar = function(open) {
+            var sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                if (open) sidebar.classList.add('open');
+                else sidebar.classList.remove('open');
+            }
+        };
+        window.renderKatex = function(elementId, latex, displayMode) {
+            var el = document.getElementById(elementId);
+            if (!el || typeof katex === 'undefined') return;
+            katex.render(latex, el, {
+                displayMode: displayMode,
+                throwOnError: false,
+                trust: true
+            });
+        };
+    </script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+</body>
+
+</html>

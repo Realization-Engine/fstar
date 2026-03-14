@@ -1,0 +1,270 @@
+@page "/divergence"
+
+<PageTitle>The Accelerating Gap — Eq (15a-b), (16), (16a), (32)</PageTitle>
+
+<h1>The Accelerating Gap — Eq (15a-b), (16), (16a), (32)</h1>
+
+<blockquote>
+    High-force individuals ride an accelerating curve; low-force individuals face a decelerating one. The gap between them widens at an increasing rate, and each generation starts from a lower baseline than the last. This is the mechanism behind the Great Divergence.
+</blockquote>
+
+@* ─── Cohort Force Ceiling — Eq (32) ─── *@
+<ChartCard Title="Cohort Force Ceiling — Eq (32)"
+           Description="F_init = F_max · (S_avail / S_pre)^ρ as struggle available varies.">
+    <ChildContent>
+        <LineChart Series="@_ceilingSeries"
+                   XLabel="Struggle Available (S_avail)"
+                   YLabel="Initial Force (F_init)"
+                   XMin="0" XMax="10"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F_{\text{initial}}(c) = F_{\text{max}} \cdot \left(\frac{S_{\text{available}}(c)}{S_{\text{pre-LLM}}}\right)^\rho \qquad (32)" />
+        <h4>In Plain Language</h4>
+        <p>Each successive cohort enters with a lower force ceiling, not because of individual deficiency but because the environmental conditions for building force have been structurally altered. This is different from atrophy — it's stunted development. More powerful LLMs smooth over more friction, reducing S_available. The force distribution develops a step function at the cohort boundary.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Accelerating gap Eq (15a-b)</li>
+            <li>Tacit knowledge Eq (12a)</li>
+            <li>M growing Eq (25)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Divergence Trajectories — Eq (15a-b), (16), (16a) ─── *@
+<ChartCard Title="Divergence Trajectories — Eq (15a-b)"
+           Description="Coupled integration of F_H and F_L over time, showing the widening gap.">
+    <ChildContent>
+        <LineChart Series="@_divSeries"
+                   XLabel="Time (t)"
+                   YLabel="Force (F)"
+                   XMin="0" XMax="20"
+                   YMin="0"
+                   ShowGrid="true" />
+        <div class="threshold-indicators">
+            <ThresholdIndicator Label="Gap Widening (Eq 16)" Passed="@_gapWidening" />
+            <ThresholdIndicator Label="Gap Accelerating (Eq 16a)" Passed="@_gapAccelerating" />
+        </div>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equations</h4>
+        <KatexBlock Latex="\frac{dF_H}{dt} = \alpha \cdot S_0 + \gamma \cdot M \cdot F_H \qquad (15a)" />
+        <KatexBlock Latex="\frac{dF_L}{dt} = \max\!\left(\alpha \cdot S_0 - \beta \cdot M,\; -\kappa \cdot F_L\right) \qquad (15b)" />
+        <h4>In Plain Language</h4>
+        <p>The high-force individual's growth rate includes a compounding engine (γMF_H). The low-force individual faces a drag that scales with M. The gap widens faster over time. This is the Matthew Effect in mathematical form. The max function ensures force approaches zero asymptotically (getting ever closer but never quite reaching it) rather than going negative.</p>
+        <h4>Gap Acceleration</h4>
+        <KatexBlock Latex="\frac{d}{dt}(F_H - F_L) > 0 \quad \text{and} \quad \frac{d^2}{dt^2}(F_H - F_L) > 0 \qquad (16, 16a)" />
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Barbell effect Eq (6)</li>
+            <li>Inequality accelerant</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Generational Step-Down — Eq (32) + (15a) ─── *@
+<ChartCard Title="Generational Step-Down — Eq (32) + (15a)"
+           Description="Four cohorts start from different InitialForce values (varying S_avail), then evolve via Eq 15a.">
+    <ChildContent>
+        <LineChart Series="@_genSeries"
+                   XLabel="Time (t)"
+                   YLabel="Force (F)"
+                   XMin="0" XMax="20"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>In Plain Language</h4>
+        <p>The cohort discontinuity adds a generational dimension to the accelerating gap. The between-cohort gap may be permanent because it reflects different starting conditions (Eq 32) rather than different effort levels. As the pre-LLM cohort ages out, they're replaced by members whose force ceiling is permanently lower. This interacts with tacit knowledge transmission — not only is W(t) declining (Eq 12b), but the juniors who do share work have less force to absorb what they're exposed to.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Cohort discontinuity Eq (32)</li>
+            <li>Tacit knowledge Eq (12a)</li>
+            <li>Pipeline break Eq (13)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Divergence Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (32): Cohort Force Ceiling</div>
+    <ParameterSlider Label="F_max" Min="1" Max="10" Step="0.5"
+                     Value="@_forceMax"
+                     ValueChanged="@OnForceMaxChanged" />
+    <ParameterSlider Label="S_pre (pre-existing struggle)" Min="0" Max="10" Step="0.5"
+                     Value="@_strugglePre"
+                     ValueChanged="@OnStrugglePreChanged" />
+    <ParameterSlider Label="ρ (exponent)" Min="0.1" Max="2" Step="0.1"
+                     Value="@_rho"
+                     ValueChanged="@OnRhoChanged" />
+    <div class="slider-group-header">Eq (15a-b): Divergence Trajectories</div>
+    <ParameterSlider Label="α (struggle coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_divAlpha" ValueChanged="@OnDivAlphaChanged" />
+    <ParameterSlider Label="S₀ (base struggle)" Min="0" Max="5" Step="0.1"
+                     Value="@_divStruggle0" ValueChanged="@OnDivStruggle0Changed" />
+    <ParameterSlider Label="γ (engagement rate)" Min="0" Max="1" Step="0.01"
+                     Value="@_divGamma" ValueChanged="@OnDivGammaChanged" />
+    <ParameterSlider Label="M (model quality)" Min="0.5" Max="5" Step="0.1"
+                     Value="@_divM" ValueChanged="@OnDivMChanged" />
+    <ParameterSlider Label="β (decay)" Min="0" Max="1" Step="0.01"
+                     Value="@_divBeta" ValueChanged="@OnDivBetaChanged" />
+    <ParameterSlider Label="κ (floor rate)" Min="0" Max="2" Step="0.01"
+                     Value="@_divKappa" ValueChanged="@OnDivKappaChanged" />
+    <ParameterSlider Label="dt (time step)" Min="0.01" Max="0.5" Step="0.01"
+                     Value="@_divDt" ValueChanged="@OnDivDtChanged" />
+    <div class="slider-group-header">Eq (32) + (15a): Generational Step-Down</div>
+    <ParameterSlider Label="F_max (gen)" Min="1" Max="10" Step="0.5"
+                     Value="@_genForceMax" ValueChanged="@OnGenForceMaxChanged" />
+    <ParameterSlider Label="S_pre (gen)" Min="0.1" Max="10" Step="0.1"
+                     Value="@_genStrugglePre" ValueChanged="@OnGenStrugglePreChanged" />
+    <ParameterSlider Label="ρ (gen exponent)" Min="0.1" Max="2" Step="0.1"
+                     Value="@_genRho" ValueChanged="@OnGenRhoChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // ─── Cohort Force Ceiling (Eq 32) ───
+    private double _forceMax = 8.0;
+    private double _strugglePre = 5.0;
+    private double _rho = 1.0;
+    private IReadOnlyList<ChartSeries> _ceilingSeries = Array.Empty<ChartSeries>();
+
+    // ─── Divergence Trajectories (Eq 15a-b, 16, 16a) ───
+    private double _divAlpha = 0.3;
+    private double _divStruggle0 = 2.0;
+    private double _divGamma = 0.2;
+    private double _divM = 2.0;
+    private double _divBeta = 0.3;
+    private double _divKappa = 0.5;
+    private double _divDt = 0.1;
+    private IReadOnlyList<ChartSeries> _divSeries = Array.Empty<ChartSeries>();
+    private bool _gapWidening;
+    private bool _gapAccelerating;
+
+    // ─── Generational Step-Down (Eq 32 + 15a) ───
+    private double _genForceMax = 8.0;
+    private double _genStrugglePre = 5.0;
+    private double _genRho = 1.0;
+    private IReadOnlyList<ChartSeries> _genSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        RecalcCeiling();
+        RecalcDivergence();
+        RecalcGenerational();
+    }
+
+    // ─── Cohort Force Ceiling ───
+    private void RecalcCeiling()
+    {
+        var points = new List<DataPoint>();
+        for (double sAvail = 0.1; sAvail <= 10.0; sAvail += 0.1)
+        {
+            points.Add(new DataPoint(sAvail, DivergenceTrajectories.InitialForce(_forceMax, sAvail, _strugglePre, _rho)));
+        }
+
+        _ceilingSeries = new List<ChartSeries>
+        {
+            new("F_init — Eq (32)", points, "#2563eb", 2.0)
+        };
+    }
+
+    private void OnForceMaxChanged(double val) { _forceMax = val; RecalcCeiling(); }
+    private void OnStrugglePreChanged(double val) { _strugglePre = val; RecalcCeiling(); }
+    private void OnRhoChanged(double val) { _rho = val; RecalcCeiling(); }
+
+    // ─── Divergence Trajectories ───
+    private void RecalcDivergence()
+    {
+        double[] y0 = { 8.0, 3.0 };
+        double tStart = 0.0, tEnd = 20.0;
+
+        double[][] result = Integration.ForwardEulerSystem(y0, tStart, tEnd, _divDt,
+            (t, y) => new[]
+            {
+                DivergenceTrajectories.DfHighDt(_divAlpha, _divStruggle0, _divGamma, _divM, y[0]),
+                DivergenceTrajectories.DfLowDt(_divAlpha, _divStruggle0, _divBeta, _divM, _divKappa, y[1])
+            });
+
+        int steps = result[0].Length;
+        var highPts = new List<DataPoint>(steps);
+        var lowPts = new List<DataPoint>(steps);
+        var gapPts = new List<DataPoint>(steps);
+
+        for (int i = 0; i < steps; i++)
+        {
+            double time = tStart + i * _divDt;
+            highPts.Add(new DataPoint(time, result[0][i]));
+            lowPts.Add(new DataPoint(time, result[1][i]));
+            gapPts.Add(new DataPoint(time, result[0][i] - result[1][i]));
+        }
+
+        _divSeries = new List<ChartSeries>
+        {
+            new("F_H (high) — Eq (15a)", highPts, "#2563eb", 2.0),
+            new("F_L (low) — Eq (15b)", lowPts, "#dc2626", 2.0),
+            new("Gap (F_H − F_L)", gapPts, "#9333ea", 1.5)
+        };
+
+        // Threshold indicators at final time step
+        int last = steps - 1;
+        int prev = Math.Max(0, last - 1);
+
+        double dfHighFinal = DivergenceTrajectories.DfHighDt(_divAlpha, _divStruggle0, _divGamma, _divM, result[0][last]);
+        double dfLowFinal = DivergenceTrajectories.DfLowDt(_divAlpha, _divStruggle0, _divBeta, _divM, _divKappa, result[1][last]);
+        _gapWidening = DivergenceTrajectories.IsGapWidening(dfHighFinal, dfLowFinal);
+
+        // Approximate second derivatives using finite differences
+        double dfHighPrev = DivergenceTrajectories.DfHighDt(_divAlpha, _divStruggle0, _divGamma, _divM, result[0][prev]);
+        double dfLowPrev = DivergenceTrajectories.DfLowDt(_divAlpha, _divStruggle0, _divBeta, _divM, _divKappa, result[1][prev]);
+        double d2HighDt2 = (dfHighFinal - dfHighPrev) / _divDt;
+        double d2LowDt2 = (dfLowFinal - dfLowPrev) / _divDt;
+        _gapAccelerating = DivergenceTrajectories.IsGapAccelerating(d2HighDt2, d2LowDt2);
+    }
+
+    private void OnDivAlphaChanged(double v) { _divAlpha = v; RecalcDivergence(); }
+    private void OnDivStruggle0Changed(double v) { _divStruggle0 = v; RecalcDivergence(); }
+    private void OnDivGammaChanged(double v) { _divGamma = v; RecalcDivergence(); }
+    private void OnDivMChanged(double v) { _divM = v; RecalcDivergence(); }
+    private void OnDivBetaChanged(double v) { _divBeta = v; RecalcDivergence(); }
+    private void OnDivKappaChanged(double v) { _divKappa = v; RecalcDivergence(); }
+    private void OnDivDtChanged(double v) { _divDt = v; RecalcDivergence(); }
+
+    // ─── Generational Step-Down ───
+    private void RecalcGenerational()
+    {
+        // Use the same divergence params for the trajectory integration (alpha, struggle0, gamma, m)
+        double alpha = _divAlpha;
+        double struggle0 = _divStruggle0;
+        double gamma = _divGamma;
+        double m = _divM;
+
+        double[] sAvailValues = { 2.0, 4.0, 6.0, 8.0 };
+        string[] colors = { "#dc2626", "#f59e0b", "#10b981", "#2563eb" };
+        double tStart = 0.0, tEnd = 20.0, dt = 0.1;
+
+        var series = new List<ChartSeries>();
+
+        for (int g = 0; g < sAvailValues.Length; g++)
+        {
+            double fInit = DivergenceTrajectories.InitialForce(_genForceMax, sAvailValues[g], _genStrugglePre, _genRho);
+            double[] trajectory = Integration.ForwardEuler(fInit, tStart, tEnd, dt,
+                (t, f) => DivergenceTrajectories.DfHighDt(alpha, struggle0, gamma, m, f));
+
+            var pts = new List<DataPoint>(trajectory.Length);
+            for (int i = 0; i < trajectory.Length; i++)
+            {
+                pts.Add(new DataPoint(tStart + i * dt, trajectory[i]));
+            }
+
+            series.Add(new ChartSeries($"S_avail={sAvailValues[g]:F0} (F₀={fInit:F1})", pts, colors[g], 2.0));
+        }
+
+        _genSeries = series;
+    }
+
+    private void OnGenForceMaxChanged(double v) { _genForceMax = v; RecalcGenerational(); }
+    private void OnGenStrugglePreChanged(double v) { _genStrugglePre = v; RecalcGenerational(); }
+    private void OnGenRhoChanged(double v) { _genRho = v; RecalcGenerational(); }
+}

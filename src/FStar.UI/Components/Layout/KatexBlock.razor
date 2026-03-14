@@ -1,0 +1,34 @@
+@inject IJSRuntime JS
+
+<span id="@_id" class="@CssClass"></span>
+
+@code {
+    private string _id = $"katex-{Guid.NewGuid():N}";
+    private string? _previousLatex;
+
+    [Parameter, EditorRequired]
+    public string Latex { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool DisplayMode { get; set; } = true;
+
+    private string CssClass => DisplayMode ? "katex-display-block" : "katex-inline-block";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("renderKatex", _id, Latex, DisplayMode);
+            _previousLatex = Latex;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_previousLatex is not null && _previousLatex != Latex)
+        {
+            await JS.InvokeVoidAsync("renderKatex", _id, Latex, DisplayMode);
+            _previousLatex = Latex;
+        }
+    }
+}

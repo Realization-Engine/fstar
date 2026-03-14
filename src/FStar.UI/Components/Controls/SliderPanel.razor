@@ -1,0 +1,24 @@
+<div class="slider-panel">
+    <button class="slider-panel-header" @onclick="ToggleCollapsed">
+        <span class="slider-panel-toggle">@(IsCollapsed ? "+" : "−")</span>
+        <span class="slider-panel-title">Parameters</span>
+    </button>
+    @if (!IsCollapsed)
+    {
+        <div class="slider-panel-content">
+            @ChildContent
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool IsCollapsed { get; set; }
+    [Parameter] public EventCallback<bool> IsCollapsedChanged { get; set; }
+
+    private async Task ToggleCollapsed()
+    {
+        IsCollapsed = !IsCollapsed;
+        await IsCollapsedChanged.InvokeAsync(IsCollapsed);
+    }
+}

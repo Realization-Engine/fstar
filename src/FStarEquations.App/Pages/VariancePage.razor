@@ -1,0 +1,314 @@
+@page "/variance"
+
+<PageTitle>The Variance Amplifier / Barbell Effect — Eq (4), (4a), (5), (6)</PageTitle>
+
+<h1>The Variance Amplifier / Barbell Effect — Eq (4), (4a), (5), (6)</h1>
+
+<blockquote>
+    The multiplier does not just scale the mean — it scales the spread. When M is large, small differences in force between individuals become vast differences in output. This is the mechanism behind the barbell distribution of market value.
+</blockquote>
+
+<!-- Chart 1: Variance Curve -->
+<ChartCard Title="Variance Curve" Description="Eq (4) Var(O) = M² · Var(F) and Eq (4a) lower bound as M varies.">
+    <ChildContent>
+        <LineChart Series="@_varianceSeries"
+                   XLabel="Multiplier (M)"
+                   YLabel="Var(O)"
+                   XMin="0.5" XMax="5"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{Var}(O) = M^2 \times \text{Var}(F) \qquad (4)" />
+        <h4>In Plain Language</h4>
+        <p>The variance in output between your best and worst people grows as the square of the multiplier's power. A pre-existing 3x gap becomes a 9x gap at M=3 and a 15x gap at M=5. This is the opposite of what most organizations expect — the implicit assumption behind "give everyone Copilot" is that AI is a leveler. These equations say it's a divergence engine.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Lower bound → <strong>Eq (4a)</strong></li>
+            <li>Output gap → <strong>Eq (5)</strong></li>
+            <li>Barbell effect → <strong>Eq (6)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Chart 2: Output Gap -->
+<ChartCard Title="Output Gap" Description="Eq (5) ΔO = M · (F_H − F_L) as M varies.">
+    <ChildContent>
+        <LineChart Series="@_gapSeries"
+                   XLabel="Multiplier (M)"
+                   YLabel="|ΔO|"
+                   XMin="0.5" XMax="5"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\Delta O = M \times (F_{\text{high}} - F_{\text{low}}) \qquad (5)" />
+        <h4>In Plain Language</h4>
+        <p>The absolute output gap between a strong and weak engineer scales linearly with the multiplier. Combined with Eq (4), this means both relative and absolute differences widen.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Variance → <strong>Eq (4)</strong></li>
+            <li>Diverging trajectories → <strong>Eq (15a-b)</strong></li>
+            <li>Accelerating gap → <strong>Eq (16)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Chart 3: Market Value Piecewise -->
+<ChartCard Title="Market Value Piecewise" Description="Eq (6) Piecewise market value as force varies.">
+    <ChildContent>
+        <LineChart Series="@_marketSeries"
+                   XLabel="Force (F)"
+                   YLabel="Market Value"
+                   XMin="0" XMax="10"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="V(F) \to \begin{cases} V_{\text{high}} \cdot F &amp; \text{if } F > F_{\text{threshold}} \\ V_{\text{new}} &amp; \text{if orchestration skill is high} \\ \varepsilon &amp; \text{if } F \in [F_{\text{low}}, F_{\text{threshold}}] \end{cases} \qquad (6)" />
+        <h4>In Plain Language</h4>
+        <p>The market splits into three tiers. At the top, judgment and taste gain premium. At the bottom, a new kind of value emerges in LLM orchestration. In the middle, competent-but-undistinguished execution is commoditized. The skills being commoditized are precisely the shortest-half-life components — the surface layer where M_eff is highest.</p>
+        <h4>The Mirror</h4>
+        <p>Photography didn't eliminate painters — it eliminated portrait painters while increasing the premium on artistic vision. Automation destroys the middle by commoditizing execution while increasing the premium on the judgment layer above it.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Layer hierarchy → <strong>Eq (1a)</strong></li>
+            <li>Variance amplification → <strong>Eq (4)</strong></li>
+            <li>Talent concentration</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Composite 1: Output Gap Divergence (Eq 4 + 4a + 5) -->
+<ChartCard Title="Output Gap Divergence" Description="Composite: Eq (4) Var(O), Eq (4a) Lower Bound, and Eq (5) |ΔO| as M varies.">
+    <ChildContent>
+        <LineChart Series="@_divergenceCompositeSeries"
+                   XLabel="Multiplier (M)"
+                   YLabel="Value"
+                   XMin="0.5" XMax="5"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{Var}(O) > M^2 \times \text{Var}(F) \qquad (4a)" />
+        <h4>In Plain Language</h4>
+        <p>Equation (4) actually understates the problem. High-force engineers extract more from the tool — they place sharp, well-formed questions before the mirror and get sharp reflections back. Their effective M is higher. If M correlates positively with F, the true output variance is even larger than M² would predict.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Base model → <strong>Eq (1)</strong></li>
+            <li>Accelerating gap → <strong>Eq (16)</strong></li>
+            <li>ROI paradox → <strong>Eq (17)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Composite 2: Barbell + Variance (Eq 4 + 5 + 6) -->
+<ChartCard Title="Barbell + Variance" Description="Composite: Eq (6) Market Value and M·Force barbell amplification as force varies.">
+    <ChildContent>
+        <LineChart Series="@_barbellCompositeSeries"
+                   XLabel="Force (F)"
+                   YLabel="Value"
+                   XMin="0" XMax="10"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>In Plain Language</h4>
+        <p>The variance amplification (Eq 4) produces the barbell distribution (Eq 6). The durability gradient from Eq (1a) determines which skills are commoditized (surface) and which gain premium (deep). The middle hollows out as M grows.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Layer hierarchy → <strong>Eq (1a)</strong></li>
+            <li>Competitive moats → <strong>Eq (22)</strong></li>
+            <li>Cohort discontinuity → <strong>Eq (32)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Variance Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (4): Variance Curve</div>
+    <ParameterSlider Label="Var(F)" Min="0.1" Max="10" Step="0.1"
+                     Value="@_varianceF"
+                     ValueChanged="@OnVarianceFChanged" />
+    <div class="slider-group-header">Eq (5): Output Gap</div>
+    <ParameterSlider Label="Force High" Min="1" Max="20" Step="0.5"
+                     Value="@_forceHigh"
+                     ValueChanged="@OnForceHighChanged" />
+    <ParameterSlider Label="Force Low" Min="0" Max="10" Step="0.5"
+                     Value="@_forceLow"
+                     ValueChanged="@OnForceLowChanged" />
+    <div class="slider-group-header">Eq (6): Market Value</div>
+    <ParameterSlider Label="Threshold Low" Min="0" Max="5" Step="0.1"
+                     Value="@_thresholdLow"
+                     ValueChanged="@OnThresholdLowChanged" />
+    <ParameterSlider Label="Threshold High" Min="5" Max="10" Step="0.1"
+                     Value="@_thresholdHigh"
+                     ValueChanged="@OnThresholdHighChanged" />
+    <ParameterSlider Label="Premium High" Min="1" Max="100" Step="1"
+                     Value="@_premiumHigh"
+                     ValueChanged="@OnPremiumHighChanged" />
+    <ParameterSlider Label="Wage Mid" Min="1" Max="50" Step="1"
+                     Value="@_wageMid"
+                     ValueChanged="@OnWageMidChanged" />
+    <ParameterSlider Label="Floor Low" Min="0" Max="20" Step="1"
+                     Value="@_floorLow"
+                     ValueChanged="@OnFloorLowChanged" />
+    <div class="slider-group-header">Eq (4)+(4a)+(5): Output Gap Divergence</div>
+    <ParameterSlider Label="Var(F) (Composite)" Min="0.1" Max="10" Step="0.1"
+                     Value="@_compVarianceF"
+                     ValueChanged="@OnCompVarianceFChanged" />
+    <ParameterSlider Label="Force High (Composite)" Min="1" Max="20" Step="0.5"
+                     Value="@_compForceHigh"
+                     ValueChanged="@OnCompForceHighChanged" />
+    <ParameterSlider Label="Force Low (Composite)" Min="0" Max="10" Step="0.5"
+                     Value="@_compForceLow"
+                     ValueChanged="@OnCompForceLowChanged" />
+    <div class="slider-group-header">Eq (4)+(5)+(6): Barbell + Variance</div>
+    <ParameterSlider Label="M" Min="0.5" Max="5" Step="0.1"
+                     Value="@_barbellM"
+                     ValueChanged="@OnBarbellMChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // Variance Curve parameters
+    private double _varianceF = 2.0;
+
+    // Output Gap parameters
+    private double _forceHigh = 8.0;
+    private double _forceLow = 3.0;
+
+    // Market Value parameters
+    private double _thresholdLow = 2.0;
+    private double _thresholdHigh = 7.0;
+    private double _premiumHigh = 50.0;
+    private double _wageMid = 25.0;
+    private double _floorLow = 10.0;
+
+    // Composite 1: Output Gap Divergence parameters
+    private double _compVarianceF = 2.0;
+    private double _compForceHigh = 8.0;
+    private double _compForceLow = 3.0;
+
+    // Composite 2: Barbell + Variance parameters
+    private double _barbellM = 2.0;
+
+    // Computed series
+    private IReadOnlyList<ChartSeries> _varianceSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _gapSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _marketSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _divergenceCompositeSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _barbellCompositeSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        RecalcVariance();
+        RecalcGap();
+        RecalcMarket();
+        RecalcDivergenceComposite();
+        RecalcBarbellComposite();
+    }
+
+    private void RecalcVariance()
+    {
+        var variancePoints = new List<DataPoint>();
+        var lowerBoundPoints = new List<DataPoint>();
+
+        for (double m = 0.5; m <= 5.0; m += 0.1)
+        {
+            variancePoints.Add(new DataPoint(m, VarianceAmplification.OutputVariance(m, _varianceF)));
+            lowerBoundPoints.Add(new DataPoint(m, VarianceAmplification.OutputVarianceLowerBound(m, _varianceF)));
+        }
+
+        _varianceSeries = new List<ChartSeries>
+        {
+            new("Var(O) — Eq (4)", variancePoints, "#2563eb", 2.0),
+            new("Lower Bound — Eq (4a)", lowerBoundPoints, "#dc2626", 2.0)
+        };
+    }
+
+    private void RecalcGap()
+    {
+        var gapPoints = new List<DataPoint>();
+
+        for (double m = 0.5; m <= 5.0; m += 0.1)
+        {
+            gapPoints.Add(new DataPoint(m, VarianceAmplification.AbsoluteOutputGap(m, _forceHigh, _forceLow)));
+        }
+
+        _gapSeries = new List<ChartSeries>
+        {
+            new("ΔO — Eq (5)", gapPoints, "#2563eb", 2.0)
+        };
+    }
+
+    private void RecalcMarket()
+    {
+        var marketPoints = new List<DataPoint>();
+
+        for (double f = 0.0; f <= 10.0; f += 0.05)
+        {
+            marketPoints.Add(new DataPoint(f, VarianceAmplification.MarketValue(f, _thresholdLow, _thresholdHigh, _premiumHigh, _wageMid, _floorLow)));
+        }
+
+        _marketSeries = new List<ChartSeries>
+        {
+            new("Market Value — Eq (6)", marketPoints, "#2563eb", 2.0)
+        };
+    }
+
+    private void RecalcDivergenceComposite()
+    {
+        var varPoints = new List<DataPoint>();
+        var lbPoints = new List<DataPoint>();
+        var gapPoints = new List<DataPoint>();
+
+        for (double m = 0.5; m <= 5.0; m += 0.1)
+        {
+            varPoints.Add(new DataPoint(m, VarianceAmplification.OutputVariance(m, _compVarianceF)));
+            lbPoints.Add(new DataPoint(m, VarianceAmplification.OutputVarianceLowerBound(m, _compVarianceF)));
+            gapPoints.Add(new DataPoint(m, VarianceAmplification.AbsoluteOutputGap(m, _compForceHigh, _compForceLow)));
+        }
+
+        _divergenceCompositeSeries = new List<ChartSeries>
+        {
+            new("Var(O) — Eq (4)", varPoints, "#2563eb", 2.0),
+            new("Lower Bound — Eq (4a)", lbPoints, "#dc2626", 2.0),
+            new("|ΔO| — Eq (5)", gapPoints, "#16a34a", 2.0)
+        };
+    }
+
+    private void RecalcBarbellComposite()
+    {
+        var marketPoints = new List<DataPoint>();
+        var barbellPoints = new List<DataPoint>();
+
+        for (double f = 0.0; f <= 10.0; f += 0.05)
+        {
+            marketPoints.Add(new DataPoint(f, VarianceAmplification.MarketValue(f, _thresholdLow, _thresholdHigh, _premiumHigh, _wageMid, _floorLow)));
+            barbellPoints.Add(new DataPoint(f, _barbellM * f));
+        }
+
+        _barbellCompositeSeries = new List<ChartSeries>
+        {
+            new("Market Value — Eq (6)", marketPoints, "#2563eb", 2.0),
+            new("M · F (Barbell)", barbellPoints, "#f59e0b", 2.0)
+        };
+    }
+
+    private void OnCompVarianceFChanged(double val) { _compVarianceF = val; RecalcDivergenceComposite(); }
+    private void OnCompForceHighChanged(double val) { _compForceHigh = val; RecalcDivergenceComposite(); }
+    private void OnCompForceLowChanged(double val) { _compForceLow = val; RecalcDivergenceComposite(); }
+    private void OnBarbellMChanged(double val) { _barbellM = val; RecalcBarbellComposite(); }
+
+    private void OnVarianceFChanged(double val) { _varianceF = val; RecalcVariance(); }
+    private void OnForceHighChanged(double val) { _forceHigh = val; RecalcGap(); }
+    private void OnForceLowChanged(double val) { _forceLow = val; RecalcGap(); }
+    private void OnThresholdLowChanged(double val) { _thresholdLow = val; RecalcMarket(); }
+    private void OnThresholdHighChanged(double val) { _thresholdHigh = val; RecalcMarket(); }
+    private void OnPremiumHighChanged(double val) { _premiumHigh = val; RecalcMarket(); }
+    private void OnWageMidChanged(double val) { _wageMid = val; RecalcMarket(); }
+    private void OnFloorLowChanged(double val) { _floorLow = val; RecalcMarket(); }
+}

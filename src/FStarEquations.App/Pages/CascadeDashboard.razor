@@ -1,0 +1,322 @@
+@page "/cascade"
+
+<PageTitle>The Cascade — Feedback Loops</PageTitle>
+
+<h1>The Cascade — Feedback Loops</h1>
+<p>Interactive flow diagram showing how 12 equations feed into each other in a continuous feedback loop.
+   Adjust the global parameters to see how values propagate through the cascade.</p>
+
+<ChartCard Title="Cascade Flow — Reinforcing Feedback Loops">
+    <ChildContent>
+    <svg viewBox="0 0 1000 720" width="100%" class="cascade-svg"
+         xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="var(--text-muted, #888)" />
+            </marker>
+        </defs>
+
+        @* ─── Edges (drawn first so nodes overlay them) ─── *@
+        @foreach (var edge in _edges)
+        {
+            <path d="@edge.Path" stroke="var(--border-color, #555)" stroke-width="1.5" fill="none"
+                  marker-end="url(#arrowhead)" />
+            @SvgText(edge.Label, edge.LabelX, edge.LabelY, fontSize: "10")
+        }
+
+        @* ─── Nodes ─── *@
+        @foreach (var node in _nodes)
+        {
+            <a href="@node.Href">
+                <rect x="@Inv(node.X)" y="@Inv(node.Y)" width="@Inv(NodeW)" height="@Inv(NodeH)"
+                      rx="8" fill="var(--bg-card, #1e1e2e)" stroke="@node.Color" stroke-width="2" />
+                @SvgText(node.Label, node.CX, node.Y + 20, fontSize: "11")
+                @SvgText(node.Description, node.CX, node.Y + 34, fontSize: "9")
+                @SvgText(node.Value.ToString("F2"), node.CX, node.Y + 50, fontSize: "14")
+            </a>
+        }
+    </svg>
+    </ChildContent>
+    <TheoryContent>
+        <h4>The Cascade</h4>
+        <p>The preceding equations form a system of seven reinforcing feedback loops. Loop 1: Atrophy → Epistemic corruption → Undetected damage. Loop 2: Epistemic corruption → Evaluation bottleneck → Organizational risk. Loop 3: Organizational efficiency → Tacit knowledge decay → Force supply collapse. Loop 4: Force decay → Motivation decay → Force decay. Loop 5: Variance amplification → Barbell → Talent concentration → Evaluation bottleneck. Loop 6: F→M transfer → De-investment → Training signal degradation → M stagnation. Loop 7: Cohort discontinuity → Reduced absorption → Accelerated pipeline collapse. Multiple positive feedback mechanisms, few natural brakes. These loops interact — the system is not a collection of separate problems but a connected cascade.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>All equation families → <strong>Eq (1)-(32)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Cascade Parameters" DefaultY="100">
+    <div class="slider-group-header">Model & Force</div>
+    <ParameterSlider Label="M (multiplier)" Min="1" Max="10" Step="0.1"
+                     Value="@_m" ValueChanged="@OnMChanged" />
+    <ParameterSlider Label="F (force)" Min="0.1" Max="10" Step="0.1"
+                     Value="@_force" ValueChanged="@OnForceChanged" />
+    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1"
+                     Value="@_engagement" ValueChanged="@OnEngagementChanged" />
+    <div class="slider-group-header">Knowledge & Decay</div>
+    <ParameterSlider Label="R (replacement)" Min="0.1" Max="5" Step="0.1"
+                     Value="@_replacement" ValueChanged="@OnReplacementChanged" />
+    <ParameterSlider Label="S (struggle)" Min="0.1" Max="5" Step="0.1"
+                     Value="@_struggle" ValueChanged="@OnStruggleChanged" />
+    <ParameterSlider Label="K (knowledge)" Min="0.1" Max="10" Step="0.1"
+                     Value="@_knowledge" ValueChanged="@OnKnowledgeChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // ─── Global parameters ───
+    private double _m = 3.0;
+    private double _force = 5.0;
+    private double _engagement = 1.5;
+    private double _replacement = 2.0;
+    private double _struggle = 2.5;
+    private double _knowledge = 5.0;
+
+    // ─── Derived constants ───
+    private const double Alpha = 0.3;
+    private const double Beta = 0.3;
+    private const double Gamma = 0.2;
+    private const double Sigma = 0.5;
+    private const double Delta = 0.1;
+    private const double Lambda = 0.3;
+    private const double Rho = 0.8;
+    private const double Phi = 0.5;
+    private const double ThresholdLow = 3.0;
+    private const double ThresholdHigh = 7.0;
+    private const double PremiumHigh = 10.0;
+    private const double WageMid = 30.0;
+    private const double FloorLow = 15.0;
+    private const double BudgetEval = 100.0;
+    private const double CostEval = 20.0;
+    private const double TauExtract = 0.5;
+
+    // ─── Computed values for each node ───
+    private double _valEq1;
+    private double _valEq4;
+    private double _valEq6;
+    private double _valEq7;
+    private double _valEq10;
+    private double _valEq11;
+    private double _valEq12;
+    private double _valEq14;
+    private double _valEq23;
+    private double _valEq26;
+    private double _valEq31;
+    private double _valEq32;
+
+    // ─── Node layout ───
+    private const double NodeW = 130;
+    private const double NodeH = 60;
+
+    private record NodeInfo(double X, double Y, string Label, string Description, double Value, string Href, string Color)
+    {
+        public double CX => X + NodeW / 2.0;
+    }
+
+    private record EdgeInfo(string Path, string Label, double LabelX, double LabelY);
+
+    private NodeInfo[] _nodes = System.Array.Empty<NodeInfo>();
+    private EdgeInfo[] _edges = System.Array.Empty<EdgeInfo>();
+
+    // Node positions: arranged in a clockwise elliptical loop
+    private static readonly (double X, double Y)[] Positions = new[]
+    {
+        (100.0, 20.0),   // 0: Eq 1  - Base Model (top-left)
+        (300.0, 20.0),   // 1: Eq 4  - Variance (top)
+        (520.0, 20.0),   // 2: Eq 6  - Market Value (top-right)
+        (740.0, 20.0),   // 3: Eq 7  - Creation/Eval (top-right)
+        (830.0, 175.0),  // 4: Eq 10 - Epistemic Gap (right)
+        (830.0, 330.0),  // 5: Eq 11 - Force Dynamics (right)
+        (740.0, 485.0),  // 6: Eq 12 - Tacit Knowledge (bottom-right)
+        (520.0, 485.0),  // 7: Eq 14 - Tipping Point (bottom)
+        (300.0, 485.0),  // 8: Eq 23 - Motivation (bottom)
+        (80.0, 485.0),   // 9: Eq 26 - Transfer (bottom-left)
+        (20.0, 330.0),   // 10: Eq 31 - Quality (left)
+        (20.0, 175.0),   // 11: Eq 32 - Initial Force (left)
+    };
+
+    protected override void OnInitialized()
+    {
+        Recalculate();
+    }
+
+    private void Recalculate()
+    {
+        // Eq 1: O = M * product(fi^wi)
+        _valEq1 = BaseModel.ComputeOutput(_m, new[] { _force }, new[] { 1.0 });
+
+        // Eq 4: Var(O) = M^2 * Var(F)
+        double varianceF = _force * 0.1; // rough proxy
+        _valEq4 = VarianceAmplification.OutputVariance(_m, varianceF);
+
+        // Eq 6: Market Value
+        _valEq6 = VarianceAmplification.MarketValue(_force, ThresholdLow, ThresholdHigh, PremiumHigh, WageMid, FloorLow);
+
+        // Eq 7: Throughput
+        _valEq7 = CreationEvaluation.EvaluationThroughput(BudgetEval, CostEval);
+
+        // Eq 10: Epistemic Gap
+        double mPresentation = _m * 1.2;
+        double mSubstance = _m;
+        _valEq10 = NegativeForce.EpistemicGap(mPresentation, mSubstance, _force);
+
+        // Eq 11: dF/dt
+        double mAbsorbed = _m * 0.5;
+        _valEq11 = ForceDynamics.DfDt(Alpha, _struggle, Gamma, _engagement, _force, Beta, _replacement, Sigma, mAbsorbed);
+
+        // Eq 12: K(t+1)
+        double transmission = Phi * _struggle * _force * 0.5;
+        _valEq12 = TacitKnowledge.KnowledgeStockNext(_knowledge, Delta, transmission);
+
+        // Eq 14: Tipping Point
+        _valEq14 = (_engagement > 0 && Gamma > 0)
+            ? ForceDynamics.TippingPoint(Beta, _replacement, Sigma, mAbsorbed, Gamma, _engagement)
+            : 0;
+
+        // Eq 23: Motivation Decay
+        double accumulatedLoss = Math.Max(0, _valEq14 - _force);
+        _valEq23 = Motivation.MotivationDecay(_force, Lambda, accumulatedLoss);
+
+        // Eq 26: Transfer Rate
+        _valEq26 = ForceToModelTransfer.TransferRate(new[] { 0.9, 0.4 }, new[] { _force, _force * 0.7 }, TauExtract);
+
+        // Eq 31: Model Quality Next
+        _valEq31 = ForceToModelTransfer.ModelQualityNext(_m, _force, (q, f) => q + 0.1 * f);
+
+        // Eq 32: Initial Force
+        double strugglePre = Math.Max(_struggle * 0.5, 0.01);
+        _valEq32 = DivergenceTrajectories.InitialForce(_force * 2.0, _struggle, strugglePre, Rho);
+
+        BuildNodes();
+        BuildEdges();
+    }
+
+    private void BuildNodes()
+    {
+        _nodes = new NodeInfo[]
+        {
+            new(Positions[0].X, Positions[0].Y,  "Eq (1)",  "Base Output",     _valEq1,  "base-model",          "#2563eb"),
+            new(Positions[1].X, Positions[1].Y,  "Eq (4)",  "Variance",        _valEq4,  "variance",            "#7c3aed"),
+            new(Positions[2].X, Positions[2].Y,  "Eq (6)",  "Market Value",    _valEq6,  "variance",            "#0891b2"),
+            new(Positions[3].X, Positions[3].Y,  "Eq (7)",  "Eval Throughput", _valEq7,  "creation-evaluation", "#059669"),
+            new(Positions[4].X, Positions[4].Y,  "Eq (10)", "Epistemic Gap",   _valEq10, "negative-force",      "#d97706"),
+            new(Positions[5].X, Positions[5].Y,  "Eq (11)", "Force Dynamics",  _valEq11, "force-dynamics",      "#dc2626"),
+            new(Positions[6].X, Positions[6].Y,  "Eq (12)", "Tacit Knowledge", _valEq12, "tacit-knowledge",     "#16a34a"),
+            new(Positions[7].X, Positions[7].Y,  "Eq (14)", "Tipping Point",   _valEq14, "tipping-point",       "#a855f7"),
+            new(Positions[8].X, Positions[8].Y,  "Eq (23)", "Motivation",      _valEq23, "motivation",          "#e11d48"),
+            new(Positions[9].X, Positions[9].Y,  "Eq (26)", "Transfer Rate",   _valEq26, "transfer",            "#0284c7"),
+            new(Positions[10].X, Positions[10].Y,"Eq (31)", "Model Quality",   _valEq31, "transfer",            "#4f46e5"),
+            new(Positions[11].X, Positions[11].Y,"Eq (32)", "Initial Force",   _valEq32, "divergence",          "#ea580c"),
+        };
+    }
+
+    private void BuildEdges()
+    {
+        var edgeList = new List<EdgeInfo>();
+
+        // 0->1: Eq1 -> Eq4
+        edgeList.Add(MakeEdge(0, 1, "(1)->(4)"));
+        // 1->2: Eq4 -> Eq6
+        edgeList.Add(MakeEdge(1, 2, "(4)->(6)"));
+        // 2->3: Eq6 -> Eq7
+        edgeList.Add(MakeEdge(2, 3, "(6)->(7)"));
+        // 3->4: Eq7 -> Eq10
+        edgeList.Add(MakeEdge(3, 4, "(7)->(10)"));
+        // 4->5: Eq10 -> Eq11
+        edgeList.Add(MakeEdge(4, 5, "(10)->(11)"));
+        // 5->6: Eq11 -> Eq12
+        edgeList.Add(MakeEdge(5, 6, "(11)->(12)"));
+        // 6->7: Eq12 -> Eq14
+        edgeList.Add(MakeEdge(6, 7, "(12)->(14)"));
+        // 7->8: Eq14 -> Eq23
+        edgeList.Add(MakeEdge(7, 8, "(14)->(23)"));
+        // 8->9: Eq23 -> Eq26
+        edgeList.Add(MakeEdge(8, 9, "(23)->(26)"));
+        // 9->10: Eq26 -> Eq31
+        edgeList.Add(MakeEdge(9, 10, "(26)->(31)"));
+        // 10->11: Eq31 -> Eq32
+        edgeList.Add(MakeEdge(10, 11, "(31)->(32)"));
+        // 11->5: Eq32 -> Eq11 (feedback loop back to Force Dynamics)
+        edgeList.Add(MakeEdge(11, 5, "(32)->(11)"));
+
+        _edges = edgeList.ToArray();
+    }
+
+    private EdgeInfo MakeEdge(int fromIdx, int toIdx, string label)
+    {
+        var from = Positions[fromIdx];
+        var to = Positions[toIdx];
+
+        double fromCX = from.X + NodeW / 2.0;
+        double fromCY = from.Y + NodeH / 2.0;
+        double toCX = to.X + NodeW / 2.0;
+        double toCY = to.Y + NodeH / 2.0;
+
+        // Determine exit/entry points on node edges
+        double dx = toCX - fromCX;
+        double dy = toCY - fromCY;
+        double absDx = Math.Abs(dx);
+        double absDy = Math.Abs(dy);
+
+        double startX, startY, endX, endY;
+
+        // Exit from the correct side of the source node
+        if (absDx > absDy)
+        {
+            // Primarily horizontal
+            startX = dx > 0 ? from.X + NodeW : from.X;
+            startY = fromCY;
+            endX = dx > 0 ? to.X : to.X + NodeW;
+            endY = toCY;
+        }
+        else
+        {
+            // Primarily vertical
+            startX = fromCX;
+            startY = dy > 0 ? from.Y + NodeH : from.Y;
+            endX = toCX;
+            endY = dy > 0 ? to.Y : to.Y + NodeH;
+        }
+
+        // Curve control point
+        double midX = (startX + endX) / 2.0;
+        double midY = (startY + endY) / 2.0;
+
+        // Add slight curvature for the feedback edge
+        double offsetX = 0;
+        double offsetY = 0;
+        if (fromIdx == 11 && toIdx == 5)
+        {
+            // Feedback loop: curve it to the left
+            offsetX = -40;
+        }
+
+        string path = $"M {Inv(startX)} {Inv(startY)} Q {Inv(midX + offsetX)} {Inv(midY + offsetY)} {Inv(endX)} {Inv(endY)}";
+
+        double labelX = midX + offsetX;
+        double labelY = midY + offsetY - 6;
+
+        return new EdgeInfo(path, label, labelX, labelY);
+    }
+
+    // ─── SVG text helper (Razor reserves <text>) ───
+    private static MarkupString SvgText(string content, double x, double y,
+        string anchor = "middle", string fontSize = "12") =>
+        new($"<text x=\"{x.ToString(System.Globalization.CultureInfo.InvariantCulture)}\" " +
+            $"y=\"{y.ToString(System.Globalization.CultureInfo.InvariantCulture)}\" " +
+            $"text-anchor=\"{anchor}\" font-size=\"{fontSize}\" " +
+            $"fill=\"var(--text-primary, #ccc)\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+
+    // Format double with InvariantCulture for SVG attributes
+    private static string Inv(double v) =>
+        v.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    // ─── Slider change handlers ───
+    private void OnMChanged(double val) { _m = val; Recalculate(); }
+    private void OnForceChanged(double val) { _force = val; Recalculate(); }
+    private void OnEngagementChanged(double val) { _engagement = val; Recalculate(); }
+    private void OnReplacementChanged(double val) { _replacement = val; Recalculate(); }
+    private void OnStruggleChanged(double val) { _struggle = val; Recalculate(); }
+    private void OnKnowledgeChanged(double val) { _knowledge = val; Recalculate(); }
+}

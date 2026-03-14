@@ -1,0 +1,210 @@
+@page "/organizational"
+
+<PageTitle>Organizational Consequences — Eq (17)-(22)</PageTitle>
+
+<h1>Organizational Consequences — Eq (17)-(22)</h1>
+
+<blockquote>
+    Organizations face a paradox: the multiplier raises the return on every unit of force, but it simultaneously degrades the ability to measure force accurately. As M grows, signal-to-noise collapses, Goodhart effects amplify, and decision bottlenecks compound.
+</blockquote>
+
+@* ─── Chart 1: ROI Bars — Eq (17) ─── *@
+<ChartCard Title="ROI Bars — Eq (17): Marginal Return"
+           Description="ΔOⱼ = (M−1) · Fⱼ for M = 1…5">
+    <ChildContent>
+        <BarChart Bars="@_roiBars" XLabel="M" YLabel="ΔOⱼ" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\Delta O_j = (M - 1) \times F_j \qquad (17)" />
+        <h4>In Plain Language</h4>
+        <p>The marginal return of giving the LLM to person j is proportional to that person's existing force. A 10x engineer with a 3x multiplier produces 30 units of additional output. A 1.5x engineer with the same multiplier produces 4.5 units. The rational allocation strategy is to concentrate the multiplier on your strongest people first. Uniform distribution is equitable but leaves the largest returns on the table.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Base model Eq (1)</li>
+            <li>Variance Eq (4)</li>
+            <li>Lower bound Eq (4a)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 2: SNR Collapse — Eq (18) ─── *@
+<ChartCard Title="SNR Collapse — Eq (18): Assessment Signal-to-Noise"
+           Description="SNR = Var(F_true) / (Var(F_true) + Mp²·Var(ε) + Var(η))">
+    <ChildContent>
+        <LineChart Series="@_snrSeries" XLabel="Mp (presentation multiplier)" YLabel="SNR" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{SNR}_{\text{assessment}} = \frac{\text{Var}(F_{\text{true}})}{\text{Var}(F_{\text{true}}) + M_p^2 \cdot \text{Var}(\varepsilon_{\text{LLM}}) + \text{Var}(\eta)} \qquad (18)" />
+        <h4>In Plain Language</h4>
+        <p>The signal-to-noise ratio for assessing true capability through output artifacts approaches zero as the presentation multiplier grows. M_p — not M_s — drives the collapse. The mirror polishes everyone's output identically, collapsing the visible difference between deep understanding and shallow borrowing. To assess true force, evaluate substance rather than presentation.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Epistemic gap Eq (10)</li>
+            <li>Goodhart's trap Eq (19)</li>
+            <li>Evaluation bottleneck Eq (7)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 3: Goodhart Bars — Eq (19) ─── *@
+<ChartCard Title="Goodhart Bars — Eq (19): Measured vs True Force"
+           Description="F_meas = F_true + δ for several gaming levels">
+    <ChildContent>
+        <BarChart Bars="@_goodhartBars" XLabel="δ (gaming)" YLabel="F_meas" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F_{\text{measured}} = F_{\text{true}} + \delta_{\text{gaming}}(M_p) \qquad (19)" />
+        <h4>In Plain Language</h4>
+        <p>The amount by which people can inflate their measured force by using LLMs to game the assessment grows with the presentation multiplier. Engineers will use LLMs to prepare for force-assessment exercises, to polish design docs, to simulate architectural sophistication. The LLM becomes simultaneously the thing that makes force important (Eq 1), hard to measure (Eq 18), and the tool people use to game the measurement (Eq 19).</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Assessment SNR Eq (18)</li>
+            <li>Epistemic gap Eq (10)</li>
+            <li>Base model Eq (1)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 4: Decision Bottleneck — Eq (20) ─── *@
+<ChartCard Title="Decision Bottleneck — Eq (20): Organizational Throughput"
+           Description="Throughput = min(R_dec, M · R_exec)">
+    <ChildContent>
+        <LineChart Series="@_throughputSeries" XLabel="R_dec (decision rate)" YLabel="Throughput" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{Throughput} = \min(R_{\text{decision}},\; M \times R_{\text{execution}}) \qquad (20)" />
+        <h4>In Plain Language</h4>
+        <p>Total output is limited by whichever is slower: deciding what to build or building it. Pre-LLM, execution was almost always the bottleneck. Post-LLM, as M grows, decision-making becomes the constraint. The companies that win won't be the ones with the best engineers or AI tools — they'll be the ones that can decide what to build fastest.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Indecision cost Eq (21)</li>
+            <li>Evaluation bottleneck Eq (7)</li>
+            <li>Competitive moats Eq (22)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 5: Indecision Cost — Eq (21) ─── *@
+<ChartCard Title="Indecision Cost — Eq (21): Opportunity Cost of Delay"
+           Description="OC = M · R_exec · Δt">
+    <ChildContent>
+        <LineChart Series="@_indecisionSeries" XLabel="M (multiplier)" YLabel="OC" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)" />
+        <h4>In Plain Language</h4>
+        <p>Every hour spent debating what to build wastes M times more potential output than it did before. An organization that takes two weeks to align on a feature spec is burning five to ten times more idle execution capacity than pre-LLM. Strategic clarity becomes the binding constraint.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Decision bottleneck Eq (20)</li>
+            <li>M growing Eq (25)</li>
+            <li>Competitive advantage Eq (22)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 6: Competitive Advantage — Eq (22) ─── *@
+<ChartCard Title="Competitive Advantage — Eq (22)"
+           Description="A = M · (F_firm − F_comp) for various firm forces">
+    <ChildContent>
+        <BarChart Bars="@_advantageBars" XLabel="F_firm" YLabel="Advantage" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="A = M \times (F_{\text{firm}} - F_{\text{competitor}}) \qquad (22)" />
+        <h4>In Plain Language</h4>
+        <p>When both you and your competitor have the same mirror, the only remaining competitive advantage is the difference in force between your workforces. "We have 500 engineers" stops being a moat and starts being overhead. The advantage reduces to force density — not how many people you have, but how capable they are per capita. The moat shifts from "we built it" to "we understood the problem deeply enough to build the right thing."</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Base model Eq (1)</li>
+            <li>Decision speed Eq (20)</li>
+            <li>Variance Eq (4)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Organizational Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (17): Marginal Return</div>
+    <ParameterSlider Label="Fⱼ (forceJ)" Min="0.5" Max="10" Step="0.5" Value="@_roiForceJ" ValueChanged="v => { _roiForceJ = v; }" />
+    <div class="slider-group-header">Eq (18): Assessment SNR</div>
+    <ParameterSlider Label="Var(F_true)" Min="0.1" Max="10" Step="0.1" Value="@_snrVarForceTrue" ValueChanged="v => { _snrVarForceTrue = v; }" />
+    <ParameterSlider Label="Var(ε)" Min="0.1" Max="5" Step="0.1" Value="@_snrVarEpsilon" ValueChanged="v => { _snrVarEpsilon = v; }" />
+    <ParameterSlider Label="Var(η)" Min="0.1" Max="5" Step="0.1" Value="@_snrVarEta" ValueChanged="v => { _snrVarEta = v; }" />
+    <div class="slider-group-header">Eq (19): Goodhart</div>
+    <ParameterSlider Label="F_true" Min="1" Max="10" Step="0.5" Value="@_goodhartForceTrue" ValueChanged="v => { _goodhartForceTrue = v; }" />
+    <div class="slider-group-header">Eq (20): Decision Bottleneck</div>
+    <ParameterSlider Label="M (throughput)" Min="0.5" Max="5" Step="0.1" Value="@_throughputM" ValueChanged="v => { _throughputM = v; }" />
+    <ParameterSlider Label="R_exec (throughput)" Min="0.1" Max="10" Step="0.1" Value="@_throughputRateExec" ValueChanged="v => { _throughputRateExec = v; }" />
+    <div class="slider-group-header">Eq (21): Indecision Cost</div>
+    <ParameterSlider Label="R_exec (indecision)" Min="0.1" Max="10" Step="0.1" Value="@_indecisionRateExec" ValueChanged="v => { _indecisionRateExec = v; }" />
+    <ParameterSlider Label="Δt" Min="0.1" Max="5" Step="0.1" Value="@_indecisionDeltaTime" ValueChanged="v => { _indecisionDeltaTime = v; }" />
+    <div class="slider-group-header">Eq (22): Competitive Advantage</div>
+    <ParameterSlider Label="M (advantage)" Min="0.5" Max="5" Step="0.1" Value="@_advantageM" ValueChanged="v => { _advantageM = v; }" />
+    <ParameterSlider Label="F_comp" Min="1" Max="10" Step="0.5" Value="@_advantageForceComp" ValueChanged="v => { _advantageForceComp = v; }" />
+</FloatingSliderPanel>
+
+@code {
+    // ─── Chart 1: ROI ───
+    private double _roiForceJ = 5;
+    private IReadOnlyList<BarItem> _roiBars => Enumerable.Range(1, 5)
+        .Select(m => new BarItem($"M={m}", OrganizationalDynamics.MarginalReturn(m, _roiForceJ)))
+        .ToList();
+
+    // ─── Chart 2: SNR ───
+    private double _snrVarForceTrue = 4;
+    private double _snrVarEpsilon = 1;
+    private double _snrVarEta = 0.5;
+    private IReadOnlyList<ChartSeries> _snrSeries => new List<ChartSeries>
+    {
+        new("SNR", Enumerable.Range(1, 90)
+            .Select(i => 0.5 + i * 0.05)
+            .Select(mp => new DataPoint(mp, OrganizationalDynamics.AssessmentSnr(_snrVarForceTrue, mp, _snrVarEpsilon, _snrVarEta)))
+            .ToList())
+    };
+
+    // ─── Chart 3: Goodhart ───
+    private double _goodhartForceTrue = 5;
+    private static readonly double[] GoodhartDeltas = { 0, 1, 2, 3, 5 };
+    private IReadOnlyList<BarItem> _goodhartBars => GoodhartDeltas
+        .Select(d => new BarItem($"δ={d}", OrganizationalDynamics.MeasuredForce(_goodhartForceTrue, d), d == 0 ? "#2563eb" : "#f59e0b"))
+        .ToList();
+
+    // ─── Chart 4: Decision Bottleneck ───
+    private double _throughputM = 2;
+    private double _throughputRateExec = 5;
+    private IReadOnlyList<ChartSeries> _throughputSeries => new List<ChartSeries>
+    {
+        new("Throughput", Enumerable.Range(1, 100)
+            .Select(i => 0.1 + i * 0.099)
+            .Select(rd => new DataPoint(rd, OrganizationalDynamics.OrganizationalThroughput(rd, _throughputM, _throughputRateExec)))
+            .ToList())
+    };
+
+    // ─── Chart 5: Indecision Cost ───
+    private double _indecisionRateExec = 5;
+    private double _indecisionDeltaTime = 1;
+    private IReadOnlyList<ChartSeries> _indecisionSeries => new List<ChartSeries>
+    {
+        new("OC", Enumerable.Range(1, 90)
+            .Select(i => 0.5 + i * 0.05)
+            .Select(m => new DataPoint(m, OrganizationalDynamics.IndecisionCost(m, _indecisionRateExec, _indecisionDeltaTime)))
+            .ToList())
+    };
+
+    // ─── Chart 6: Competitive Advantage ───
+    private double _advantageM = 2;
+    private double _advantageForceComp = 5;
+    private static readonly double[] FirmForces = { 2, 4, 6, 8 };
+    private IReadOnlyList<BarItem> _advantageBars => FirmForces
+        .Select(ff =>
+        {
+            var val = OrganizationalDynamics.CompetitiveAdvantage(_advantageM, ff, _advantageForceComp);
+            return new BarItem($"F={ff}", val, val >= 0 ? "#2563eb" : "#ef4444");
+        })
+        .ToList();
+}

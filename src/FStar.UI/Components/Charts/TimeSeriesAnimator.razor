@@ -1,0 +1,42 @@
+@using FStar.UI.Models
+@using Microsoft.AspNetCore.Components
+
+<canvas id="@_canvasId"
+        role="img"
+        aria-label="Animated time series chart"
+        width="@Width"
+        height="@Height">
+</canvas>
+
+<div class="time-series-controls">
+    <button @onclick="OnPlayPause" aria-label="@(IsAnimating ? "Pause animation" : "Play animation")">@(IsAnimating ? "Pause" : "Play")</button>
+    <button @onclick="OnReset" aria-label="Reset animation">Reset</button>
+</div>
+
+@code {
+    [Parameter] public int Width { get; set; } = 800;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public IReadOnlyList<AnimatedSeries>? TimeSeries { get; set; }
+    [Parameter] public double Duration { get; set; }
+    [Parameter] public double Dt { get; set; }
+    [Parameter] public bool IsAnimating { get; set; }
+    [Parameter] public EventCallback<double> OnFrame { get; set; }
+
+    private string _canvasId = $"ts-canvas-{Guid.NewGuid():N}";
+
+    private async Task OnPlayPause()
+    {
+        if (OnFrame.HasDelegate)
+        {
+            await OnFrame.InvokeAsync(0);
+        }
+    }
+
+    private async Task OnReset()
+    {
+        if (OnFrame.HasDelegate)
+        {
+            await OnFrame.InvokeAsync(-1);
+        }
+    }
+}

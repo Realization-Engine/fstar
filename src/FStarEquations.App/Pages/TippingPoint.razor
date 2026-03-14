@@ -1,0 +1,221 @@
+@page "/tipping-point"
+
+<PageTitle>The Tipping Point — Eq (14), (14a)</PageTitle>
+
+<h1>The Tipping Point — Eq (14), (14a)</h1>
+
+<blockquote>
+    The tipping point is the fulcrum of the entire framework. Below F*, force decays faster than it recovers; above it, a virtuous cycle of engagement and growth takes hold. Every parameter in the model either raises or lowers this threshold.
+</blockquote>
+
+@* 1. Moving Threshold — NumberLine *@
+<ChartCard Title="Moving Threshold — F* on the Number Line">
+    <ChildContent>
+        <NumberLine Width="600" Height="100"
+                    Min="0" Max="@NumberLineMax"
+                    Threshold="@FStarValue"
+                    Points="@PopulationPoints" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F^* = \frac{\beta \cdot R + \sigma \cdot M_{\text{absorbed}}}{\gamma \cdot E} \qquad (14)" />
+        <h4>In Plain Language</h4>
+        <p>There is a threshold level of force. Above it, the LLM accelerates your growth — you're strong enough to use it as a sparring partner, and learning compounds. Below it, the LLM accelerates your decline — you default to passive reliance, and atrophy compounds. As the F→M transfer succeeds, M_absorbed grows, which raises F*, which means more engineers fall below the threshold — not because they got weaker, but because successful transfer moved the threshold upward.</p>
+        <h4>The Mirror</h4>
+        <p>Above F*, the mirror functions like a dancer's studio mirror — a feedback instrument for form-correction. Below F*, it functions like Narcissus's pool — flattering, self-confirming, eventually fatal to growth. The same object. Entirely different function. Determined entirely by what stands in front of it.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Force dynamics Eq (11)</li>
+            <li>Hysteresis Eq (14a)</li>
+            <li>Transfer paradox Eq (30)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* 2. Parameter Decomposition — TornadoDiagram *@
+<ChartCard Title="Parameter Decomposition — Tornado Diagram">
+    <ChildContent>
+        <TornadoDiagram Width="600" Height="300" Factors="@TornadoFactors" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F^* = \frac{\beta \cdot R + \sigma \cdot M_{\text{absorbed}}}{\gamma \cdot E} \qquad (14)" />
+        <h4>In Plain Language</h4>
+        <p>F* is sensitive to four parameters. Increasing passive reliance (β·R) or model absorption (σ·M_absorbed) raises the threshold, putting more people at risk. Increasing deliberate engagement (γ·E) lowers it, creating safety margin. The tornado diagram reveals which levers have the most impact on who falls below the tipping point.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Organizational de-investment Eq (11)</li>
+            <li>Transfer rate Eq (26)</li>
+            <li>Diverging trajectories Eq (15a-b)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* 3. Phase Portrait — dF/dt vs F *@
+<ChartCard Title="Phase Portrait — dF/dt vs F">
+    <ChildContent>
+        <PhasePortrait Width="600" Height="400"
+                       XLabel="F (Force)" YLabel="dF/dt"
+                       Curve="@PhaseCurve"
+                       ZeroCrossing="@FStarValue" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{dF}{dt} = \alpha \cdot S + \gamma \cdot E \cdot F - \beta \cdot R - \sigma \cdot M_{\text{absorbed}} \qquad (11)" />
+        <h4>In Plain Language</h4>
+        <p>The phase portrait shows two stable equilibria. Where dF/dt crosses zero from positive to negative is the tipping point F*. To the right, force grows (the γEF compounding engine dominates). To the left, force decays (the βR drag dominates). The shape of the curve reveals the strength of each basin of attraction.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Diverging trajectories Eq (15a-b)</li>
+            <li>Terminal dynamics</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* 4. Hysteresis Funnel — Decay vs Recovery *@
+<ChartCard Title="Hysteresis Funnel — Decay vs Recovery at F*">
+    <ChildContent>
+        <NumberLine Width="600" Height="100"
+                    Min="@HysteresisMin" Max="@HysteresisMax"
+                    Threshold="0"
+                    Points="@HysteresisPoints" />
+        <p class="hysteresis-caption">
+            @if (HysteresisPresent)
+            {
+                <strong class="hysteresis-alert">Hysteresis detected:</strong> @(" decay rate exceeds recovery rate")
+            }
+            else
+            {
+                <span>No hysteresis: recovery rate meets or exceeds decay rate</span>
+            }
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\left|\frac{dF}{dt}\right|_{\text{decay}} > \left|\frac{dF}{dt}\right|_{\text{recovery}} \quad \text{for the same distance from } F^* \qquad (14a)" />
+        <h4>In Plain Language</h4>
+        <p>Falling below the tipping point isn't just entering a decay trajectory. It's entering a trajectory that's harder to escape than it was to enter. The first time you struggle through a debugging session, there's first-contact novelty that aids encoding. Re-learning after atrophy lacks that novelty, feels more tedious, and competes against the knowledge that the LLM shortcut exists. F* is a cliff, not a hill.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Force dynamics Eq (11)</li>
+            <li>Cohort discontinuity Eq (32)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Cross-links *@
+<nav class="cross-links">
+    <h3>Related Pages</h3>
+    <ul>
+        <li><a href="/force-dynamics">The Atrophy Problem — Force Dynamics</a></li>
+        <li><a href="/transfer">Transfer</a></li>
+        <li><a href="/model-growth">Model Growth</a></li>
+        <li><a href="/divergence">The Accelerating Gap — Divergence</a></li>
+        <li><a href="/motivation">Motivation</a></li>
+    </ul>
+</nav>
+
+<FloatingSliderPanel Visible="true" Title="Tipping Point Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (14): Tipping Point F*</div>
+    <ParameterSlider Label="β (decay)" Min="0.01" Max="1" Step="0.01" Value="@_beta" ValueChanged="OnBetaChanged" />
+    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1" Value="@_replacement" ValueChanged="OnReplacementChanged" />
+    <ParameterSlider Label="σ (absorption rate)" Min="0" Max="2" Step="0.1" Value="@_sigma" ValueChanged="OnSigmaChanged" />
+    <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1" Value="@_mAbsorbed" ValueChanged="OnMAbsorbedChanged" />
+    <ParameterSlider Label="γ (engagement rate)" Min="0.01" Max="1" Step="0.01" Value="@_gamma" ValueChanged="OnGammaChanged" />
+    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1" Value="@_engagement" ValueChanged="OnEngagementChanged" />
+    <div class="slider-group-header">Eq (11): Force Dynamics</div>
+    <ParameterSlider Label="α (struggle coeff)" Min="0" Max="1" Step="0.01" Value="@Alpha" ValueChanged="OnAlphaChanged" />
+    <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1" Value="@Struggle" ValueChanged="OnStruggleChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // Shared slider parameters
+    private double _beta = 0.3;
+    private double _replacement = 2.0;
+    private double _sigma = 0.5;
+    private double _mAbsorbed = 1.0;
+    private double _gamma = 0.2;
+    private double _engagement = 1.0;
+    private double _alpha = 0.5;
+    private double _struggle = 2.0;
+
+    // Properties for two-way slider binding
+    private double Beta { get => _beta; set => _beta = value; }
+    private double Replacement { get => _replacement; set => _replacement = value; }
+    private double Sigma { get => _sigma; set => _sigma = value; }
+    private double MAbsorbed { get => _mAbsorbed; set => _mAbsorbed = value; }
+    private double Gamma { get => _gamma; set => _gamma = value; }
+    private double Engagement { get => _engagement; set => _engagement = value; }
+    private double Alpha { get => _alpha; set => _alpha = value; }
+    private double Struggle { get => _struggle; set => _struggle = value; }
+
+    // Computed values
+    private double FStarValue => ForceDynamics.TippingPoint(Beta, Replacement, Sigma, MAbsorbed, Gamma, Engagement);
+    private double NumberLineMax => Math.Max(FStarValue * 2, 10);
+
+    // 1. Population points distributed around a configurable mean
+    private IReadOnlyList<NumberLinePoint> PopulationPoints => GeneratePopulationPoints();
+
+    // 2. Tornado factors
+    private IReadOnlyList<TornadoFactor> TornadoFactors => new List<TornadoFactor>
+    {
+        new("β × R (decay)", Beta * Replacement, 0),
+        new("σ × M_abs (absorption)", Sigma * MAbsorbed, 0),
+        new("γ × E (engagement)", 0, -(Gamma * Engagement))
+    };
+
+    // 3. Phase curve
+    private IReadOnlyList<DataPoint> PhaseCurve => GeneratePhaseCurve();
+
+    // 4. Hysteresis
+    private double DfDtDecay => ForceDynamics.DfDt(Alpha, Struggle, Gamma, Engagement, FStarValue - 1, Beta, Replacement, Sigma, MAbsorbed);
+    private double DfDtRecovery => ForceDynamics.DfDt(Alpha, Struggle, Gamma, Engagement, FStarValue + 1, Beta, Replacement, Sigma, MAbsorbed);
+    private bool HysteresisPresent => ForceDynamics.IsHysteresisPresent(DfDtDecay, DfDtRecovery);
+    private double HysteresisMin => Math.Min(DfDtDecay, DfDtRecovery) * 1.2;
+    private double HysteresisMax => Math.Max(DfDtDecay, DfDtRecovery) * 1.2;
+
+    private IReadOnlyList<NumberLinePoint> HysteresisPoints => new List<NumberLinePoint>
+    {
+        new(DfDtDecay, "#dc2626"),
+        new(DfDtRecovery, "#2563eb")
+    };
+
+    private List<NumberLinePoint> GeneratePopulationPoints()
+    {
+        var points = new List<NumberLinePoint>();
+        var mean = FStarValue * 0.8;
+        var spread = FStarValue * 0.4;
+        if (spread < 0.5) spread = 0.5;
+
+        for (int i = 0; i < 20; i++)
+        {
+            var value = mean + (i - 10) * spread / 10.0;
+            var color = value < FStarValue ? "#2563eb" : "#dc2626";
+            points.Add(new NumberLinePoint(value, color));
+        }
+        return points;
+    }
+
+    private List<DataPoint> GeneratePhaseCurve()
+    {
+        var curve = new List<DataPoint>();
+        for (double f = 0; f <= 10; f += 0.1)
+        {
+            var dfdt = ForceDynamics.DfDt(Alpha, Struggle, Gamma, Engagement, f, Beta, Replacement, Sigma, MAbsorbed);
+            curve.Add(new DataPoint(f, dfdt));
+        }
+        return curve;
+    }
+
+    // Slider callbacks
+    private void OnBetaChanged(double v) => Beta = v;
+    private void OnReplacementChanged(double v) => Replacement = v;
+    private void OnSigmaChanged(double v) => Sigma = v;
+    private void OnMAbsorbedChanged(double v) => MAbsorbed = v;
+    private void OnGammaChanged(double v) => Gamma = v;
+    private void OnEngagementChanged(double v) => Engagement = v;
+    private void OnAlphaChanged(double v) => Alpha = v;
+    private void OnStruggleChanged(double v) => Struggle = v;
+}

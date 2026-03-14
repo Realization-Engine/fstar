@@ -1,0 +1,140 @@
+@page "/motivation"
+
+<PageTitle>The Meaning Problem — Eq (23)</PageTitle>
+
+<h1>The Meaning Problem — Eq (23)</h1>
+
+<blockquote>
+    Motivation is not exogenous — it feeds back into force. When accumulated loss erodes motivation, force declines, which produces further loss. The decay is exponential: once the spiral begins, recovery requires external intervention at a scale proportional to the loss already sustained.
+</blockquote>
+
+<!-- Chart 1: Motivation Decay Curve -->
+<ChartCard Title="Motivation Decay Curve" Description="Eq (23) f_mot = f_mot(0) · e^(−λA(t)) as accumulated loss varies.">
+    <ChildContent>
+        <LineChart Series="@_decaySeries"
+                   XLabel="Accumulated Loss A(t)"
+                   YLabel="Motivation f_mot"
+                   XMin="0" XMax="20"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="f_{\text{mot}}(t) = f_{\text{mot}}(0) \times e^{-\lambda \cdot A(t)} \qquad (23)" />
+        <h4>In Plain Language</h4>
+        <p>Intrinsic motivation is a component of force in the Cobb-Douglas form (Eq 1). Its decay doesn't just reduce output linearly — it enters as f_mot^w_mot, which pulls down the entire force product. A demotivated expert doesn't produce "slightly less." They lose the engagement that made their judgment sharp. The highest-force individuals may be most sensitive to this loss.</p>
+        <h4>The Mirror</h4>
+        <p>The craft experience is diluted. When the mirror does most of the work, the sense of authorship — the satisfaction of having built something through effort — diminishes.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Base model Eq (1)</li>
+            <li>Force dynamics Eq (11)</li>
+            <li>Evaluation bottleneck Eq (7)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Composite: Motivation -> Force Feedback (Eq 23 + 1) -->
+<ChartCard Title="Motivation → Force Feedback" Description="Eq (23) + Eq (1): Left shows motivation decay; right shows ComputeOutput as motivation varies over accumulated loss.">
+    <ChildContent>
+    <SplitPanel>
+        <Left>
+            <LineChart Series="@_decaySeries"
+                       XLabel="Accumulated Loss A(t)"
+                       YLabel="Motivation f_mot"
+                       XMin="0" XMax="20"
+                       YMin="0"
+                       ShowGrid="true" />
+        </Left>
+        <Right>
+            <LineChart Series="@_forceFeedbackSeries"
+                       XLabel="Accumulated Loss A(t)"
+                       YLabel="Output O"
+                       XMin="0" XMax="20"
+                       YMin="0"
+                       ShowGrid="true" />
+        </Right>
+    </SplitPanel>
+    </ChildContent>
+    <TheoryContent>
+        <h4>In Plain Language</h4>
+        <p>Declining f_mot reduces F (via Cobb-Douglas), which reduces the γEF growth term in Eq (11), which shifts the balance toward atrophy, which further reduces F. The feedback loop hits highest-force individuals hardest — their departure degrades force supply at the top, where the evaluation bottleneck (Eq 7) and the F→M transfer can least afford it.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Force dynamics Eq (11)</li>
+            <li>Tipping point Eq (14)</li>
+            <li>Evaluation bottleneck Eq (7)</li>
+            <li>Transfer Eq (26)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Motivation Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (23): Motivation Decay</div>
+    <ParameterSlider Label="Initial Motivation (f_mot₀)" Min="0" Max="10" Step="0.5"
+                     Value="@_fMot0"
+                     ValueChanged="@OnFMot0Changed" />
+    <ParameterSlider Label="Decay Rate (λ)" Min="0.01" Max="1" Step="0.01"
+                     Value="@_lambda"
+                     ValueChanged="@OnLambdaChanged" />
+    <div class="slider-group-header">Eq (23) + (1): Force Feedback</div>
+    <ParameterSlider Label="Multiplier (M)" Min="0.5" Max="5" Step="0.1"
+                     Value="@_compositeM"
+                     ValueChanged="@OnCompositeMChanged" />
+    <ParameterSlider Label="Weight" Min="0" Max="1" Step="0.1"
+                     Value="@_compositeWeight"
+                     ValueChanged="@OnCompositeWeightChanged" />
+</FloatingSliderPanel>
+
+@code {
+    private double _fMot0 = 8.0;
+    private double _lambda = 0.1;
+    private double _compositeM = 2.0;
+    private double _compositeWeight = 1.0;
+
+    private IReadOnlyList<ChartSeries> _decaySeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _forceFeedbackSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        RecalcDecay();
+        RecalcForceFeedback();
+    }
+
+    private void RecalcDecay()
+    {
+        var points = new List<DataPoint>();
+        for (double loss = 0.0; loss <= 20.0; loss += 0.2)
+        {
+            points.Add(new DataPoint(loss, Motivation.MotivationDecay(_fMot0, _lambda, loss)));
+        }
+
+        _decaySeries = new List<ChartSeries>
+        {
+            new("Motivation — Eq (23)", points, "#2563eb", 2.0)
+        };
+    }
+
+    private void RecalcForceFeedback()
+    {
+        var points = new List<DataPoint>();
+        for (double loss = 0.0; loss <= 20.0; loss += 0.2)
+        {
+            var motivatedForce = Motivation.MotivationDecay(_fMot0, _lambda, loss);
+            var output = BaseModel.ComputeOutput(_compositeM, new[] { motivatedForce }, new[] { _compositeWeight });
+            points.Add(new DataPoint(loss, output));
+        }
+
+        _forceFeedbackSeries = new List<ChartSeries>
+        {
+            new("Output O — Eq (1)", points, "#16a34a", 2.0)
+        };
+    }
+
+    private void RecalcAll() { RecalcDecay(); RecalcForceFeedback(); }
+
+    private void OnFMot0Changed(double val) { _fMot0 = val; RecalcAll(); }
+    private void OnLambdaChanged(double val) { _lambda = val; RecalcAll(); }
+    private void OnCompositeMChanged(double val) { _compositeM = val; RecalcForceFeedback(); }
+    private void OnCompositeWeightChanged(double val) { _compositeWeight = val; RecalcForceFeedback(); }
+}

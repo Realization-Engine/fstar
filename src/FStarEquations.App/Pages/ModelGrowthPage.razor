@@ -1,0 +1,145 @@
+@page "/model-growth"
+
+<PageTitle>Model Growth — Eq (25)</PageTitle>
+
+<h1>Model Growth — Eq (25)</h1>
+
+<blockquote>
+    The multiplier grows exponentially. This single fact drives every dynamic in the framework: rising variance, accelerating divergence, collapsing SNR, and the relentless upward pressure on the tipping point. Understanding M(t) is understanding the clock speed of disruption.
+</blockquote>
+
+@* ─── Exponential M(t) Growth — Eq (25) ─── *@
+<ChartCard Title="Exponential M(t) Growth — Eq (25)"
+           Description="M(t) = M₀ · e^(μ·t)">
+    <ChildContent>
+        <LineChart Series="@_growthSeries" XLabel="t (time)" YLabel="M(t)" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="M(t) = M_0 \cdot e^{\mu t} \qquad (25)" />
+        <h4>In Plain Language</h4>
+        <p>The LLM's capability grows exponentially — each model generation is meaningfully more powerful than the last. The growth rate μ is subject to the data quality constraint (Eq 31): if human signal feeding training pipelines degrades, the exponent may slow or stall. Most dynamics are convex in M: variance scales as M², epistemic gap worsens, evaluation bottleneck tightens, tacit knowledge threshold crossed earlier, tipping point rises.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Data quality spiral Eq (31)</li>
+            <li>Variance Eq (4)</li>
+            <li>Tipping point Eq (14)</li>
+            <li>Indecision cost Eq (21)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Composite: M(t) Impact Cascade — Eq (25) + (4) + (14) + (21) ─── *@
+<ChartCard Title="M(t) Impact Cascade" Description="Eq (25) + (4) + (14) + (21): How multiplier growth cascades through variance, tipping point, and indecision cost.">
+    <ChildContent>
+    <div class="cascade-grid">
+        <ChartCard Title="1. M(t) — Eq (25)" Description="Multiplier over time">
+            <ChildContent><LineChart Series="@_cascadeMtSeries" XLabel="t" YLabel="M(t)" Width="400" Height="250" /></ChildContent>
+        </ChartCard>
+        <ChartCard Title="2. Var(O)(t) — Eq (4)" Description="Output variance at M(t)">
+            <ChildContent><LineChart Series="@_cascadeVarSeries" XLabel="t" YLabel="Var(O)" Width="400" Height="250" /></ChildContent>
+        </ChartCard>
+        <ChartCard Title="3. F*(t) — Eq (14)" Description="Tipping point with M(t) as absorbed multiplier">
+            <ChildContent><LineChart Series="@_cascadeFStarSeries" XLabel="t" YLabel="F*" Width="400" Height="250" /></ChildContent>
+        </ChartCard>
+        <ChartCard Title="4. Cost(t) — Eq (21)" Description="Indecision cost at M(t)">
+            <ChildContent><LineChart Series="@_cascadeCostSeries" XLabel="t" YLabel="Cost" Width="400" Height="250" /></ChildContent>
+        </ChartCard>
+    </div>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equations</h4>
+        <KatexBlock Latex="M(t) = M_0 \cdot e^{\mu t} \qquad (25)" />
+        <KatexBlock Latex="\text{Var}(O) = M^2 \cdot \text{Var}(F) \qquad (4)" />
+        <KatexBlock Latex="F^* = \frac{\beta R + \sigma M_{\text{absorbed}}}{\gamma E} \qquad (14)" />
+        <KatexBlock Latex="\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)" />
+        <h4>In Plain Language</h4>
+        <p>As M(t) grows exponentially, four downstream quantities evolve: Var(O) scales as M², F* rises as M_absorbed grows with better models, the indecision cost scales linearly with M, and the opportunity cost of delay compounds. The problems compound faster as the technology improves. The F→M transfer may eventually make this self-limiting — but only after the force supply has already degraded.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>All equations shown in the sub-panels</li>
+            <li>Terminal dynamics</li>
+            <li>Data quality spiral Eq (31)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Model Growth Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (25): M(t) Growth</div>
+    <ParameterSlider Label="M₀" Min="0.5" Max="5" Step="0.1" Value="@_m0" ValueChanged="v => { _m0 = v; RecalcCascade(); }" />
+    <ParameterSlider Label="μ (growth rate)" Min="0.01" Max="0.5" Step="0.01" Value="@_mu" ValueChanged="v => { _mu = v; RecalcCascade(); }" />
+    <div class="slider-group-header">Eq (4): Variance Amplification</div>
+    <ParameterSlider Label="Var(F)" Min="0.1" Max="10" Step="0.1" Value="@_cascadeVarF" ValueChanged="v => { _cascadeVarF = v; RecalcCascade(); }" />
+    <div class="slider-group-header">Eq (14): Tipping Point</div>
+    <ParameterSlider Label="β (decay)" Min="0" Max="1" Step="0.01" Value="@_cascadeBeta" ValueChanged="v => { _cascadeBeta = v; RecalcCascade(); }" />
+    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1" Value="@_cascadeReplacement" ValueChanged="v => { _cascadeReplacement = v; RecalcCascade(); }" />
+    <ParameterSlider Label="σ (absorption)" Min="0" Max="2" Step="0.1" Value="@_cascadeSigma" ValueChanged="v => { _cascadeSigma = v; RecalcCascade(); }" />
+    <ParameterSlider Label="γ (engagement rate)" Min="0" Max="1" Step="0.01" Value="@_cascadeGamma" ValueChanged="v => { _cascadeGamma = v; RecalcCascade(); }" />
+    <ParameterSlider Label="E (engagement)" Min="0" Max="5" Step="0.1" Value="@_cascadeEngagement" ValueChanged="v => { _cascadeEngagement = v; RecalcCascade(); }" />
+    <div class="slider-group-header">Eq (21): Indecision Cost</div>
+    <ParameterSlider Label="R_exec" Min="0.1" Max="10" Step="0.1" Value="@_cascadeRateExec" ValueChanged="v => { _cascadeRateExec = v; RecalcCascade(); }" />
+    <ParameterSlider Label="Δt" Min="0.1" Max="5" Step="0.1" Value="@_cascadeDeltaTime" ValueChanged="v => { _cascadeDeltaTime = v; RecalcCascade(); }" />
+</FloatingSliderPanel>
+
+@code {
+    private double _m0 = 1;
+    private double _mu = 0.1;
+
+    // Cascade parameters
+    private double _cascadeVarF = 2.0;
+    private double _cascadeBeta = 0.3;
+    private double _cascadeReplacement = 2.0;
+    private double _cascadeSigma = 0.5;
+    private double _cascadeGamma = 0.2;
+    private double _cascadeEngagement = 1.0;
+    private double _cascadeRateExec = 5.0;
+    private double _cascadeDeltaTime = 1.0;
+
+    private IReadOnlyList<ChartSeries> _growthSeries => new List<ChartSeries>
+    {
+        new("M(t)", Enumerable.Range(0, 201)
+            .Select(i => i * 0.1)
+            .Select(t => new DataPoint(t, ModelGrowth.MultiplierAtTime(_m0, _mu, t)))
+            .ToList())
+    };
+
+    // Cascade series
+    private IReadOnlyList<ChartSeries> _cascadeMtSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _cascadeVarSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _cascadeFStarSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _cascadeCostSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        RecalcCascade();
+    }
+
+    private void RecalcCascade()
+    {
+        var mtPoints = new List<DataPoint>();
+        var varPoints = new List<DataPoint>();
+        var fStarPoints = new List<DataPoint>();
+        var costPoints = new List<DataPoint>();
+
+        for (double t = 0; t <= 20.0; t += 0.2)
+        {
+            var mt = ModelGrowth.MultiplierAtTime(_m0, _mu, t);
+            mtPoints.Add(new DataPoint(t, mt));
+            varPoints.Add(new DataPoint(t, VarianceAmplification.OutputVariance(mt, _cascadeVarF)));
+
+            var mAbsorbed = _cascadeSigma * mt;
+            var gammaE = _cascadeGamma * _cascadeEngagement;
+            var fStar = gammaE > 0
+                ? ForceDynamics.TippingPoint(_cascadeBeta, _cascadeReplacement, _cascadeSigma, mAbsorbed, _cascadeGamma, _cascadeEngagement)
+                : 0;
+            fStarPoints.Add(new DataPoint(t, fStar));
+
+            costPoints.Add(new DataPoint(t, OrganizationalDynamics.IndecisionCost(mt, _cascadeRateExec, _cascadeDeltaTime)));
+        }
+
+        _cascadeMtSeries = new List<ChartSeries> { new("M(t)", mtPoints, "#2563eb", 2.0) };
+        _cascadeVarSeries = new List<ChartSeries> { new("Var(O)", varPoints, "#16a34a", 2.0) };
+        _cascadeFStarSeries = new List<ChartSeries> { new("F*", fStarPoints, "#dc2626", 2.0) };
+        _cascadeCostSeries = new List<ChartSeries> { new("Cost", costPoints, "#f59e0b", 2.0) };
+    }
+}

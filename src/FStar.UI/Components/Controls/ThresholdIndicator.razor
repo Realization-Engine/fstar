@@ -1,0 +1,8 @@
+<span class="threshold-indicator @(Passed ? "threshold-pass" : "threshold-fail")">
+    @Label
+</span>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public bool Passed { get; set; }
+}

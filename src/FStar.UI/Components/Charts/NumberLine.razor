@@ -1,0 +1,64 @@
+@using FStar.UI.Models
+@using System.Globalization
+
+<svg class="number-line"
+     role="img"
+     aria-label="Number line"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @* Horizontal baseline *@
+    <line x1="@Fmt(MarginLeft)" y1="@Fmt(CenterY)" x2="@Fmt(PlotRight)" y2="@Fmt(CenterY)"
+          stroke="var(--text-secondary, #333)" stroke-width="2" />
+
+    @* Min / Max labels *@
+    @SvgText(Fmt(Min), MarginLeft, CenterY + 24, "start", "11")
+    @SvgText(Fmt(Max), PlotRight, CenterY + 24, "end", "11")
+
+    @* Threshold vertical marker *@
+    <line x1="@Fmt(ScaleX(Threshold))" y1="@Fmt(CenterY - 30)"
+          x2="@Fmt(ScaleX(Threshold))" y2="@Fmt(CenterY + 30)"
+          stroke="#dc2626" stroke-width="2" class="threshold-line" />
+    @SvgText($"F*={Fmt(Threshold)}", ScaleX(Threshold), CenterY - 34, "middle", "11")
+
+    @* Population dots *@
+    @if (Points is not null)
+    {
+        @foreach (var point in Points)
+        {
+            var cx = ScaleX(point.Value);
+            <circle cx="@Fmt(cx)" cy="@Fmt(CenterY)" r="5" fill="@point.Color" opacity="0.7" />
+        }
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 100;
+    [Parameter] public double Min { get; set; }
+    [Parameter] public double Max { get; set; }
+    [Parameter] public double Threshold { get; set; }
+    [Parameter] public IReadOnlyList<NumberLinePoint>? Points { get; set; }
+
+    private const int MarginLeft = 40;
+    private const int MarginRight = 40;
+
+    private double PlotRight => Width - MarginRight;
+    private double CenterY => Height / 2.0;
+
+    private double ScaleX(double value)
+    {
+        var range = Max - Min;
+        if (Math.Abs(range) < 1e-12) range = 1;
+        var ratio = (value - Min) / range;
+        ratio = Math.Clamp(ratio, 0, 1);
+        return MarginLeft + ratio * (PlotRight - MarginLeft);
+    }
+
+    private static string Fmt(double value) => value.ToString(CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(string content, double x, double y, string anchor = "middle", string fontSize = "12") =>
+        new($"<text x=\"{Fmt(x)}\" y=\"{Fmt(y)}\" text-anchor=\"{anchor}\" font-size=\"{fontSize}\" fill=\"var(--text-primary, #333)\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+}

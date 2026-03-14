@@ -1,0 +1,92 @@
+.chart-card {
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: var(--radius, 0.5rem);
+    box-shadow: var(--shadow, 0 2px 4px rgba(0, 0, 0, 0.08));
+    background-color: var(--bg-card, #ffffff);
+    overflow: hidden;
+}
+
+.chart-card-header {
+    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.25rem) var(--spacing-xs, 0.5rem);
+}
+
+.chart-card-title {
+    margin: 0;
+    font-size: var(--font-size-lg, 1.125rem);
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.chart-card-description {
+    margin: var(--spacing-xs, 0.25rem) 0 0;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-secondary, #6b7280);
+}
+
+/* Tab bar */
+.chart-card-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border-color, #e0e0e0);
+    padding: 0 var(--spacing-lg, 1.25rem);
+}
+
+.tab {
+    padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 1rem);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-muted, #9ca3af);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+    color: var(--text-primary, #1a1a2e);
+}
+
+.tab.active {
+    color: var(--accent, #2563eb);
+    border-bottom-color: var(--accent, #2563eb);
+}
+
+/* Chart content area */
+.chart-card-content {
+    padding: var(--spacing-sm, 0.75rem) var(--spacing-lg, 1.25rem) var(--spacing-lg, 1.25rem);
+    overflow: hidden;
+}
+
+/* Theory content styling */
+.theory-content {
+    line-height: 1.7;
+    max-width: 72ch;
+}
+
+.theory-content h4 {
+    margin: var(--spacing-md, 1rem) 0 var(--spacing-xs, 0.25rem);
+    color: var(--text-primary, #1a1a2e);
+    font-size: var(--font-size-sm, 0.875rem);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.theory-content h4:first-child {
+    margin-top: 0;
+}
+
+.theory-content p {
+    color: var(--text-secondary, #6b7280);
+    margin: 0 0 var(--spacing-sm, 0.5rem);
+}
+
+.theory-content ul {
+    padding-left: var(--spacing-lg, 1.25rem);
+    color: var(--text-secondary, #6b7280);
+    margin: 0 0 var(--spacing-sm, 0.5rem);
+}
+
+.theory-content li {
+    margin-bottom: var(--spacing-xs, 0.25rem);
+}

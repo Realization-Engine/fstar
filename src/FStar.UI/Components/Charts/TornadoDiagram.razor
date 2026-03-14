@@ -1,0 +1,69 @@
+@using FStar.UI.Models
+@using System.Globalization
+
+<svg class="tornado-diagram"
+     role="img"
+     aria-label="Tornado diagram"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @if (Factors is not null && Factors.Count > 0)
+    {
+        var maxAbsValue = Factors.Max(f => Math.Max(Math.Abs(f.PositiveContribution), Math.Abs(f.NegativeContribution)));
+        if (maxAbsValue < 1e-12) { maxAbsValue = 1; }
+
+        var centerX = Width / 2.0;
+
+        @* Center axis *@
+        <line x1="@Fmt(centerX)" y1="@Fmt(MarginTop)"
+              x2="@Fmt(centerX)" y2="@Fmt(PlotBottom)"
+              stroke="var(--text-secondary, #333)" stroke-width="1" />
+
+        var rowCount = Factors.Count;
+        var slotHeight = PlotHeight / rowCount;
+        var barHeight = slotHeight * 0.6;
+        var halfWidth = (Width - LabelMargin - MarginRight) / 2.0;
+
+        @for (int i = 0; i < rowCount; i++)
+        {
+            var factor = Factors[i];
+            var rowCenterY = MarginTop + i * slotHeight + slotHeight / 2.0;
+
+            @* Label *@
+            @SvgText(factor.Label, LabelMargin - 8, rowCenterY + 4, "end", "12")
+
+            @* Positive bar (right) *@
+            var posWidth = (factor.PositiveContribution / maxAbsValue) * halfWidth;
+            <rect x="@Fmt(centerX)" y="@Fmt(rowCenterY - barHeight / 2)"
+                  width="@Fmt(Math.Abs(posWidth))" height="@Fmt(barHeight)"
+                  fill="#2563eb" opacity="0.8" />
+
+            @* Negative bar (left) *@
+            var negWidth = (Math.Abs(factor.NegativeContribution) / maxAbsValue) * halfWidth;
+            <rect x="@Fmt(centerX - negWidth)" y="@Fmt(rowCenterY - barHeight / 2)"
+                  width="@Fmt(Math.Abs(negWidth))" height="@Fmt(barHeight)"
+                  fill="#dc2626" opacity="0.8" />
+        }
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public IReadOnlyList<TornadoFactor>? Factors { get; set; }
+
+    private const int MarginTop = 20;
+    private const int MarginBottom = 20;
+    private const int LabelMargin = 140;
+    private const int MarginRight = 20;
+
+    private double PlotBottom => Height - MarginBottom;
+    private double PlotHeight => PlotBottom - MarginTop;
+
+    private static string Fmt(double value) => value.ToString(CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(string content, double x, double y, string anchor = "middle", string fontSize = "12") =>
+        new($"<text x=\"{Fmt(x)}\" y=\"{Fmt(y)}\" text-anchor=\"{anchor}\" font-size=\"{fontSize}\" fill=\"var(--text-primary, #333)\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+}

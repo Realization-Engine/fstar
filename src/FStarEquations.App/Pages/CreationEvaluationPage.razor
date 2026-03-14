@@ -1,0 +1,185 @@
+@page "/creation-evaluation"
+
+<PageTitle>Creation vs Evaluation — Eq (7), (7a)</PageTitle>
+
+<h1>Creation vs Evaluation — Eq (7), (7a)</h1>
+
+<blockquote>
+    Every hour a high-force individual spends evaluating others is an hour not spent creating. The evaluation bottleneck arises because the same people who are best at doing the work are also the only ones who can reliably judge it.
+</blockquote>
+
+<!-- Chart 1: Evaluation Bottleneck -->
+<ChartCard Title="Evaluation Bottleneck" Description="Eq (7) Throughput = Budget / Cost for different budget levels.">
+    <ChildContent>
+        <BarChart Bars="@_throughputBars"
+                  XLabel="Budget"
+                  YLabel="Throughput"
+                  Orientation="BarOrientation.Vertical" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{Throughput} = \frac{\text{Budget}_{\text{eval}}}{C_{\text{evaluate}}} \qquad (7)" />
+        <h4>In Plain Language</h4>
+        <p>A developer can generate thousands of lines of plausible code in minutes. But determining whether that code is correct, secure, and aligned with requirements still demands deep human judgment. Possibly more judgment, because the mirror's presentation channel (M_p) adds a uniform polish that makes defects harder to spot — hand-written bad code often looks bad, but LLM-generated bad code looks professional.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Reallocation paradox → <strong>Eq (7a)</strong></li>
+            <li>Three-way competition → <strong>Eq (28)</strong></li>
+            <li>Epistemic gap → <strong>Eq (10)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Chart 2: Reallocation Effect -->
+<ChartCard Title="Reallocation Effect" Description="Eq (7a) Reallocated Force = F_H · fraction as fraction varies.">
+    <ChildContent>
+        <LineChart Series="@_reallocationSeries"
+                   XLabel="Fraction to Evaluation"
+                   YLabel="Reallocated Force"
+                   XMin="0" XMax="1"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F_{\text{high}} \to \text{evaluation} \implies F_{\text{high}} \not\to \text{creation} \qquad (7a)" />
+        <h4>In Plain Language</h4>
+        <p>Your most valuable people need to spend more time reviewing others' AI-augmented output and less time doing their own creation, even though their own creation yields the highest return. This is a genuine organizational paradox.</p>
+        <h4>The Mirror</h4>
+        <p>Can the LLM evaluate too? Partially, but the defects that matter most — architectural misalignment, subtle concurrency bugs, security vulnerabilities — are precisely the ones LLMs evaluate poorly. The gap between creation-M_s and evaluation-M_s is what makes this equation bind.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Three-way competition → <strong>Eq (28)</strong></li>
+            <li>Decision bottleneck → <strong>Eq (20)</strong></li>
+            <li>Evaluation SNR → <strong>Eq (18)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<!-- Composite: Resource Allocation (Eq 7a + 28) -->
+<ChartCard Title="Resource Allocation" Description="Composite: Eq (28) Total Time Allocation and Eq (7a) Reallocated Force as τ_create varies.">
+    <ChildContent>
+        <LineChart Series="@_resourceSeries"
+                   XLabel="τ_create"
+                   YLabel="Value"
+                   XMin="0" XMax="10"
+                   YMin="0"
+                   ShowGrid="true" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau_{\text{extract}} \qquad (28)" />
+        <h4>In Plain Language</h4>
+        <p>The total working time of a high-force individual is now split three ways: building (highest multiplier on their output), reviewing others' LLM-augmented work (bottleneck-clearing), and teaching the model (RLHF, knowledge systems). Every hour spent on one is an hour not spent on the others. Organizations now face a three-way optimization with no slack.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Transfer rate → <strong>Eq (26)</strong></li>
+            <li>Evaluation bottleneck → <strong>Eq (7)</strong></li>
+            <li>Reallocation → <strong>Eq (7a)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Creation vs Evaluation Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (7): Evaluation Bottleneck</div>
+    <ParameterSlider Label="Cost per Evaluation" Min="1" Max="50" Step="1"
+                     Value="@_costEval"
+                     ValueChanged="@OnCostEvalChanged" />
+    <div class="slider-group-header">Eq (7a): Reallocation Effect</div>
+    <ParameterSlider Label="Force High" Min="1" Max="10" Step="0.5"
+                     Value="@_forceHigh"
+                     ValueChanged="@OnForceHighChanged" />
+    <div class="slider-group-header">Eq (7a)+(28): Resource Allocation</div>
+    <ParameterSlider Label="τ_eval" Min="0" Max="5" Step="0.1"
+                     Value="@_resTauEval"
+                     ValueChanged="@OnResTauEvalChanged" />
+    <ParameterSlider Label="τ_extract" Min="0" Max="5" Step="0.1"
+                     Value="@_resTauExtract"
+                     ValueChanged="@OnResTauExtractChanged" />
+    <ParameterSlider Label="Force High (Resource)" Min="1" Max="10" Step="0.5"
+                     Value="@_resForceHigh"
+                     ValueChanged="@OnResForceHighChanged" />
+    <ParameterSlider Label="Fraction to Eval" Min="0" Max="1" Step="0.01"
+                     Value="@_resFractionToEval"
+                     ValueChanged="@OnResFractionChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // Evaluation Bottleneck parameters
+    private double _costEval = 5.0;
+
+    // Reallocation parameters
+    private double _forceHigh = 8.0;
+
+    // Resource Allocation composite parameters
+    private double _resTauEval = 1.0;
+    private double _resTauExtract = 1.0;
+    private double _resForceHigh = 8.0;
+    private double _resFractionToEval = 0.3;
+
+    // Computed data
+    private IReadOnlyList<BarItem> _throughputBars = Array.Empty<BarItem>();
+    private IReadOnlyList<ChartSeries> _reallocationSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _resourceSeries = Array.Empty<ChartSeries>();
+
+    private static readonly double[] BudgetLevels = { 10, 20, 50, 100, 200 };
+    private static readonly string[] BarColors = { "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe" };
+
+    protected override void OnInitialized()
+    {
+        RecalcThroughput();
+        RecalcReallocation();
+        RecalcResource();
+    }
+
+    private void RecalcThroughput()
+    {
+        var bars = new List<BarItem>();
+        for (int i = 0; i < BudgetLevels.Length; i++)
+        {
+            var budget = BudgetLevels[i];
+            var throughput = CreationEvaluation.EvaluationThroughput(budget, _costEval);
+            bars.Add(new BarItem($"B={budget:F0}", throughput, BarColors[i]));
+        }
+        _throughputBars = bars;
+    }
+
+    private void RecalcReallocation()
+    {
+        var points = new List<DataPoint>();
+        for (double frac = 0.0; frac <= 1.0; frac += 0.02)
+        {
+            points.Add(new DataPoint(frac, CreationEvaluation.ReallocatedForce(_forceHigh, frac)));
+        }
+
+        _reallocationSeries = new List<ChartSeries>
+        {
+            new("Reallocated Force — Eq (7a)", points, "#2563eb", 2.0)
+        };
+    }
+
+    private void RecalcResource()
+    {
+        var timePoints = new List<DataPoint>();
+        var forcePoints = new List<DataPoint>();
+
+        for (double tauCreate = 0.0; tauCreate <= 10.0; tauCreate += 0.1)
+        {
+            timePoints.Add(new DataPoint(tauCreate, ForceToModelTransfer.TotalTimeAllocation(tauCreate, _resTauEval, _resTauExtract)));
+            forcePoints.Add(new DataPoint(tauCreate, CreationEvaluation.ReallocatedForce(_resForceHigh, _resFractionToEval)));
+        }
+
+        _resourceSeries = new List<ChartSeries>
+        {
+            new("Total Time — Eq (28)", timePoints, "#2563eb", 2.0),
+            new("Reallocated Force — Eq (7a)", forcePoints, "#dc2626", 2.0)
+        };
+    }
+
+    private void OnCostEvalChanged(double val) { _costEval = val; RecalcThroughput(); }
+    private void OnForceHighChanged(double val) { _forceHigh = val; RecalcReallocation(); }
+    private void OnResTauEvalChanged(double val) { _resTauEval = val; RecalcResource(); }
+    private void OnResTauExtractChanged(double val) { _resTauExtract = val; RecalcResource(); }
+    private void OnResForceHighChanged(double val) { _resForceHigh = val; RecalcResource(); }
+    private void OnResFractionChanged(double val) { _resFractionToEval = val; RecalcResource(); }
+}

@@ -1,0 +1,367 @@
+﻿@page "/transfer"
+
+<PageTitle>F to M Transfer — Eq (26)-(31)</PageTitle>
+
+<h1>F to M Transfer — Eq (26)-(31)</h1>
+
+<blockquote>
+    The transfer from human force to model capability is not lossless. Surface knowledge transfers almost perfectly; deep expertise barely transfers at all. The absorption ceiling, the data quality spiral, and the rising tipping point are all consequences of this asymmetric extraction.
+</blockquote>
+
+@* ─── Chart 1: Transfer Rate Bars — Eq (26) ─── *@
+<ChartCard Title="Transfer Rate — Eq (26)"
+           Description="dM_abs/dt = Σ(ηᵢ · Fᵢ) · τ_extract for different τ_extract values.">
+    <ChildContent>
+    <BarChart Bars="@_transferRateBars" XLabel="τ_extract" YLabel="Transfer Rate" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{dM_{\text{absorbed}}}{dt} = \sum_i \eta_i \cdot f_{i,\text{high}} \cdot \tau_{\text{extract}} \qquad (26)" />
+        <h4>In Plain Language</h4>
+        <p>Every time a senior engineer's code review preferences train a code-review model, every time an expert's evaluation judgments become RLHF signal — force is flowing from F into M. The rate is the sum across all force layers of (how transferable that layer is) × (expert's force in that layer) × (time spent on extraction). The mirror isn't just reflecting. It's recording.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Transfer efficiency → <strong>Eq (26a)</strong></li>
+            <li>Absorption ceiling → <strong>Eq (27)</strong></li>
+            <li>Three-way competition → <strong>Eq (28)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 2: Transfer Efficiency Validation — Eq (26a) ─── *@
+<ChartCard Title="Transfer Efficiency Validation — Eq (26a)"
+           Description="η_surf ∈ [0.9,1.0], η_mid ∈ [0.3,0.6], η_deep ∈ [0.0,0.1]">
+    <ChildContent>
+    <ThresholdIndicator Label="@_validationLabel" Passed="@_efficiencyValid" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\eta_{\text{surface}} \approx 1, \quad \eta_{\text{middle}} \approx 0.3\text{-}0.6, \quad \eta_{\text{deep}} \approx 0 \qquad (26a)" />
+        <h4>In Plain Language</h4>
+        <p>The surface layer transfers almost completely — standard patterns, API behaviors, common failure modes. The middle layer transfers partially — the model can learn some evaluative patterns and preferences. The deep layer barely transfers at all — contextual judgment, the sense of when rules don't apply, taste in genuine ambiguity. This knowledge is relational and situational in ways that resist encoding.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Layer hierarchy → <strong>Eq (1a)</strong></li>
+            <li>Transfer rate → <strong>Eq (26)</strong></li>
+            <li>Absorption ceiling → <strong>Eq (27)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 2b: Knowledge Preservation — Eq (29) ─── *@
+<ChartCard Title="Knowledge Preservation — Eq (29)"
+           Description="K_tacit ≠ K_model: tacit knowledge is not fully captured by the model.">
+    <ChildContent>
+    <ThresholdIndicator Label="@_knowledgePreservedLabel" Passed="@_knowledgePreserved" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="K_{\text{tacit}} \neq K_{\text{model}} \qquad (29)" />
+        <h4>In Plain Language</h4>
+        <p>What's in the model is K_explicit — the articulable, documentable portion of the expert's knowledge. What's in the tacit stock is K_tacit — the contextual, relational, situational judgment that resists encoding. These are different knowledge types, not different amounts of the same type. The transfer doesn't reduce &#x03B4; (the decay rate in Eq 12) — it only creates the illusion that K_tacit no longer needs active transmission. Before the transfer, the organization knew it had a bus factor problem. After the transfer, it believes it has solved it. It has solved only the legible portion.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tacit knowledge → <strong>Eq (12)</strong></li>
+            <li>Transfer ceiling → <strong>Eq (27)</strong></li>
+            <li>Pipeline break → <strong>Eq (13)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 3: Absorption Ceiling Bars — Eq (27) ─── *@
+<ChartCard Title="Absorption Ceiling — Eq (27)"
+           Description="lim M_abs = M₀ + Σ(ηᵢ · Fᵢ_explicit) for different M₀ values.">
+    <ChildContent>
+    <BarChart Bars="@_absorptionBars" XLabel="M₀" YLabel="Absorption Ceiling" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\lim_{t \to \infty} M_{\text{absorbed}} = M_0 + \sum_i \eta_i \cdot f_{i,\text{explicit}} \qquad (27)" />
+        <h4>In Plain Language</h4>
+        <p>No matter how long the transfer runs, the model converges to a maximum that includes all the explicit, articulable knowledge — and none of the tacit residual. The model absorbs what experts can articulate. It cannot absorb what they cannot. The transfer captures what was least durable anyway (surface) and leaves behind what was most irreplaceable (deep).</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Transfer efficiency → <strong>Eq (26a)</strong></li>
+            <li>Bus factor illusion → <strong>Eq (29)</strong></li>
+            <li>Tacit knowledge → <strong>Eq (12)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Composite 1: Time Allocation Trade-off — Eq (28) + (7a) ─── *@
+<ChartCard Title="Time Allocation Trade-off — Eq (28) + (7a)"
+           Description="Bar breakdown of τ_create, τ_eval, τ_extract and total time (Eq 28), with reallocated force at varying fractionToEval (Eq 7a).">
+    <ChildContent>
+    <BarChart Bars="@_timeAllocationBars" XLabel="Component" YLabel="Value" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau_{\text{extract}} \qquad (28)" />
+        <h4>In Plain Language</h4>
+        <p>The total working time of a high-force individual is now split three ways: building (where the multiplier on their output is highest), reviewing others' LLM-augmented work (bottleneck-clearing), and teaching the model (RLHF, knowledge systems). Every hour spent on one is an hour not spent on the others. No slack.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Evaluation bottleneck → <strong>Eq (7)</strong></li>
+            <li>Reallocation → <strong>Eq (7a)</strong></li>
+            <li>Transfer rate → <strong>Eq (26)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Composite 2: Data Quality Spiral — Eq (31) + (25) ─── *@
+<ChartCard Title="Data Quality Spiral — Eq (31) + (25)"
+           Description="Model quality evolution over 20 iterations (Eq 31) overlaid with multiplier growth M(t) (Eq 25).">
+    <ChildContent>
+    <LineChart Series="@_qualitySpiralSeries" XLabel="Iteration" YLabel="Value" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{Quality}(M_{t+1}) = g\!\left(\text{Quality}(M_t),\; \bar{F}_{\text{annotators}}(t)\right) \qquad (31)" />
+        <h4>In Plain Language</h4>
+        <p>The next generation of the model is only as good as the current generation plus the quality of human judgment feeding its training pipeline. If the average force of the people generating training signal is declining — as Eqs (15b) and (16) predict — then model quality improvement decelerates or reverses. The mirror's fidelity degrades because the human signal has been hollowed out. This is the strongest argument for why M(t) may not grow exponentially.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>M growth → <strong>Eq (25)</strong></li>
+            <li>Force atrophy → <strong>Eq (11)</strong></li>
+            <li>Diverging trajectories → <strong>Eq (15b)</strong></li>
+            <li>Terminal dynamics</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Composite 3: Tipping Point Shift — Eq (30) + (14) ─── *@
+<ChartCard Title="Tipping Point Shift — Eq (30) + (14)"
+           Description="F* before and after model transfer. Threshold at F*_pre; indicator shows whether F*_post > F*_pre (Eq 30).">
+    <ChildContent>
+    <NumberLine Width="600" Height="100"
+                Min="0" Max="@_tpNumberLineMax"
+                Threshold="@_fStarPre"
+                Points="@_tippingPointShiftPoints" />
+    <ThresholdIndicator Label="@_tippingShiftLabel" Passed="@_hasTippingPointRisen" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}} \qquad (30)" />
+        <h4>In Plain Language</h4>
+        <p>Here is perhaps the deepest consequence of the F→M coupling. A successful knowledge transfer to the model raises the threshold below which force atrophy becomes self-reinforcing. More engineers fall below F* not because they got weaker, but because the threshold moved upward. They were above F* when the model was a simple amplifier. They fall below it when the model becomes a competent-seeming colleague. The better the transfer works, the more it undermines conditions for maintaining human force. A partially successful transfer might be safer than a very successful one.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point → <strong>Eq (14)</strong></li>
+            <li>Force dynamics → <strong>Eq (11)</strong></li>
+            <li>Transfer rate → <strong>Eq (26)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Transfer Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (26): Transfer Rate</div>
+    <ParameterSlider Label="η_surface" Min="0" Max="1" Step="0.05"
+                     Value="@_etaSurface" ValueChanged="@OnEtaSurfaceChanged" />
+    <ParameterSlider Label="η_middle" Min="0" Max="1" Step="0.05"
+                     Value="@_etaMiddle" ValueChanged="@OnEtaMiddleChanged" />
+    <ParameterSlider Label="η_deep" Min="0" Max="1" Step="0.05"
+                     Value="@_etaDeep" ValueChanged="@OnEtaDeepChanged" />
+    <ParameterSlider Label="F_surface" Min="0" Max="10" Step="0.5"
+                     Value="@_forceSurface" ValueChanged="@OnForceSurfaceChanged" />
+    <ParameterSlider Label="F_middle" Min="0" Max="10" Step="0.5"
+                     Value="@_forceMiddle" ValueChanged="@OnForceMiddleChanged" />
+    <ParameterSlider Label="F_deep" Min="0" Max="10" Step="0.5"
+                     Value="@_forceDeep" ValueChanged="@OnForceDeepChanged" />
+    <div class="slider-group-header">Eq (29): Knowledge Preservation</div>
+    <ParameterSlider Label="K_tacit" Min="0" Max="20" Step="0.5"
+                     Value="@_kTacit" ValueChanged="@OnKTacitChanged" />
+    <ParameterSlider Label="K_model" Min="0" Max="20" Step="0.5"
+                     Value="@_kModel" ValueChanged="@OnKModelChanged" />
+    <div class="slider-group-header">Eq (28): Time Allocation</div>
+    <ParameterSlider Label="τ_create" Min="0" Max="10" Step="0.5"
+                     Value="@_tauCreate" ValueChanged="@OnTauCreateChanged" />
+    <ParameterSlider Label="τ_eval" Min="0" Max="5" Step="0.25"
+                     Value="@_tauEval" ValueChanged="@OnTauEvalChanged" />
+    <ParameterSlider Label="τ_extract" Min="0" Max="5" Step="0.25"
+                     Value="@_tauExtract" ValueChanged="@OnTauExtractChanged" />
+    <ParameterSlider Label="F_high" Min="1" Max="10" Step="0.5"
+                     Value="@_forceHigh" ValueChanged="@OnForceHighChanged" />
+    <div class="slider-group-header">Eq (31): Data Quality Spiral</div>
+    <ParameterSlider Label="Q₀ (initial quality)" Min="0" Max="10" Step="0.5"
+                     Value="@_qualityCurrent" ValueChanged="@OnQualityCurrentChanged" />
+    <ParameterSlider Label="F_avg (annotators)" Min="0" Max="10" Step="0.5"
+                     Value="@_avgForceAnnotators" ValueChanged="@OnAvgForceAnnotatorsChanged" />
+    <ParameterSlider Label="M₀ (initial multiplier)" Min="0.5" Max="5" Step="0.25"
+                     Value="@_m0Growth" ValueChanged="@OnM0GrowthChanged" />
+    <ParameterSlider Label="μ (growth rate)" Min="0.01" Max="0.5" Step="0.01"
+                     Value="@_muGrowth" ValueChanged="@OnMuGrowthChanged" />
+    <div class="slider-group-header">Eq (30): Tipping Point Shift</div>
+    <ParameterSlider Label="β (decay)" Min="0" Max="1" Step="0.01"
+                     Value="@_tpBeta" ValueChanged="@OnTpBetaChanged" />
+    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1"
+                     Value="@_tpReplacement" ValueChanged="@OnTpReplacementChanged" />
+    <ParameterSlider Label="σ (absorption)" Min="0" Max="2" Step="0.05"
+                     Value="@_tpSigma" ValueChanged="@OnTpSigmaChanged" />
+    <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1"
+                     Value="@_tpMAbsorbed" ValueChanged="@OnTpMAbsorbedChanged" />
+    <ParameterSlider Label="γ (engagement rate)" Min="0" Max="1" Step="0.01"
+                     Value="@_tpGamma" ValueChanged="@OnTpGammaChanged" />
+    <ParameterSlider Label="E (engagement)" Min="0" Max="5" Step="0.1"
+                     Value="@_tpEngagement" ValueChanged="@OnTpEngagementChanged" />
+    <ParameterSlider Label="Transfer amount" Min="0" Max="3" Step="0.1"
+                     Value="@_transferAmount" ValueChanged="@OnTransferAmountChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // Shared eta sliders
+    private double _etaSurface = 0.8;
+    private double _etaMiddle = 0.5;
+    private double _etaDeep = 0.2;
+
+    // Shared force sliders
+    private double _forceSurface = 8.0;
+    private double _forceMiddle = 5.0;
+    private double _forceDeep = 3.0;
+
+    private double[] Eta => new[] { _etaSurface, _etaMiddle, _etaDeep };
+    private double[] Forces => new[] { _forceSurface, _forceMiddle, _forceDeep };
+
+    // ─── Chart 1: Transfer Rate Bars ───
+    private static readonly double[] TauValues = { 0.5, 1.0, 2.0, 5.0 };
+    private IReadOnlyList<BarItem> _transferRateBars => TauValues
+        .Select(tau => new BarItem($"τ={tau}", ForceToModelTransfer.TransferRate(Eta, Forces, tau)))
+        .ToList();
+
+    // ─── Chart 2: Efficiency Validation ───
+    private bool _efficiencyValid => ForceToModelTransfer.ValidateTransferEfficiencies(_etaSurface, _etaMiddle, _etaDeep);
+    private string _validationLabel => _efficiencyValid
+        ? $"Valid: η_s={_etaSurface:F2}, η_m={_etaMiddle:F2}, η_d={_etaDeep:F2}"
+        : $"Invalid: η_s={_etaSurface:F2}, η_m={_etaMiddle:F2}, η_d={_etaDeep:F2}";
+
+    // ─── Chart 2b: Knowledge Preservation (Eq 29) ───
+    private double _kTacit = 10.0;
+    private double _kModel = 6.0;
+    private bool _knowledgePreserved => ForceToModelTransfer.IsKnowledgePreserved(_kTacit, _kModel);
+    private string _knowledgePreservedLabel => _knowledgePreserved
+        ? $"Knowledge preserved: K_tacit ({_kTacit:F1}) = K_model ({_kModel:F1})"
+        : $"Knowledge lost: K_tacit ({_kTacit:F1}) ≠ K_model ({_kModel:F1})";
+
+    private void OnKTacitChanged(double val) { _kTacit = val; }
+    private void OnKModelChanged(double val) { _kModel = val; }
+
+    // ─── Chart 3: Absorption Ceiling Bars ───
+    private static readonly double[] M0Values = { 0.5, 1.0, 2.0, 3.0, 5.0 };
+    private IReadOnlyList<BarItem> _absorptionBars => M0Values
+        .Select(m0 => new BarItem($"M₀={m0}", ForceToModelTransfer.AbsorptionCeiling(m0, Eta, Forces)))
+        .ToList();
+
+    // Slider callbacks (Wave 3)
+    private void OnEtaSurfaceChanged(double val) { _etaSurface = val; }
+    private void OnEtaMiddleChanged(double val) { _etaMiddle = val; }
+    private void OnEtaDeepChanged(double val) { _etaDeep = val; }
+    private void OnForceSurfaceChanged(double val) { _forceSurface = val; }
+    private void OnForceMiddleChanged(double val) { _forceMiddle = val; }
+    private void OnForceDeepChanged(double val) { _forceDeep = val; }
+
+    // ═══════════════════════════════════════════════════════════
+    // Composite 1: Time Allocation Trade-off — Eq (28) + (7a)
+    // ═══════════════════════════════════════════════════════════
+    private double _tauCreate = 5.0;
+    private double _tauEval = 1.0;
+    private double _tauExtract = 1.0;
+    private double _forceHigh = 8.0;
+
+    private static readonly double[] FractionValues = { 0.1, 0.3, 0.5, 0.7 };
+
+    private IReadOnlyList<BarItem> _timeAllocationBars
+    {
+        get
+        {
+            var total = ForceToModelTransfer.TotalTimeAllocation(_tauCreate, _tauEval, _tauExtract);
+            var bars = new List<BarItem>
+            {
+                new("τ_create", _tauCreate, "#2563eb"),
+                new("τ_eval", _tauEval, "#059669"),
+                new("τ_extract", _tauExtract, "#d97706"),
+                new("Total τ", total, "#7c3aed")
+            };
+            foreach (var frac in FractionValues)
+            {
+                var reallocated = CreationEvaluation.ReallocatedForce(_forceHigh, frac);
+                bars.Add(new BarItem($"Realloc f={frac:F1}", reallocated, "#dc2626"));
+            }
+            return bars;
+        }
+    }
+
+    private void OnTauCreateChanged(double val) { _tauCreate = val; }
+    private void OnTauEvalChanged(double val) { _tauEval = val; }
+    private void OnTauExtractChanged(double val) { _tauExtract = val; }
+    private void OnForceHighChanged(double val) { _forceHigh = val; }
+
+    // ═══════════════════════════════════════════════════════════
+    // Composite 2: Data Quality Spiral — Eq (31) + (25)
+    // ═══════════════════════════════════════════════════════════
+    private double _qualityCurrent = 5.0;
+    private double _avgForceAnnotators = 6.0;
+    private double _m0Growth = 1.0;
+    private double _muGrowth = 0.1;
+
+    private IReadOnlyList<ChartSeries> _qualitySpiralSeries
+    {
+        get
+        {
+            var qualityPoints = new List<DataPoint>();
+            var multiplierPoints = new List<DataPoint>();
+            Func<double, double, double> qualityFn = (q, f) => q + 0.1 * f;
+
+            double q = _qualityCurrent;
+            for (int t = 0; t <= 20; t++)
+            {
+                qualityPoints.Add(new DataPoint(t, q));
+                multiplierPoints.Add(new DataPoint(t, ModelGrowth.MultiplierAtTime(_m0Growth, _muGrowth, t)));
+                q = ForceToModelTransfer.ModelQualityNext(q, _avgForceAnnotators, qualityFn);
+            }
+
+            return new List<ChartSeries>
+            {
+                new("Quality Q(t)", qualityPoints, "#2563eb", 2.0, true),
+                new("Multiplier M(t)", multiplierPoints, "#dc2626", 2.0, true)
+            };
+        }
+    }
+
+    private void OnQualityCurrentChanged(double val) { _qualityCurrent = val; }
+    private void OnAvgForceAnnotatorsChanged(double val) { _avgForceAnnotators = val; }
+    private void OnM0GrowthChanged(double val) { _m0Growth = val; }
+    private void OnMuGrowthChanged(double val) { _muGrowth = val; }
+
+    // ═══════════════════════════════════════════════════════════
+    // Composite 3: Tipping Point Shift — Eq (30) + (14)
+    // ═══════════════════════════════════════════════════════════
+    private double _tpBeta = 0.3;
+    private double _tpReplacement = 2.0;
+    private double _tpSigma = 0.5;
+    private double _tpMAbsorbed = 1.0;
+    private double _tpGamma = 0.2;
+    private double _tpEngagement = 1.0;
+    private double _transferAmount = 1.0;
+
+    private double _fStarPre => ForceDynamics.TippingPoint(_tpBeta, _tpReplacement, _tpSigma, _tpMAbsorbed, _tpGamma, _tpEngagement);
+    private double _fStarPost => ForceDynamics.TippingPoint(_tpBeta, _tpReplacement, _tpSigma, _tpMAbsorbed + _transferAmount, _tpGamma, _tpEngagement);
+    private bool _hasTippingPointRisen => ForceToModelTransfer.HasTippingPointRisen(_fStarPost, _fStarPre);
+    private double _tpNumberLineMax => Math.Max(Math.Max(_fStarPre, _fStarPost) * 1.5, 10);
+
+    private string _tippingShiftLabel => _hasTippingPointRisen
+        ? $"F*_post ({_fStarPost:F2}) > F*_pre ({_fStarPre:F2}) — tipping point risen"
+        : $"F*_post ({_fStarPost:F2}) <= F*_pre ({_fStarPre:F2}) — tipping point not risen";
+
+    private IReadOnlyList<NumberLinePoint> _tippingPointShiftPoints => new List<NumberLinePoint>
+    {
+        new(_fStarPre, "#2563eb"),
+        new(_fStarPost, "#dc2626")
+    };
+
+    private void OnTpBetaChanged(double val) { _tpBeta = val; }
+    private void OnTpReplacementChanged(double val) { _tpReplacement = val; }
+    private void OnTpSigmaChanged(double val) { _tpSigma = val; }
+    private void OnTpMAbsorbedChanged(double val) { _tpMAbsorbed = val; }
+    private void OnTpGammaChanged(double val) { _tpGamma = val; }
+    private void OnTpEngagementChanged(double val) { _tpEngagement = val; }
+    private void OnTransferAmountChanged(double val) { _transferAmount = val; }
+}

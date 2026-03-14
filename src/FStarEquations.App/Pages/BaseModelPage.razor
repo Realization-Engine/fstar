@@ -1,0 +1,148 @@
+@page "/base-model"
+
+<PageTitle>Force is Not a Number — Eq (1), (1a), (2), (3)</PageTitle>
+
+<h1>Force is Not a Number — Eq (1), (1a), (2), (3)</h1>
+
+<blockquote>
+    Output is not the sum of its parts — it is a product. The Cobb-Douglas structure means that zeroing any single force dimension collapses the entire output, no matter how strong the others. The multiplier M acts as a scaling lens on this product.
+</blockquote>
+
+<ChartCard Title="Cobb-Douglas HeatMap" Description="Eq (1): O = M * product(fi^wi). Varies M (x-axis) and average force (y-axis) to compute output.">
+    <ChildContent>
+        <HeatMap Width="600" Height="400"
+                 XLabel="Multiplier (M)"
+                 YLabel="Average Force"
+                 Data="@_heatMapData"
+                 XValues="@_heatMapXValues"
+                 YValues="@_heatMapYValues" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="O = M \times F \quad \text{where} \quad F = \prod_{i} f_i^{w_i} \qquad (1)" />
+        <h4>In Plain Language</h4>
+        <p>Your productive output equals the LLM's power times the product of your capabilities, each raised to its importance for the task at hand. The mathematical consequence of the multiplicative form is decisive: if any critical component approaches zero, force collapses toward zero regardless of how strong the others are.</p>
+        <h4>The Mirror</h4>
+        <p>You cannot place a question before the mirror that exhibits precision you don't possess. The reflection is faithful along the substance channel — it gives back what you brought, no more and no less.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Layer hierarchy → <strong>Eq (1a)</strong></li>
+            <li>Variance amplification → <strong>Eq (4)</strong></li>
+            <li>Force dynamics → <strong>Eq (11)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<ChartCard Title="Layer Ordering" Description="Eq (2): Validates surface > middle > deep layer ordering.">
+    <ChildContent>
+        <BarChart Bars="@_layerBars" XLabel="Layer" YLabel="M_eff" />
+        <ThresholdIndicator Label="@(_layerValid ? "Layer ordering valid" : "Layer ordering violated")" Passed="@_layerValid" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="M_{\text{eff}}^{\text{surface}} \gg M_{\text{eff}}^{\text{middle}} > M_{\text{eff}}^{\text{deep}} \approx 1 \qquad (1a)" />
+        <h4>In Plain Language</h4>
+        <p>The LLM is an almost perfect substitute for the surface layer (syntax, APIs — high M), a partial substitute for the middle layer (judgment, taste — moderate M), and barely a substitute at all for the deep layer (structural intuition — M ≈ 1). Surface has a half-life of months, middle of years, deep of decades.</p>
+        <h4>The Mirror</h4>
+        <p>The mirror's fidelity at the surface conceals its limitations at depth.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Barbell effect → <strong>Eq (6)</strong></li>
+            <li>Layered decay → <strong>Eq (11a-c)</strong></li>
+            <li>Transfer efficiency → <strong>Eq (26a)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Base Model Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (1): Base Output</div>
+    <ParameterSlider Label="M" Min="0.5" Max="5" Step="0.1" Value="@_m" ValueChanged="OnMChanged" />
+    <ParameterSlider Label="Force (Surface)" Min="0" Max="10" Step="0.1" Value="@_forceSurface" ValueChanged="OnForceSurfaceChanged" />
+    <ParameterSlider Label="Force (Middle)" Min="0" Max="10" Step="0.1" Value="@_forceMiddle" ValueChanged="OnForceMiddleChanged" />
+    <ParameterSlider Label="Force (Deep)" Min="0" Max="10" Step="0.1" Value="@_forceDeep" ValueChanged="OnForceDeepChanged" />
+    <div class="slider-group-header">Eq (1a): Layer Ordering</div>
+    <ParameterSlider Label="Weight (Surface)" Min="0" Max="1" Step="0.1" Value="@_weightSurface" ValueChanged="OnWeightSurfaceChanged" />
+    <ParameterSlider Label="Weight (Middle)" Min="0" Max="1" Step="0.1" Value="@_weightMiddle" ValueChanged="OnWeightMiddleChanged" />
+    <ParameterSlider Label="Weight (Deep)" Min="0" Max="1" Step="0.1" Value="@_weightDeep" ValueChanged="OnWeightDeepChanged" />
+</FloatingSliderPanel>
+
+@code {
+    private double _m = 1;
+    private double _forceSurface = 3;
+    private double _forceMiddle = 5;
+    private double _forceDeep = 8;
+    private double _weightSurface = 0.2;
+    private double _weightMiddle = 0.3;
+    private double _weightDeep = 0.5;
+
+    private double[,] _heatMapData = new double[0, 0];
+    private double[] _heatMapXValues = Array.Empty<double>();
+    private double[] _heatMapYValues = Array.Empty<double>();
+    private List<BarItem> _layerBars = new();
+    private bool _layerValid;
+
+    protected override void OnInitialized() => Recalculate();
+
+    private void OnMChanged(double v) { _m = v; Recalculate(); }
+    private void OnForceSurfaceChanged(double v) { _forceSurface = v; Recalculate(); }
+    private void OnForceMiddleChanged(double v) { _forceMiddle = v; Recalculate(); }
+    private void OnForceDeepChanged(double v) { _forceDeep = v; Recalculate(); }
+    private void OnWeightSurfaceChanged(double v) { _weightSurface = v; Recalculate(); }
+    private void OnWeightMiddleChanged(double v) { _weightMiddle = v; Recalculate(); }
+    private void OnWeightDeepChanged(double v) { _weightDeep = v; Recalculate(); }
+
+    private void Recalculate()
+    {
+        ComputeHeatMap();
+        ComputeLayerBars();
+    }
+
+    private void ComputeHeatMap()
+    {
+        const int steps = 20;
+        _heatMapXValues = new double[steps];
+        _heatMapYValues = new double[steps];
+        _heatMapData = new double[steps, steps];
+
+        var weights = new[] { _weightSurface, _weightMiddle, _weightDeep };
+
+        for (int i = 0; i < steps; i++)
+        {
+            _heatMapXValues[i] = 0.5 + i * 4.5 / (steps - 1);
+        }
+        for (int j = 0; j < steps; j++)
+        {
+            _heatMapYValues[j] = 0.1 + j * 9.9 / (steps - 1);
+        }
+
+        for (int r = 0; r < steps; r++)
+        {
+            var avgForce = _heatMapYValues[r];
+            var forces = new[] { avgForce, avgForce, avgForce };
+            for (int c = 0; c < steps; c++)
+            {
+                var mVal = _heatMapXValues[c];
+                _heatMapData[r, c] = BaseModel.ComputeOutput(mVal, forces, weights);
+            }
+        }
+    }
+
+    private void ComputeLayerBars()
+    {
+        var forces = new[] { _forceSurface, _forceMiddle, _forceDeep };
+        var weights = new[] { _weightSurface, _weightMiddle, _weightDeep };
+
+        var mEffSurface = BaseModel.ComputeOutput(_m, new[] { _forceSurface }, new[] { 1.0 });
+        var mEffMiddle = BaseModel.ComputeOutput(_m, new[] { _forceMiddle }, new[] { 1.0 });
+        var mEffDeep = BaseModel.ComputeOutput(_m, new[] { _forceDeep }, new[] { 1.0 });
+
+        _layerBars = new List<BarItem>
+        {
+            new("Surface", mEffSurface, "#f97316"),
+            new("Middle", mEffMiddle, "#8b5cf6"),
+            new("Deep", mEffDeep, "#06b6d4")
+        };
+
+        _layerValid = BaseModel.ValidateLayerOrdering(mEffSurface, mEffMiddle, mEffDeep);
+    }
+}

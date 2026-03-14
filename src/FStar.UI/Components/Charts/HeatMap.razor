@@ -1,0 +1,151 @@
+@using FStar.UI.Models
+@using System.Globalization
+
+<svg class="heat-map"
+     role="img"
+     aria-label="@GetAriaLabel()"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @if (Data is not null && Data.GetLength(0) > 0 && Data.GetLength(1) > 0)
+    {
+        var rows = Data.GetLength(0);
+        var cols = Data.GetLength(1);
+        var cellWidth = (double)PlotAreaWidth / cols;
+        var cellHeight = (double)PlotAreaHeight / rows;
+        var (scaleMin, scaleMax) = GetColorBounds();
+
+        @for (int r = 0; r < rows; r++)
+        {
+            @for (int c = 0; c < cols; c++)
+            {
+                var x = MarginLeft + c * cellWidth;
+                var y = MarginTop + (rows - 1 - r) * cellHeight;
+                var color = InterpolateColor(Data[r, c], scaleMin, scaleMax);
+                <rect x="@F(x)" y="@F(y)" width="@F(cellWidth)" height="@F(cellHeight)" fill="@color" />
+            }
+        }
+    }
+
+    @* X-axis tick labels *@
+    @if (XValues is not null)
+    {
+        var cols = XValues.Length;
+        var cellWidth = (double)PlotAreaWidth / cols;
+        var step = Math.Max(1, cols / 5);
+        @for (int c = 0; c < cols; c += step)
+        {
+            var x = MarginLeft + (c + 0.5) * cellWidth;
+            @SvgText(XValues[c].ToString("G3", CultureInfo.InvariantCulture), x, PlotBottom + 16)
+        }
+    }
+
+    @* Y-axis tick labels *@
+    @if (YValues is not null)
+    {
+        var rows = YValues.Length;
+        var cellHeight = (double)PlotAreaHeight / rows;
+        var step = Math.Max(1, rows / 5);
+        @for (int r = 0; r < rows; r += step)
+        {
+            var y = MarginTop + (rows - 1 - r + 0.5) * cellHeight;
+            @SvgText(YValues[r].ToString("G3", CultureInfo.InvariantCulture), MarginLeft - 8, y, "end")
+        }
+    }
+
+    @* Axis labels *@
+    @if (!string.IsNullOrEmpty(XLabel))
+    {
+        @SvgText(XLabel, MarginLeft + PlotAreaWidth / 2.0, Height - 4)
+    }
+    @if (!string.IsNullOrEmpty(YLabel))
+    {
+        var cy = MarginTop + PlotAreaHeight / 2.0;
+        @((MarkupString)$"<text x=\"14\" y=\"{F(cy)}\" text-anchor=\"middle\" font-size=\"13\" fill=\"var(--text-primary, #333)\" transform=\"rotate(-90, 14, {F(cy)})\">{System.Net.WebUtility.HtmlEncode(YLabel)}</text>")
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public string? XLabel { get; set; }
+    [Parameter] public string? YLabel { get; set; }
+    [Parameter] public double[,]? Data { get; set; }
+    [Parameter] public double[]? XValues { get; set; }
+    [Parameter] public double[]? YValues { get; set; }
+    [Parameter] public double? ColorScaleMin { get; set; }
+    [Parameter] public double? ColorScaleMax { get; set; }
+    [Parameter] public string LowColor { get; set; } = "#f0f9ff";
+    [Parameter] public string HighColor { get; set; } = "#1e40af";
+
+    private const int MarginTop = 20;
+    private const int MarginRight = 20;
+    private const int MarginBottom = 50;
+    private const int MarginLeft = 60;
+
+    private int PlotAreaWidth => Width - MarginLeft - MarginRight;
+    private int PlotAreaHeight => Height - MarginTop - MarginBottom;
+    private int PlotBottom => Height - MarginBottom;
+
+    private string F(double v) => v.ToString("F2", CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(string content, double x, double y, string anchor = "middle", string fontSize = "12")
+    {
+        var encoded = System.Net.WebUtility.HtmlEncode(content);
+        return (MarkupString)$"<text x=\"{x.ToString("F2", CultureInfo.InvariantCulture)}\" y=\"{y.ToString("F2", CultureInfo.InvariantCulture)}\" text-anchor=\"{anchor}\" font-size=\"{fontSize}\" fill=\"var(--text-primary, #333)\">{encoded}</text>";
+    }
+
+    private (double min, double max) GetColorBounds()
+    {
+        if (Data is null) return (0, 1);
+
+        double min = ColorScaleMin ?? double.MaxValue;
+        double max = ColorScaleMax ?? double.MinValue;
+
+        if (ColorScaleMin is null || ColorScaleMax is null)
+        {
+            for (int r = 0; r < Data.GetLength(0); r++)
+            {
+                for (int c = 0; c < Data.GetLength(1); c++)
+                {
+                    if (ColorScaleMin is null) min = Math.Min(min, Data[r, c]);
+                    if (ColorScaleMax is null) max = Math.Max(max, Data[r, c]);
+                }
+            }
+        }
+
+        if (Math.Abs(max - min) < 1e-12) max = min + 1;
+        return (min, max);
+    }
+
+    private string InterpolateColor(double value, double min, double max)
+    {
+        var t = Math.Clamp((value - min) / (max - min), 0, 1);
+        var (lr, lg, lb) = ParseHexColor(LowColor);
+        var (hr, hg, hb) = ParseHexColor(HighColor);
+        var r = (int)Math.Round(lr + t * (hr - lr));
+        var g = (int)Math.Round(lg + t * (hg - lg));
+        var b = (int)Math.Round(lb + t * (hb - lb));
+        return $"#{r:X2}{g:X2}{b:X2}";
+    }
+
+    private static (int r, int g, int b) ParseHexColor(string hex)
+    {
+        hex = hex.TrimStart('#');
+        return (
+            Convert.ToInt32(hex.Substring(0, 2), 16),
+            Convert.ToInt32(hex.Substring(2, 2), 16),
+            Convert.ToInt32(hex.Substring(4, 2), 16)
+        );
+    }
+
+    private string GetAriaLabel()
+    {
+        var label = "Heat map";
+        if (!string.IsNullOrEmpty(XLabel) && !string.IsNullOrEmpty(YLabel))
+            label += $": {XLabel} vs {YLabel}";
+        return label;
+    }
+}

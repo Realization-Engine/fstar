@@ -1,0 +1,135 @@
+@using FStar.UI.Models
+@using System.Globalization
+
+<svg class="phase-portrait"
+     role="img"
+     aria-label="@GetAriaLabel()"
+     width="@Width"
+     height="@Height"
+     viewBox="0 0 @Width @Height"
+     xmlns="http://www.w3.org/2000/svg">
+
+    @* Y axis *@
+    <line x1="@MarginLeft" y1="@MarginTop" x2="@MarginLeft" y2="@PlotBottom"
+          stroke="var(--text-secondary, #333)" stroke-width="1" />
+
+    @* X axis *@
+    <line x1="@MarginLeft" y1="@PlotBottom" x2="@PlotRight" y2="@PlotBottom"
+          stroke="var(--text-secondary, #333)" stroke-width="1" />
+
+    @* Axis labels *@
+    @if (!string.IsNullOrEmpty(XLabel))
+    {
+        @SvgText(XLabel, (MarginLeft + PlotRight) / 2.0, Height - 4, "middle", "13")
+    }
+    @if (!string.IsNullOrEmpty(YLabel))
+    {
+        var cy = (MarginTop + PlotBottom) / 2.0;
+        @((MarkupString)$"<text x=\"14\" y=\"{Fmt(cy)}\" text-anchor=\"middle\" font-size=\"13\" fill=\"var(--text-primary, #333)\" transform=\"rotate(-90, 14, {Fmt(cy)})\">{System.Net.WebUtility.HtmlEncode(YLabel)}</text>")
+    }
+
+    @* Zero line (horizontal) for dF/dt = 0 *@
+    @if (DataYMin < 0 && DataYMax > 0)
+    {
+        var zeroY = ScaleY(0);
+        <line x1="@MarginLeft" y1="@Fmt(zeroY)" x2="@PlotRight" y2="@Fmt(zeroY)"
+              stroke="var(--text-muted, #999)" stroke-width="1" stroke-dasharray="4,4" />
+    }
+
+    @* Curve polyline *@
+    @if (Curve is not null && Curve.Count > 1)
+    {
+        var pointsAttr = string.Join(" ",
+            Curve.Select(p => $"{Fmt(ScaleX(p.X))},{Fmt(ScaleY(p.Y))}"));
+
+        <polyline points="@pointsAttr"
+                  fill="none"
+                  stroke="#2563eb"
+                  stroke-width="2" />
+    }
+
+    @* Zero crossing vertical marker *@
+    @if (ZeroCrossing.HasValue)
+    {
+        var xPos = ScaleX(ZeroCrossing.Value);
+        <line x1="@Fmt(xPos)" y1="@Fmt(MarginTop)" x2="@Fmt(xPos)" y2="@Fmt(PlotBottom)"
+              stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4" class="zero-crossing-line" />
+        @SvgText($"F*={Fmt(ZeroCrossing.Value)}", xPos, MarginTop - 6, "middle", "11")
+    }
+</svg>
+
+@code {
+    [Parameter] public int Width { get; set; } = 600;
+    [Parameter] public int Height { get; set; } = 400;
+    [Parameter] public string? XLabel { get; set; }
+    [Parameter] public string? YLabel { get; set; }
+    [Parameter] public IReadOnlyList<DataPoint>? Curve { get; set; }
+    [Parameter] public double? ZeroCrossing { get; set; }
+
+    private const int MarginLeft = 60;
+    private const int MarginRight = 20;
+    private const int MarginTop = 30;
+    private const int MarginBottom = 40;
+
+    private double PlotRight => Width - MarginRight;
+    private double PlotBottom => Height - MarginBottom;
+    private double PlotWidth => PlotRight - MarginLeft;
+    private double PlotHeight => PlotBottom - MarginTop;
+
+    private double DataXMin { get; set; }
+    private double DataXMax { get; set; }
+    private double DataYMin { get; set; }
+    private double DataYMax { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        ComputeBounds();
+    }
+
+    private void ComputeBounds()
+    {
+        if (Curve is null || Curve.Count == 0)
+        {
+            DataXMin = 0; DataXMax = 1;
+            DataYMin = 0; DataYMax = 1;
+            return;
+        }
+
+        DataXMin = Curve.Min(p => p.X);
+        DataXMax = Curve.Max(p => p.X);
+        DataYMin = Curve.Min(p => p.Y);
+        DataYMax = Curve.Max(p => p.Y);
+
+        if (Math.Abs(DataXMax - DataXMin) < 1e-12) { DataXMin -= 1; DataXMax += 1; }
+        if (Math.Abs(DataYMax - DataYMin) < 1e-12) { DataYMin -= 1; DataYMax += 1; }
+
+        // Ensure Y range includes zero for phase portraits
+        if (DataYMin > 0) DataYMin = 0;
+        if (DataYMax < 0) DataYMax = 0;
+    }
+
+    private double ScaleX(double value)
+    {
+        var ratio = (value - DataXMin) / (DataXMax - DataXMin);
+        return MarginLeft + ratio * PlotWidth;
+    }
+
+    private double ScaleY(double value)
+    {
+        var ratio = (value - DataYMin) / (DataYMax - DataYMin);
+        return PlotBottom - ratio * PlotHeight;
+    }
+
+    private static string Fmt(double value) => value.ToString(CultureInfo.InvariantCulture);
+
+    private static MarkupString SvgText(string content, double x, double y, string anchor = "middle", string fontSize = "12") =>
+        new($"<text x=\"{Fmt(x)}\" y=\"{Fmt(y)}\" text-anchor=\"{anchor}\" font-size=\"{fontSize}\" fill=\"var(--text-primary, #333)\">{System.Net.WebUtility.HtmlEncode(content)}</text>");
+
+    private string GetAriaLabel()
+    {
+        var label = "Phase portrait";
+        if (!string.IsNullOrEmpty(XLabel) && !string.IsNullOrEmpty(YLabel))
+            label += $": {XLabel} vs {YLabel}";
+        return label;
+    }
+}

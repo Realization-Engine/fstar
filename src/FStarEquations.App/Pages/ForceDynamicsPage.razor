@@ -1,0 +1,333 @@
+@page "/force-dynamics"
+
+<PageTitle>The Atrophy Problem — Eq (11), (11a-c)</PageTitle>
+
+<h1>The Atrophy Problem — Eq (11), (11a-c)</h1>
+
+<blockquote>
+    Force is not static. It decays through replacement, atrophies without struggle, and stratifies into surface, middle, and deep layers. The surface layer is the first to erode and the easiest to replace; the deep layer is the most durable and the hardest to rebuild.
+</blockquote>
+
+@* ─── Sparkline 1: Surface Layer — Eq (11a) ─── *@
+<ChartCard Title="Surface Layer dF/dt — Eq (11a)"
+           Description="df_surf/dt = −β_s · R as replacement varies.">
+    <ChildContent>
+        <LineChart Series="@_surfaceSeries"
+                   XLabel="Replacement (R)"
+                   YLabel="df_surf/dt"
+                   XMin="0" XMax="5"
+                   ShowGrid="true"
+                   Width="400" Height="200" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{df_{\text{surface}}}{dt} = -\beta_s \cdot R \qquad (11a)" />
+        <h4>In Plain Language</h4>
+        <p>The surface layer — framework syntax, API signatures, tool configurations — erodes fast under LLM dependence. But its loss is benign: the LLM substitutes for it fully (Eq 1a). Why memorize what the mirror can always show you? Half-life measured in months.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Layer hierarchy Eq (1a)</li>
+            <li>Middle layer Eq (11b)</li>
+            <li>Transfer efficiency Eq (26a)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Sparkline 2: Middle Layer — Eq (11b) ─── *@
+<ChartCard Title="Middle Layer dF/dt — Eq (11b)"
+           Description="df_mid/dt = α_m·S + γ_m·E·f_mid − β_m·R as replacement varies.">
+    <ChildContent>
+        <LineChart Series="@_middleSeries"
+                   XLabel="Replacement (R)"
+                   YLabel="df_mid/dt"
+                   XMin="0" XMax="5"
+                   ShowGrid="true"
+                   Width="400" Height="200" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{df_{\text{middle}}}{dt} = \alpha_m \cdot S + \gamma_m \cdot E \cdot f_{\text{middle}} - \beta_m \cdot R \qquad (11b)" />
+        <h4>In Plain Language</h4>
+        <p>The middle layer is the critical battleground — judgment, taste, pattern recognition, the ability to evaluate the LLM's output. This is where the tipping point (Eq 14) operates. The γ_m·E·f_middle term determines whether judgment compounds or atrophies. Half-life measured in years. Decays silently because judgment is precisely the faculty that would detect its own absence.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Epistemic gap Eq (10)</li>
+            <li>Full dynamics Eq (11)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Sparkline 3: Deep Layer — Eq (11c) ─── *@
+<ChartCard Title="Deep Layer dF/dt — Eq (11c)"
+           Description="df_deep/dt = α_d·S − β_d·R as replacement varies.">
+    <ChildContent>
+        <LineChart Series="@_deepSeries"
+                   XLabel="Replacement (R)"
+                   YLabel="df_deep/dt"
+                   XMin="0" XMax="5"
+                   ShowGrid="true"
+                   Width="400" Height="200" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{df_{\text{deep}}}{dt} = \alpha_d \cdot S - \beta_d \cdot R \qquad \text{where } \beta_d \ll \beta_s \qquad (11c)" />
+        <h4>In Plain Language</h4>
+        <p>The deep layer — structural intuition, the felt sense of impending failure — barely changes in the short run but is the hardest to rebuild once lost. Built through years of direct experience no language model can replicate. Half-life measured in decades. Almost somatic in its encoding.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Transfer ceiling Eq (27)</li>
+            <li>Sovereignty Eq (24a)</li>
+            <li>Tacit knowledge Eq (12)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── ODE Simulator — Eq (11), (11a-c) integrated over time ─── *@
+<ChartCard Title="Differential Equation Simulator — Force Layers Over Time"
+           Description="Forward-Euler integration of all four force ODEs (Ordinary Differential Equations — equations describing how force changes over time, e.g. dF/dt = …) for Eq (11, 11a-c) over 20 years.">
+    <ChildContent>
+        <LineChart Series="@_odeSeries"
+                   XLabel="Time (years)"
+                   YLabel="Force"
+                   XMin="0" XMax="20"
+                   ShowGrid="true"
+                   Width="600" Height="400" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)" />
+        <h4>In Plain Language</h4>
+        <p>Force grows from traditional struggle (αS) and from deliberately using the LLM to accelerate thinking (γEF). It shrinks from passive reliance (βR) and from organizational de-investment once the model appears to handle it (σM_absorbed). Short-term output O(t) = M × F(t) can increase even as F(t) decays. The damage is invisible until the multiplier is unavailable.</p>
+        <h4>The Mirror</h4>
+        <p>αS is learning without the mirror — direct contact with problems. γEF is the dancer watching her reflection to spot and fix errors. βR is Narcissus — staring at the flattering reflection. σM_absorbed is the studio closing down dance classes because "the mirror teaches well enough on its own."</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Hysteresis Eq (14a)</li>
+            <li>Tacit knowledge Eq (12)</li>
+            <li>Diverging trajectories Eq (15a-b)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Force Dynamics Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (11a): Surface Layer</div>
+    <ParameterSlider Label="β_s (surface decay)" Min="0.1" Max="2" Step="0.1"
+                     Value="@_betaSurface"
+                     ValueChanged="@OnBetaSurfaceChanged" />
+    <div class="slider-group-header">Eq (11b): Middle Layer</div>
+    <ParameterSlider Label="α_m (struggle coeff)" Min="0" Max="2" Step="0.1"
+                     Value="@_alphaM"
+                     ValueChanged="@OnAlphaMChanged" />
+    <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1"
+                     Value="@_struggle"
+                     ValueChanged="@OnStruggleChanged" />
+    <ParameterSlider Label="γ_m (engagement coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_gammaM"
+                     ValueChanged="@OnGammaMChanged" />
+    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1"
+                     Value="@_engagement"
+                     ValueChanged="@OnEngagementChanged" />
+    <ParameterSlider Label="f_mid (current)" Min="0" Max="10" Step="0.5"
+                     Value="@_forceMid"
+                     ValueChanged="@OnForceMidChanged" />
+    <ParameterSlider Label="β_m (middle decay)" Min="0.1" Max="2" Step="0.1"
+                     Value="@_betaM"
+                     ValueChanged="@OnBetaMChanged" />
+    <div class="slider-group-header">Eq (11c): Deep Layer</div>
+    <ParameterSlider Label="α_d (deep struggle coeff)" Min="0" Max="2" Step="0.1"
+                     Value="@_alphaD"
+                     ValueChanged="@OnAlphaDChanged" />
+    <ParameterSlider Label="β_d (deep decay)" Min="0.1" Max="2" Step="0.1"
+                     Value="@_betaD"
+                     ValueChanged="@OnBetaDChanged" />
+    <div class="slider-group-header">Eq (11): Time Integration</div>
+    <ParameterSlider Label="α (total struggle coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_odeAlpha"
+                     ValueChanged="@OnOdeAlphaChanged" />
+    <ParameterSlider Label="β (total decay)" Min="0" Max="1" Step="0.01"
+                     Value="@_odeBeta"
+                     ValueChanged="@OnOdeBetaChanged" />
+    <ParameterSlider Label="γ (engagement coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_odeGamma"
+                     ValueChanged="@OnOdeGammaChanged" />
+    <ParameterSlider Label="σ (absorbed coeff)" Min="0" Max="2" Step="0.01"
+                     Value="@_odeSigma"
+                     ValueChanged="@OnOdeSigmaChanged" />
+    <ParameterSlider Label="E (engagement, integrated)" Min="0" Max="5" Step="0.1"
+                     Value="@_odeEngagement"
+                     ValueChanged="@OnOdeEngagementChanged" />
+    <ParameterSlider Label="S (struggle, integrated)" Min="0" Max="5" Step="0.1"
+                     Value="@_odeStruggle"
+                     ValueChanged="@OnOdeStruggleChanged" />
+    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1"
+                     Value="@_odeReplacement"
+                     ValueChanged="@OnOdeReplacementChanged" />
+    <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1"
+                     Value="@_odeMAbsorbed"
+                     ValueChanged="@OnOdeMAbsorbedChanged" />
+    <ParameterSlider Label="dt (time step)" Min="0.01" Max="0.5" Step="0.01"
+                     Value="@_odeDt"
+                     ValueChanged="@OnOdeDtChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // Surface layer params
+    private double _betaSurface = 0.5;
+
+    // Middle layer params
+    private double _alphaM = 0.3;
+    private double _struggle = 2.0;
+    private double _gammaM = 0.2;
+    private double _engagement = 1.0;
+    private double _forceMid = 5.0;
+    private double _betaM = 0.4;
+
+    // Deep layer params
+    private double _alphaD = 0.5;
+    private double _betaD = 0.3;
+
+    // Computed series
+    private IReadOnlyList<ChartSeries> _surfaceSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _middleSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _deepSeries = Array.Empty<ChartSeries>();
+
+    // ODE Simulator params
+    private double _odeAlpha = 0.3;
+    private double _odeBeta = 0.3;
+    private double _odeGamma = 0.2;
+    private double _odeSigma = 0.5;
+    private double _odeEngagement = 1.0;
+    private double _odeStruggle = 2.0;
+    private double _odeReplacement = 2.0;
+    private double _odeMAbsorbed = 1.0;
+    private double _odeDt = 0.1;
+
+    private IReadOnlyList<ChartSeries> _odeSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        RecalcSurface();
+        RecalcMiddle();
+        RecalcDeep();
+        RecalcOde();
+    }
+
+    private void RecalcSurface()
+    {
+        var points = new List<DataPoint>();
+        for (double r = 0; r <= 5.0; r += 0.1)
+        {
+            points.Add(new DataPoint(r, ForceDynamics.DfSurfaceDt(_betaSurface, r)));
+        }
+        _surfaceSeries = new List<ChartSeries>
+        {
+            new("df_surf/dt — Eq (11a)", points, "#2563eb", 2.0)
+        };
+    }
+
+    private void RecalcMiddle()
+    {
+        var points = new List<DataPoint>();
+        for (double r = 0; r <= 5.0; r += 0.1)
+        {
+            points.Add(new DataPoint(r, ForceDynamics.DfMiddleDt(_alphaM, _struggle, _gammaM, _engagement, _forceMid, _betaM, r)));
+        }
+        _middleSeries = new List<ChartSeries>
+        {
+            new("df_mid/dt — Eq (11b)", points, "#16a34a", 2.0)
+        };
+    }
+
+    private void RecalcDeep()
+    {
+        var points = new List<DataPoint>();
+        for (double r = 0; r <= 5.0; r += 0.1)
+        {
+            points.Add(new DataPoint(r, ForceDynamics.DfDeepDt(_alphaD, _struggle, _betaD, r)));
+        }
+        _deepSeries = new List<ChartSeries>
+        {
+            new("df_deep/dt — Eq (11c)", points, "#dc2626", 2.0)
+        };
+    }
+
+    private void RecalcOde()
+    {
+        var y0 = new double[] { 5.0, 3.0, 4.0, 6.0 }; // F_total, f_surface, f_middle, f_deep
+
+        // Capture locals for the closure
+        double alpha = _odeAlpha, beta = _odeBeta, gamma = _odeGamma, sigma = _odeSigma;
+        double eng = _odeEngagement, str = _odeStruggle, rep = _odeReplacement, mAbs = _odeMAbsorbed;
+        double dt = _odeDt;
+
+        var result = Integration.ForwardEulerSystem(y0, 0, 20, dt, (t, y) => new double[]
+        {
+            ForceDynamics.DfDt(alpha, str, gamma, eng, y[0], beta, rep, sigma, mAbs),
+            ForceDynamics.DfSurfaceDt(beta, rep),
+            ForceDynamics.DfMiddleDt(alpha, str, gamma, eng, y[2], beta, rep),
+            ForceDynamics.DfDeepDt(alpha, str, beta, rep)
+        });
+
+        int steps = result[0].Length;
+        var totalPts = new List<DataPoint>(steps);
+        var surfPts = new List<DataPoint>(steps);
+        var midPts = new List<DataPoint>(steps);
+        var deepPts = new List<DataPoint>(steps);
+        var tippingPts = new List<DataPoint>(steps);
+
+        double fStar = (eng > 0 && gamma > 0)
+            ? ForceDynamics.TippingPoint(beta, rep, sigma, mAbs, gamma, eng)
+            : double.NaN;
+
+        for (int i = 0; i < steps; i++)
+        {
+            double time = i * dt;
+            totalPts.Add(new DataPoint(time, result[0][i]));
+            surfPts.Add(new DataPoint(time, result[1][i]));
+            midPts.Add(new DataPoint(time, result[2][i]));
+            deepPts.Add(new DataPoint(time, result[3][i]));
+            if (!double.IsNaN(fStar) && !double.IsInfinity(fStar))
+            {
+                tippingPts.Add(new DataPoint(time, fStar));
+            }
+        }
+
+        var series = new List<ChartSeries>
+        {
+            new("F_total", totalPts, "#2563eb", 2.0),
+            new("f_surface", surfPts, "#f97316", 2.0),
+            new("f_middle", midPts, "#16a34a", 2.0),
+            new("f_deep", deepPts, "#dc2626", 2.0)
+        };
+
+        if (tippingPts.Count > 0)
+        {
+            series.Add(new("F* (Tipping Point)", tippingPts, "#a855f7", 1.5));
+        }
+
+        _odeSeries = series;
+    }
+
+    private void OnBetaSurfaceChanged(double val) { _betaSurface = val; RecalcSurface(); }
+    private void OnAlphaMChanged(double val) { _alphaM = val; RecalcMiddle(); }
+    private void OnStruggleChanged(double val) { _struggle = val; RecalcMiddle(); RecalcDeep(); }
+    private void OnGammaMChanged(double val) { _gammaM = val; RecalcMiddle(); }
+    private void OnEngagementChanged(double val) { _engagement = val; RecalcMiddle(); }
+    private void OnForceMidChanged(double val) { _forceMid = val; RecalcMiddle(); }
+    private void OnBetaMChanged(double val) { _betaM = val; RecalcMiddle(); }
+    private void OnAlphaDChanged(double val) { _alphaD = val; RecalcDeep(); }
+    private void OnBetaDChanged(double val) { _betaD = val; RecalcDeep(); }
+
+    // ODE Simulator slider handlers
+    private void OnOdeAlphaChanged(double val) { _odeAlpha = val; RecalcOde(); }
+    private void OnOdeBetaChanged(double val) { _odeBeta = val; RecalcOde(); }
+    private void OnOdeGammaChanged(double val) { _odeGamma = val; RecalcOde(); }
+    private void OnOdeSigmaChanged(double val) { _odeSigma = val; RecalcOde(); }
+    private void OnOdeEngagementChanged(double val) { _odeEngagement = val; RecalcOde(); }
+    private void OnOdeStruggleChanged(double val) { _odeStruggle = val; RecalcOde(); }
+    private void OnOdeReplacementChanged(double val) { _odeReplacement = val; RecalcOde(); }
+    private void OnOdeMAbsorbedChanged(double val) { _odeMAbsorbed = val; RecalcOde(); }
+    private void OnOdeDtChanged(double val) { _odeDt = val; RecalcOde(); }
+}

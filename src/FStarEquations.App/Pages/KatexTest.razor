@@ -1,0 +1,31 @@
+@page "/katex-test"
+
+<h1>KaTeX Rendering Test</h1>
+
+<p>This page verifies that KaTeX JS interop renders LaTeX equations correctly in Blazor WASM.</p>
+
+<ChartCard Title="Equation (1) — Base Model" Description="The Cobb-Douglas force model">
+    <div style="padding: 1rem;">
+        <h4>Display mode (block equation):</h4>
+        <KatexBlock Latex="O = M \times F \quad \text{where} \quad F = \prod_{i} f_i^{w_i}" />
+
+        <h4>Inline mode:</h4>
+        <p>
+            The output <KatexBlock Latex="O" DisplayMode="false" /> equals the multiplier
+            <KatexBlock Latex="M" DisplayMode="false" /> times force
+            <KatexBlock Latex="F" DisplayMode="false" />.
+        </p>
+
+        <h4>More equations from the framework:</h4>
+
+        <KatexBlock Latex="\text{Var}(O) = M^2 \times \text{Var}(F) \qquad (4)" />
+
+        <KatexBlock Latex="\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)" />
+
+        <KatexBlock Latex="F^* = \frac{\beta \cdot R + \sigma \cdot M_{\text{absorbed}}}{\gamma \cdot E} \qquad (14)" />
+
+        <KatexBlock Latex="K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t) \times (1 - \delta) + T(t) \qquad (12)" />
+
+        <KatexBlock Latex="M(t) = M_0 \cdot e^{\mu t} \qquad (25)" />
+    </div>
+</ChartCard>

@@ -1,0 +1,340 @@
+@page "/timeline"
+
+<PageTitle>The Full Timeline</PageTitle>
+
+<h1>The Full Timeline</h1>
+
+@* Panel 1: M(t) *@
+<ChartCard Title="Model Multiplier M(t) — Eq (25)">
+    <ChildContent>
+    <LineChart Series="@_mSeries" XLabel="Time (years)" YLabel="M(t)"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="M(t) = M_0 \cdot e^{\mu t} \qquad (25)" />
+        <h4>In Plain Language</h4>
+        <p>Exponential growth in LLM capability. Subject to data quality constraint (Eq 31).</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Data quality Eq (31)</li>
+            <li>All downstream dynamics</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Panel 2: F_total(t) *@
+<ChartCard Title="Total Force F(t) — Eq (11)">
+    <ChildContent>
+    <LineChart Series="@_fTotalSeries" XLabel="Time (years)" YLabel="F(t)"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{dF}{dt} = \alpha S + \gamma E F - \beta R - \sigma M_{\text{absorbed}} \qquad (11)" />
+        <h4>In Plain Language</h4>
+        <p>Aggregate force dynamics. Growth from struggle and deliberate use; decay from passive reliance and de-investment.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Layer decomposition Eq (11a-c)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Panel 3: f_layers(t) *@
+<ChartCard Title="Force Layers — Eq (11a-c)">
+    <ChildContent>
+    <LineChart Series="@_layersSeries" XLabel="Time (years)" YLabel="f(t)"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>In Plain Language</h4>
+        <p>Surface (months), middle (years), deep (decades) — each layer responds differently. The surface erodes fast but is fully substitutable. The middle is the critical battleground. The deep barely changes but is irreplaceable.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Layer hierarchy Eq (1a)</li>
+            <li>Transfer efficiency Eq (26a)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Panel 4: K_tacit(t) *@
+<ChartCard Title="Tacit Knowledge Stock K(t) — Eq (12)">
+    <ChildContent>
+    <LineChart Series="@_kTacitSeries" XLabel="Time (years)" YLabel="K(t)"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t)(1-\delta) + T(t) \qquad (12)" />
+        <h4>In Plain Language</h4>
+        <p>Organizational knowledge stock: what survives attrition plus what gets transmitted. Pipeline breaks when T &lt; δK.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Transmission Eq (12a)</li>
+            <li>Shared work Eq (12b)</li>
+            <li>Pipeline break Eq (13)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Panel 5: Var(O)(t) *@
+<ChartCard Title="Output Variance Var(O)(t) — Eq (4)">
+    <ChildContent>
+    <LineChart Series="@_varOSeries" XLabel="Time (years)" YLabel="Var(O)"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{Var}(O) = M^2 \cdot \text{Var}(F) \qquad (4)" />
+        <h4>In Plain Language</h4>
+        <p>Variance scales as M². As M(t) grows over time, the spread between best and worst output widens quadratically.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Output gap Eq (5)</li>
+            <li>Barbell effect Eq (6)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Panel 6: F*(t) *@
+<ChartCard Title="Tipping Point F*(t) — Eq (14)">
+    <ChildContent>
+    <LineChart Series="@_fStarSeries" XLabel="Time (years)" YLabel="F*(t)"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="F^* = \frac{\beta R + \sigma M_{\text{absorbed}}}{\gamma E} \qquad (14)" />
+        <h4>In Plain Language</h4>
+        <p>As M grows, M_absorbed grows, pushing F* upward. More engineers fall below the threshold over time.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Force dynamics Eq (11)</li>
+            <li>Transfer paradox Eq (30)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* Panel 7: SNR(t) *@
+<ChartCard Title="Assessment Signal-to-Noise SNR(t) — Eq (18)">
+    <ChildContent>
+    <LineChart Series="@_snrSeries" XLabel="Time (years)" YLabel="SNR"
+              XMin="0" XMax="20" ShowGrid="true" Width="900" Height="180" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\text{SNR} \to 0 \text{ as } M_p \to \infty \qquad (18)" />
+        <h4>In Plain Language</h4>
+        <p>As M_p grows with model capability, the ability to assess true force through output artifacts degrades toward zero.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Epistemic gap Eq (10)</li>
+            <li>Goodhart's trap Eq (19)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Timeline Parameters" DefaultY="100">
+    <div class="slider-group-header">Model & Force</div>
+    <ParameterSlider Label="M₀ (initial multiplier)" Min="1" Max="10" Step="0.5"
+                     Value="@_m0" ValueChanged="@OnM0Changed" />
+    <ParameterSlider Label="μ (growth rate)" Min="-0.1" Max="0.2" Step="0.01"
+                     Value="@_mu" ValueChanged="@OnMuChanged" />
+    <ParameterSlider Label="α (struggle coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_alpha" ValueChanged="@OnAlphaChanged" />
+    <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1"
+                     Value="@_struggle" ValueChanged="@OnStruggleChanged" />
+    <ParameterSlider Label="γ (engagement coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_gamma" ValueChanged="@OnGammaChanged" />
+    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1"
+                     Value="@_engagement" ValueChanged="@OnEngagementChanged" />
+    <div class="slider-group-header">Knowledge & Decay</div>
+    <ParameterSlider Label="β (decay)" Min="0" Max="1" Step="0.01"
+                     Value="@_beta" ValueChanged="@OnBetaChanged" />
+    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1"
+                     Value="@_replacement" ValueChanged="@OnReplacementChanged" />
+    <ParameterSlider Label="σ (absorbed coeff)" Min="0" Max="2" Step="0.01"
+                     Value="@_sigma" ValueChanged="@OnSigmaChanged" />
+    <ParameterSlider Label="δ (knowledge depreciation)" Min="0" Max="0.5" Step="0.01"
+                     Value="@_delta" ValueChanged="@OnDeltaChanged" />
+    <ParameterSlider Label="φ (transmission efficiency)" Min="0" Max="1" Step="0.01"
+                     Value="@_phi" ValueChanged="@OnPhiChanged" />
+    <ParameterSlider Label="dt (time step)" Min="0.01" Max="0.5" Step="0.01"
+                     Value="@_dt" ValueChanged="@OnDtChanged" />
+</FloatingSliderPanel>
+
+@code {
+    // Slider parameters
+    private double _m0 = 2.0;
+    private double _mu = 0.05;
+    private double _alpha = 0.3;
+    private double _struggle = 2.0;
+    private double _gamma = 0.2;
+    private double _engagement = 1.5;
+    private double _beta = 0.3;
+    private double _replacement = 2.0;
+    private double _sigma = 0.5;
+    private double _delta = 0.1;
+    private double _phi = 0.5;
+    private double _dt = 0.1;
+
+    // Layer-specific coefficients (derived from main params)
+    private const double BetaS = 0.4;
+    private const double AlphaM = 0.25;
+    private const double GammaM = 0.15;
+    private const double BetaM = 0.3;
+    private const double AlphaD = 0.4;
+    private const double BetaD = 0.2;
+
+    // Tacit knowledge auxiliary constants
+    private const double W0 = 1.0;
+    private const double Psi = 0.1;
+
+    // SNR auxiliary constants
+    private const double VarEpsilon = 0.5;
+    private const double VarEta = 0.3;
+    private const double VarFBase = 1.0;
+
+    // Chart series
+    private IReadOnlyList<ChartSeries> _mSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _fTotalSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _layersSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _kTacitSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _varOSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _fStarSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _snrSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        Recalc();
+    }
+
+    private void Recalc()
+    {
+        double alpha = _alpha, struggle = _struggle, gamma = _gamma, engagement = _engagement;
+        double beta = _beta, replacement = _replacement, sigma = _sigma;
+        double delta = _delta, phi = _phi;
+        double m0 = _m0, mu = _mu, dt = _dt;
+
+        // Initial conditions: F_total, f_surface, f_middle, f_deep, K_tacit, M
+        var y0 = new double[] { 5.0, 3.0, 4.0, 6.0, 10.0, m0 };
+
+        var result = Integration.ForwardEulerSystem(y0, 0, 20, dt, (t, y) =>
+        {
+            double mCurrent = y[5];
+            double transmission = TacitKnowledge.Transmission(
+                phi,
+                TacitKnowledge.SharedWork(W0, Psi, mCurrent),
+                y[0]);
+            double kNext = TacitKnowledge.KnowledgeStockNext(y[4], delta, transmission);
+            double dKdt = (kNext - y[4]) / dt;
+
+            return new double[]
+            {
+                ForceDynamics.DfDt(alpha, struggle, gamma, engagement, y[0], beta, replacement, sigma, mCurrent),
+                ForceDynamics.DfSurfaceDt(BetaS, replacement),
+                ForceDynamics.DfMiddleDt(AlphaM, struggle, GammaM, engagement, y[2], BetaM, replacement),
+                ForceDynamics.DfDeepDt(AlphaD, struggle, BetaD, replacement),
+                dKdt,
+                mu * mCurrent
+            };
+        });
+
+        int steps = result[0].Length;
+
+        var mPts = new List<DataPoint>(steps);
+        var fTotalPts = new List<DataPoint>(steps);
+        var surfPts = new List<DataPoint>(steps);
+        var midPts = new List<DataPoint>(steps);
+        var deepPts = new List<DataPoint>(steps);
+        var kPts = new List<DataPoint>(steps);
+        var varOPts = new List<DataPoint>(steps);
+        var fStarPts = new List<DataPoint>(steps);
+        var snrPts = new List<DataPoint>(steps);
+
+        for (int i = 0; i < steps; i++)
+        {
+            double time = i * dt;
+            double mVal = result[5][i];
+            double fTotal = result[0][i];
+
+            mPts.Add(new DataPoint(time, mVal));
+            fTotalPts.Add(new DataPoint(time, fTotal));
+            surfPts.Add(new DataPoint(time, result[1][i]));
+            midPts.Add(new DataPoint(time, result[2][i]));
+            deepPts.Add(new DataPoint(time, result[3][i]));
+            kPts.Add(new DataPoint(time, result[4][i]));
+
+            // Var(O) = M^2 * Var(F) — use base force variance
+            double varO = VarianceAmplification.OutputVariance(mVal, VarFBase);
+            varOPts.Add(new DataPoint(time, varO));
+
+            // F*(t) = (beta*R + sigma*M(t)) / (gamma*E)
+            if (gamma * engagement > 0)
+            {
+                double fStar = ForceDynamics.TippingPoint(beta, replacement, sigma, mVal, gamma, engagement);
+                if (!double.IsInfinity(fStar))
+                {
+                    fStarPts.Add(new DataPoint(time, fStar));
+                }
+            }
+
+            // SNR(t) = Var(F_true) / (Var(F_true) + M^2*varEps + varEta)
+            double snr = OrganizationalDynamics.AssessmentSnr(VarFBase, mVal, VarEpsilon, VarEta);
+            snrPts.Add(new DataPoint(time, snr));
+        }
+
+        _mSeries = new List<ChartSeries>
+        {
+            new("M(t)", mPts, "#2563eb", 2.0)
+        };
+
+        _fTotalSeries = new List<ChartSeries>
+        {
+            new("F_total(t)", fTotalPts, "#2563eb", 2.0)
+        };
+
+        _layersSeries = new List<ChartSeries>
+        {
+            new("f_surface", surfPts, "#f97316", 2.0),
+            new("f_middle", midPts, "#16a34a", 2.0),
+            new("f_deep", deepPts, "#dc2626", 2.0)
+        };
+
+        _kTacitSeries = new List<ChartSeries>
+        {
+            new("K_tacit(t)", kPts, "#8b5cf6", 2.0)
+        };
+
+        _varOSeries = new List<ChartSeries>
+        {
+            new("Var(O)(t)", varOPts, "#e11d48", 2.0)
+        };
+
+        _fStarSeries = new List<ChartSeries>
+        {
+            new("F*(t)", fStarPts, "#a855f7", 2.0)
+        };
+
+        _snrSeries = new List<ChartSeries>
+        {
+            new("SNR(t)", snrPts, "#0891b2", 2.0)
+        };
+    }
+
+    // Slider changed handlers
+    private void OnM0Changed(double val) { _m0 = val; Recalc(); }
+    private void OnMuChanged(double val) { _mu = val; Recalc(); }
+    private void OnAlphaChanged(double val) { _alpha = val; Recalc(); }
+    private void OnStruggleChanged(double val) { _struggle = val; Recalc(); }
+    private void OnGammaChanged(double val) { _gamma = val; Recalc(); }
+    private void OnEngagementChanged(double val) { _engagement = val; Recalc(); }
+    private void OnBetaChanged(double val) { _beta = val; Recalc(); }
+    private void OnReplacementChanged(double val) { _replacement = val; Recalc(); }
+    private void OnSigmaChanged(double val) { _sigma = val; Recalc(); }
+    private void OnDeltaChanged(double val) { _delta = val; Recalc(); }
+    private void OnPhiChanged(double val) { _phi = val; Recalc(); }
+    private void OnDtChanged(double val) { _dt = val; Recalc(); }
+}

@@ -1,0 +1,85 @@
+@page "/sovereignty"
+
+<PageTitle>Sovereignty — Eq (24), (24a)</PageTitle>
+
+<h1>Sovereignty — Eq (24), (24a)</h1>
+
+<blockquote>
+    A nation's capability is the product of its domestic force, its multiplier access, and the probability that access persists. Sovereignty requires maintaining a minimum viable force stock — if it falls below the threshold, no amount of imported multiplier can compensate.
+</blockquote>
+
+@* ─── Chart 1: Capability Bars — Eq (24) ─── *@
+<ChartCard Title="National Capability — Eq (24)"
+           Description="E[cap] = Σ Fᵢ · M · P(access) for varying access probability">
+    <ChildContent>
+        <BarChart Bars="@_capabilityBars" XLabel="P(access)" YLabel="Capability" Width="500" Height="320" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="E[\text{national capability}] = \sum_{i \in \text{workforce}} F_i \times M \times P(\text{access}) \qquad (24)" />
+        <h4>In Plain Language</h4>
+        <p>A nation's expected technical capability is the sum of its workforce's force, amplified by the multiplier, discounted by the probability that access to the multiplier continues. If the multiplier is provided by a foreign entity subject to sanctions or regulation, P(access) &lt; 1. Countries that underinvest in education but expect AI to close the gap are making a category error: Eq (1) says you cannot multiply what isn't there.</p>
+        <h4>The Mirror</h4>
+        <p>Giving a nation of low-force workers access to a powerful mirror creates flattering reflections of shallow input, not capability.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Base model Eq (1)</li>
+            <li>Transfer Eq (26)</li>
+            <li>Provider investment Eq (3)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Chart 2: Resilience Gauge — Eq (24a) ─── *@
+<ChartCard Title="Sovereign Resilience — Eq (24a)"
+           Description="Σ Fᵢ ≥ minViable">
+    <ChildContent>
+        <ThresholdIndicator Label="@_resilienceLabel" Passed="@_isResilient" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\sum_{i} F_i \times 1 \geq \text{minimum viable capability} \qquad (24a)" />
+        <h4>In Plain Language</h4>
+        <p>The sovereign resilience test: the workforce must be viable without the multiplier. If F has atrophied while relying on a foreign M, the nation fails this test precisely when it matters most — when access is cut. The atrophy dynamic, the cohort discontinuity, and the F→M transfer each threaten this condition from a different angle.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>National capability Eq (24)</li>
+            <li>Atrophy Eq (11)</li>
+            <li>Cohort discontinuity Eq (32)</li>
+            <li>Transfer Eq (26)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Sovereignty Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (24): National Capability</div>
+    <ParameterSlider Label="M" Min="0.5" Max="5" Step="0.1" Value="@_capM" ValueChanged="v => { _capM = v; }" />
+    <ParameterSlider Label="Force 1" Min="0" Max="10" Step="0.5" Value="@_capF1" ValueChanged="v => { _capF1 = v; }" />
+    <ParameterSlider Label="Force 2" Min="0" Max="10" Step="0.5" Value="@_capF2" ValueChanged="v => { _capF2 = v; }" />
+    <ParameterSlider Label="Force 3" Min="0" Max="10" Step="0.5" Value="@_capF3" ValueChanged="v => { _capF3 = v; }" />
+    <div class="slider-group-header">Eq (24a): Sovereign Resilience</div>
+    <ParameterSlider Label="Min Viable" Min="0" Max="50" Step="0.5" Value="@_resMinViable" ValueChanged="v => { _resMinViable = v; }" />
+</FloatingSliderPanel>
+
+@code {
+    // Shared force sliders
+    private double _capM = 2;
+    private double _capF1 = 3;
+    private double _capF2 = 5;
+    private double _capF3 = 7;
+
+    private double[] Forces => new[] { _capF1, _capF2, _capF3 };
+
+    // ─── Chart 1: Capability Bars ───
+    private static readonly double[] AccessProbs = { 0.2, 0.4, 0.6, 0.8, 1.0 };
+    private IReadOnlyList<BarItem> _capabilityBars => AccessProbs
+        .Select(p => new BarItem($"P={p:F1}", Sovereignty.NationalCapability(Forces, _capM, p)))
+        .ToList();
+
+    // ─── Chart 2: Resilience Gauge ───
+    private double _resMinViable = 10;
+    private bool _isResilient => Sovereignty.IsSovereignResilient(Forces, _resMinViable);
+    private string _resilienceLabel => _isResilient
+        ? $"Resilient: ΣF = {Forces.Sum():F1} >= {_resMinViable:F1}"
+        : $"Vulnerable: ΣF = {Forces.Sum():F1} < {_resMinViable:F1}";
+}

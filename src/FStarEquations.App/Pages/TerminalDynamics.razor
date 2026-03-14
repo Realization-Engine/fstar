@@ -1,0 +1,213 @@
+@page "/terminal-dynamics"
+
+<PageTitle>Terminal Dynamics Phase Space</PageTitle>
+
+<h1>Terminal Dynamics Phase Space</h1>
+<p>
+    Animated phase-plane plot of F(t) vs M(t) trajectories. The coupled system integrates
+    Eq (11) for force dynamics and Eq (25) for model growth using Forward Euler over @_tEnd years.
+    Select a preset or adjust parameters to explore how force and the multiplier co-evolve.
+</p>
+
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.Virtuous)">Virtuous Cycle</button>
+    <button @onclick="() => ApplyPreset(Preset.Decline)">Managed Decline</button>
+    <button @onclick="() => ApplyPreset(Preset.Collapse)">Collapse</button>
+</div>
+
+@* ─── Phase Portrait ─── *@
+<ChartCard Title="Phase Portrait: F(t) vs M(t)"
+           Description="Trajectory in phase space — each point is (F(t), M(t)) at a given time step.">
+    <ChildContent>
+    <PhasePortrait Curve="@_phaseCurve"
+                   XLabel="F (Force)"
+                   YLabel="M (Multiplier)"
+                   Width="600" Height="400" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>In Plain Language</h4>
+        <p>The coupled system — M growing but dependent on F for training quality, F decaying but dependent on M for its rate of change — has three identifiable regimes. Virtuous regime: high F maintained, high-quality training signal, both grow. Managed decline: F atrophies moderately, M growth decelerates, lower equilibrium reached. Collapse spiral: F atrophies severely, training signal degrades, M stalls or reverses, no stable equilibrium. Which trajectory obtains depends on whether interventions preserving αS and γEF are implemented before the data quality spiral begins to bite.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Force dynamics Eq (11)</li>
+            <li>M growth Eq (25)</li>
+            <li>Data quality Eq (31)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Force Over Time ─── *@
+<ChartCard Title="Force Over Time"
+           Description="F(t) trajectory from the coupled differential equation system (dF/dt and dM/dt integrated over time).">
+    <ChildContent>
+    <LineChart Series="@_forceSeries"
+               XLabel="Time (years)" YLabel="F(t)"
+               XMin="0" XMax="@_tEnd"
+               ShowGrid="true"
+               Width="600" Height="300" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)" />
+        <h4>In Plain Language</h4>
+        <p>In the terminal dynamics view, force is coupled bidirectionally with the multiplier. The presets illustrate: in the virtuous cycle, struggle and engagement dominate and F grows. In managed decline, moderate atrophy settles to a new equilibrium. In the collapse spiral, passive reliance and de-investment dominate, and recovery becomes impossible once the data quality spiral (Eq 31) begins.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Tipping point Eq (14)</li>
+            <li>Hysteresis Eq (14a)</li>
+            <li>Tacit knowledge Eq (12)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ─── Multiplier Over Time ─── *@
+<ChartCard Title="Multiplier Over Time"
+           Description="M(t) trajectory — exponential model growth or decay.">
+    <ChildContent>
+    <LineChart Series="@_multiplierSeries"
+               XLabel="Time (years)" YLabel="M(t)"
+               XMin="0" XMax="@_tEnd"
+               ShowGrid="true"
+               Width="600" Height="300" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="M(t) = M_0 \cdot e^{\mu t} \qquad (25)" />
+        <h4>In Plain Language</h4>
+        <p>The multiplier's trajectory depends on the quality of human signal feeding its training pipeline (Eq 31). In the virtuous regime, M grows as high-force humans generate excellent training data. In collapse, the workforce that generated training signal has atrophied, and the mirror's fidelity degrades — not from a flaw in methodology, but because the human signal has been hollowed out. The worst outcome: a workforce that has atrophied in reliance on a strong M, combined with an M that is no longer strong.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Data quality Eq (31)</li>
+            <li>Force dynamics Eq (11)</li>
+            <li>Transfer rate Eq (26)</li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+<FloatingSliderPanel Visible="true" Title="Terminal Dynamics Parameters" DefaultY="100">
+    <div class="slider-group-header">Eq (11): Force Dynamics</div>
+    <ParameterSlider Label="alpha (struggle coeff)" Min="0.01" Max="1" Step="0.01"
+                     Value="@_alpha" ValueChanged="@OnAlphaChanged" />
+    <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1"
+                     Value="@_struggle" ValueChanged="@OnStruggleChanged" />
+    <ParameterSlider Label="gamma (engagement coeff)" Min="0" Max="1" Step="0.01"
+                     Value="@_gamma" ValueChanged="@OnGammaChanged" />
+    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1"
+                     Value="@_engagement" ValueChanged="@OnEngagementChanged" />
+    <ParameterSlider Label="beta (decay)" Min="0.01" Max="1" Step="0.01"
+                     Value="@_beta" ValueChanged="@OnBetaChanged" />
+    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1"
+                     Value="@_replacement" ValueChanged="@OnReplacementChanged" />
+    <ParameterSlider Label="sigma (absorption coeff)" Min="0" Max="2" Step="0.01"
+                     Value="@_sigma" ValueChanged="@OnSigmaChanged" />
+    <div class="slider-group-header">Eq (25): Model Growth</div>
+    <ParameterSlider Label="mu (model growth rate)" Min="-0.1" Max="0.2" Step="0.005"
+                     Value="@_mu" ValueChanged="@OnMuChanged" />
+    <div class="slider-group-header">Integration</div>
+    <ParameterSlider Label="dt (time step)" Min="0.01" Max="0.5" Step="0.01"
+                     Value="@_dt" ValueChanged="@OnDtChanged" />
+    <ParameterSlider Label="tEnd (years)" Min="5" Max="50" Step="1"
+                     Value="@_tEnd" ValueChanged="@OnTEndChanged" />
+</FloatingSliderPanel>
+
+@code {
+    private enum Preset { Virtuous, Decline, Collapse }
+
+    // Parameters
+    private double _alpha = 0.3;
+    private double _struggle = 3.0;
+    private double _gamma = 0.2;
+    private double _engagement = 2.0;
+    private double _beta = 0.1;
+    private double _replacement = 1.0;
+    private double _sigma = 0.5;
+    private double _mu = 0.05;
+    private double _dt = 0.1;
+    private double _tEnd = 20;
+
+    // Initial conditions
+    private const double F0 = 5.0;
+    private const double M0 = 1.0;
+
+    // Computed data
+    private IReadOnlyList<DataPoint> _phaseCurve = Array.Empty<DataPoint>();
+    private IReadOnlyList<ChartSeries> _forceSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartSeries> _multiplierSeries = Array.Empty<ChartSeries>();
+
+    protected override void OnInitialized()
+    {
+        ApplyPreset(Preset.Virtuous);
+    }
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.Virtuous:
+                _alpha = 0.3; _struggle = 3.0; _gamma = 0.2; _engagement = 2.0;
+                _beta = 0.1; _replacement = 1.0; _sigma = 0.5; _mu = 0.05;
+                break;
+            case Preset.Decline:
+                _alpha = 0.3; _struggle = 1.5; _gamma = 0.2; _engagement = 1.0;
+                _beta = 0.3; _replacement = 2.0; _sigma = 0.5; _mu = 0.02;
+                break;
+            case Preset.Collapse:
+                _alpha = 0.3; _struggle = 0.5; _gamma = 0.2; _engagement = 0.5;
+                _beta = 0.5; _replacement = 4.0; _sigma = 0.5; _mu = -0.03;
+                break;
+        }
+        Recalc();
+    }
+
+    private void Recalc()
+    {
+        double alpha = _alpha, struggle = _struggle, gamma = _gamma, engagement = _engagement;
+        double beta = _beta, replacement = _replacement, sigma = _sigma, mu = _mu;
+        double dt = _dt, tEnd = _tEnd;
+
+        var y0 = new double[] { F0, M0 };
+
+        var result = Integration.ForwardEulerSystem(y0, 0, tEnd, dt, (t, y) => new double[]
+        {
+            ForceDynamics.DfDt(alpha, struggle, gamma, engagement, y[0], beta, replacement, sigma, y[1]),
+            mu * y[1]
+        });
+
+        int steps = result[0].Length;
+        var phasePoints = new List<DataPoint>(steps);
+        var forcePoints = new List<DataPoint>(steps);
+        var multiplierPoints = new List<DataPoint>(steps);
+
+        for (int i = 0; i < steps; i++)
+        {
+            double time = i * dt;
+            double f = result[0][i];
+            double m = result[1][i];
+            phasePoints.Add(new DataPoint(f, m));
+            forcePoints.Add(new DataPoint(time, f));
+            multiplierPoints.Add(new DataPoint(time, m));
+        }
+
+        _phaseCurve = phasePoints;
+        _forceSeries = new List<ChartSeries>
+        {
+            new("F(t)", forcePoints, "#2563eb", 2.0)
+        };
+        _multiplierSeries = new List<ChartSeries>
+        {
+            new("M(t)", multiplierPoints, "#16a34a", 2.0)
+        };
+    }
+
+    // Slider handlers
+    private void OnAlphaChanged(double val) { _alpha = val; Recalc(); }
+    private void OnStruggleChanged(double val) { _struggle = val; Recalc(); }
+    private void OnGammaChanged(double val) { _gamma = val; Recalc(); }
+    private void OnEngagementChanged(double val) { _engagement = val; Recalc(); }
+    private void OnBetaChanged(double val) { _beta = val; Recalc(); }
+    private void OnReplacementChanged(double val) { _replacement = val; Recalc(); }
+    private void OnSigmaChanged(double val) { _sigma = val; Recalc(); }
+    private void OnMuChanged(double val) { _mu = val; Recalc(); }
+    private void OnDtChanged(double val) { _dt = val; Recalc(); }
+    private void OnTEndChanged(double val) { _tEnd = val; Recalc(); }
+}
