@@ -42,61 +42,33 @@ jobs:
       - name: Create 404.html for client-side routing
         run: cp output/wwwroot/index.html output/wwwroot/404.html
 
-      - name: Install pandoc and mermaid CLI
-        run: |
-          sudo apt-get install -y pandoc
-          npm install -g @mermaid-js/mermaid-cli
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
 
-      - name: Pre-render mermaid diagrams to SVG
+      - name: Create mermaid Lua filter
+        run: |
+          cat > /tmp/mermaid.lua << 'LUAEOF'
+          function CodeBlock(block)
+            if block.classes[1] == "mermaid" then
+              return pandoc.RawBlock("html",
+                '<pre class="mermaid">\n' .. block.text .. '\n</pre>')
+            end
+          end
+          LUAEOF
+
+      - name: Convert docs to HTML
         run: |
           mkdir -p output/wwwroot/docs
           for md in Docs/*.md; do
             filename=$(basename "$md" .md)
-            cp "$md" "/tmp/${filename}.md"
-            # Extract and render each mermaid block, replacing with SVG inline
-            python3 - "/tmp/${filename}.md" << 'PYEOF'
-          import sys, subprocess, tempfile, os, re
-          path = sys.argv[1]
-          with open(path, 'r', encoding='utf-8') as f:
-              content = f.read()
-          counter = 0
-          def replace_mermaid(m):
-              global counter
-              counter += 1
-              mermaid_code = m.group(1)
-              mmd = tempfile.NamedTemporaryFile(suffix='.mmd', mode='w', delete=False, encoding='utf-8')
-              mmd.write(mermaid_code)
-              mmd.close()
-              svg_path = mmd.name.replace('.mmd', '.svg')
-              try:
-                  subprocess.run(['mmdc', '-i', mmd.name, '-o', svg_path, '-b', 'transparent'], check=True, timeout=30)
-                  with open(svg_path, 'r', encoding='utf-8') as sf:
-                      svg = sf.read()
-                  return f'\n<div class="mermaid-diagram" align="center">\n{svg}\n</div>\n'
-              except Exception as e:
-                  print(f"Warning: mermaid render failed for block {counter}: {e}", file=sys.stderr)
-                  return m.group(0)
-              finally:
-                  os.unlink(mmd.name)
-                  if os.path.exists(svg_path):
-                      os.unlink(svg_path)
-          content = re.sub(r'```mermaid\s*\n(.*?)```', replace_mermaid, content, flags=re.DOTALL)
-          with open(path, 'w', encoding='utf-8') as f:
-              f.write(content)
-          PYEOF
-          done
-
-      - name: Convert docs to HTML
-        run: |
-          for md in Docs/*.md; do
-            filename=$(basename "$md" .md)
-            pandoc "/tmp/${filename}.md" \
+            pandoc "$md" \
               --standalone \
               --metadata title="" \
               --css "../css/Site.css" \
               --css "../lib/katex/katex.min.css" \
               --katex="../lib/katex/" \
-              --variable header-includes='<style>body { margin: 3em 3em 0 3em; } .mermaid-diagram svg { max-width: 100%; height: auto; }</style>' \
+              --lua-filter=/tmp/mermaid.lua \
+              --variable header-includes='<style>body { margin: 3em 3em 0 3em; } pre.mermaid { text-align: center; background: none; border: none; }</style><script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";mermaid.initialize({startOnLoad:true});</script>' \
               -o "output/wwwroot/docs/${filename}.html"
           done
 
