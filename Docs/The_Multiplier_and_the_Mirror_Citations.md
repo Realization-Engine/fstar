@@ -1,4 +1,4 @@
-# References for "The Multiplier, Mirror and The Tipping Point"
+﻿# References for "The Multiplier, Mirror and The Tipping Point"
 
 *Supporting citations for the concept document by Dennis A. Landi (v0.01, 2026-03-14).*
 *Compiled 2026-03-16. Verify all DOIs and URLs before formal citation.*
