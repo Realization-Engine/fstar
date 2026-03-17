@@ -917,3 +917,9 @@ The framework is strong enough to make these specific, non-obvious predictions. 
 | (30) | $F^*_{\text{post}} > F^*_{\text{pre}}$ | F→M Transfer | Successful transfer raises tipping point |
 | (31) | Quality($M_{t+1}$) $= g($Quality$(M_t), \bar{F}_{\text{ann}})$ | F→M Transfer | Data quality spiral |
 | (32) | $F_{\text{init}}(c) = F_{\text{max}}(S_{\text{avail}}(c) / S_{\text{pre}})^\rho$ | Cohort Discontinuity | Force ceiling bounded by available struggle |
+
+---
+
+## Citations
+
+See companion document: [The_Multiplier_and_the_Mirror_Citations.md](The_Multiplier_and_the_Mirror_Citations.md)
