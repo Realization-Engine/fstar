@@ -5,144 +5,474 @@
 <h1>Force is Not a Number — Eq (1), (1a), (2), (3)</h1>
 
 <blockquote>
-    Output is not the sum of its parts — it is a product. The Cobb-Douglas structure means that zeroing any single force dimension collapses the entire output, no matter how strong the others. The multiplier M acts as a scaling lens on this product.
+    Output is not the sum of its parts; it is a product. The Cobb-Douglas structure means that zeroing any single force dimension collapses the entire output, no matter how strong the others. The multiplier M acts as a scaling lens on this product.
 </blockquote>
 
-<ChartCard Title="Cobb-Douglas HeatMap" Description="Eq (1): O = M * product(fi^wi). Varies M (x-axis) and average force (y-axis) to compute output.">
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Eq (1): Cobb-Douglas Output — HeatMap                                  *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<ChartCard Title="Cobb-Douglas Output Surface"
+           Description="Eq (1): O = M * product(fi^wi). Axes show two force components; M and all other forces held at slider values. Move any slider to see the surface shift.">
     <ChildContent>
         <HeatMap Width="600" Height="400"
-                 XLabel="Multiplier (M)"
-                 YLabel="Average Force"
+                 XLabel="@(_componentLabels[_heatAxisX] + " (f" + (_heatAxisX + 1) + ")")"
+                 YLabel="@(_componentLabels[_heatAxisY] + " (f" + (_heatAxisY + 1) + ")")"
                  Data="@_heatMapData"
                  XValues="@_heatMapXValues"
                  YValues="@_heatMapYValues" />
+        <p class="chart-readout">
+            Current output: <strong>O = @ComputeCurrentOutput().ToString("F2")</strong>
+            &ensp;|&ensp;M=@_m.ToString("F1")
+            &ensp;|&ensp;F=@ComputeCurrentForce().ToString("F2")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Heatmap axes: @_componentLabels[_heatAxisX] vs @_componentLabels[_heatAxisY].
+            All other components held at their slider values.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="O = M \times F \quad \text{where} \quad F = \prod_{i} f_i^{w_i} \qquad (1)" />
         <h4>In Plain Language</h4>
-        <p>Your productive output equals the LLM's power times the product of your capabilities, each raised to its importance for the task at hand. The mathematical consequence of the multiplicative form is decisive: if any critical component approaches zero, force collapses toward zero regardless of how strong the others are.</p>
+        <p>Your productive output equals the LLM's amplification factor times the product of your capability components, each raised to its importance weight. The multiplicative form is decisive: if any critical component approaches zero, Force collapses toward zero regardless of how strong the others are.</p>
+        <h4>Reading the Chart</h4>
+        <p>The two axes sweep two force components while M and all other forces are held at their slider values. Drag any slider to see the color surface shift. Moving M scales the entire surface. Dragging a non-axis force component changes the baseline output. Changing weights reshapes the gradient contour.</p>
         <h4>The Mirror</h4>
-        <p>You cannot place a question before the mirror that exhibits precision you don't possess. The reflection is faithful along the substance channel — it gives back what you brought, no more and no less.</p>
+        <p>You cannot place a question before the mirror that exhibits precision you don't possess. The reflection is faithful along the substance channel; it gives back what you brought, no more and no less.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Layer hierarchy → <strong>Eq (1a)</strong></li>
-            <li>Variance amplification → <strong>Eq (4)</strong></li>
-            <li>Force dynamics → <strong>Eq (11)</strong></li>
+            <li>Layer hierarchy: <strong>Eq (1a)</strong></li>
+            <li>Variance amplification: <strong>Eq (4)</strong></li>
+            <li>Force dynamics: <strong>Eq (11)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
 
-<ChartCard Title="Layer Ordering" Description="Eq (2): Validates surface > middle > deep layer ordering.">
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Eq (1): Force Component Sensitivity                                    *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<ChartCard Title="Force Component Sensitivity"
+           Description="Eq (1): How output changes as each force component varies, holding all others at their slider values.">
     <ChildContent>
-        <BarChart Bars="@_layerBars" XLabel="Layer" YLabel="M_eff" />
-        <ThresholdIndicator Label="@(_layerValid ? "Layer ordering valid" : "Layer ordering violated")" Passed="@_layerValid" />
+        <LineChart Width="600" Height="400"
+                   XLabel="Component Value (fi)"
+                   YLabel="Output (O)"
+                   Series="@_sensitivitySeries"
+                   YMin="0" />
+    </ChildContent>
+    <TheoryContent>
+        <h4>Why This Matters</h4>
+        <p>Each curve shows how output responds to a single force component while all others stay fixed. Components with higher weights produce steeper curves. A component near zero drags the entire product down regardless of others.</p>
+        <h4>Reading the Chart</h4>
+        <p>Steeper curves indicate higher sensitivity. The vertical dots on each curve mark the current slider value. If curves are clustered, the weights are similar; if one is much steeper, that component dominates the output.</p>
+    </TheoryContent>
+</ChartCard>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Eq (1a): Layer Effective Multiplier                                    *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<ChartCard Title="Layer Effective Multiplier"
+           Description="Eq (1a): M_eff by layer. The LLM substitutes almost fully at the surface, partially in the middle, and barely at depth.">
+    <ChildContent>
+        <BarChart Bars="@_layerBars" XLabel="Layer" YLabel="Layer Output (M_eff × F)" />
+        <ThresholdIndicator Label="@(_layerValid ? "Layer ordering valid: surface >> middle > deep ≈ 1" : "Layer ordering violated")" Passed="@_layerValid" />
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="M_{\text{eff}}^{\text{surface}} \gg M_{\text{eff}}^{\text{middle}} > M_{\text{eff}}^{\text{deep}} \approx 1 \qquad (1a)" />
         <h4>In Plain Language</h4>
-        <p>The LLM is an almost perfect substitute for the surface layer (syntax, APIs — high M), a partial substitute for the middle layer (judgment, taste — moderate M), and barely a substitute at all for the deep layer (structural intuition — M ≈ 1). Surface has a half-life of months, middle of years, deep of decades.</p>
+        <p>The LLM is an almost perfect substitute for the surface layer (syntax, APIs, with high M_eff), a partial substitute for the middle layer (judgment, taste, with moderate M_eff), and barely a substitute at all for the deep layer (structural intuition, where M_eff is approximately 1). Surface knowledge has a half-life of months, middle of years, deep of decades.</p>
         <h4>The Mirror</h4>
         <p>The mirror's fidelity at the surface conceals its limitations at depth.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Barbell effect → <strong>Eq (6)</strong></li>
-            <li>Layered decay → <strong>Eq (11a-c)</strong></li>
-            <li>Transfer efficiency → <strong>Eq (26a)</strong></li>
+            <li>Barbell effect: <strong>Eq (6)</strong></li>
+            <li>Layered decay: <strong>Eq (11a-c)</strong></li>
+            <li>Transfer efficiency: <strong>Eq (26a)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
 
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Eq (2): Variable Multiplier Across Domains                            *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<ChartCard Title="Variable Multiplier Across Domains"
+           Description="Eq (2): O = sum(Ms(d) * F(d)). Total output is the sum of domain-specific contributions.">
+    <ChildContent>
+        <BarChart StackedBars="@_domainStacks" XLabel="Domain" YLabel="Domain Output" />
+        <p class="chart-readout">
+            Total cross-domain output: <strong>@_domainTotal.ToString("F2")</strong>
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="O = \sum_{d} M_s(d) \times F(d) \qquad (2)" />
+        <h4>In Plain Language</h4>
+        <p>Instead of a single multiplier applied once, total output sums the contribution from each domain separately. Within a domain, Force components combine multiplicatively (one zero kills the product), but across domains the contributions combine additively. The LLM might be a 50x substance multiplier for boilerplate CRUD, 1.3x for novel architecture, and less than 1x for debugging a production race condition.</p>
+        <h4>The Mirror</h4>
+        <p>The mirror's fidelity varies by what you're reflecting. Simple, well-structured patterns reflect cleanly. Novel, ambiguous designs reflect poorly; the distortion can be worse than no reflection at all.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Skill value sensitivity: <strong>Eq (3)</strong></li>
+            <li>Sovereignty: <strong>Eq (35+)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Eq (3): Skill Value Sensitivity                                        *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<ChartCard Title="Skill Value Sensitivity by Domain"
+           Description="Eq (3): dVs/dIp = (dMs(d)/dIp) * F_bar_s. Each curve shows how provider investment changes a domain's skill value, shaped by both the multiplier improvement rate and the average Force in that domain.">
+    <ChildContent>
+        <LineChart Width="600" Height="400"
+                   XLabel="Provider Investment (Ip)"
+                   YLabel="Change in Skill Value (dVs/dIp)"
+                   Series="@_skillValueSeries"
+                   YMin="0" />
+        <p class="chart-readout">
+            At current investment level:
+            @foreach (var entry in _skillReadouts)
+            {
+                <span>&ensp;|&ensp;@entry.Key: <strong>@entry.Value.ToString("F2")</strong></span>
+            }
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equation</h4>
+        <KatexBlock Latex="\frac{\partial V_s}{\partial I_p} = \frac{\partial M_s(d)}{\partial I_p} \times \bar{F}_s \qquad (3)" />
+        <h4>In Plain Language</h4>
+        <p>V_s is the market value of skill s. I_p is the LLM provider's investment in training capability for domain d. The partial derivative dMs(d)/dIp measures how much the provider's investment improves the substance multiplier in that domain. F_bar_s is the average Force of engineers in skill s. The equation says: whoever decides where the LLM gets better is implicitly deciding which skills become more economically valuable. The magnitude of the reshaping depends on both how much the multiplier improves and how much human Force exists to be multiplied.</p>
+        <h4>Reading the Chart</h4>
+        <p>Each curve represents a domain. Domains where the LLM improves rapidly (high dMs/dIp) and where substantial human Force exists see the largest shift in skill value. Domains with low multiplier sensitivity or low average Force barely move. The crossing points reveal where provider investment flips the relative economic value of two skills.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Variable multiplier: <strong>Eq (2)</strong></li>
+            <li>Barbell effect: <strong>Eq (6)</strong></li>
+            <li>Sovereignty: <strong>Eq (35+)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Slider Panel                                                           *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
 <FloatingSliderPanel Visible="true" Title="Base Model Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (1): Base Output</div>
-    <ParameterSlider Label="M" Min="0.5" Max="5" Step="0.1" Value="@_m" ValueChanged="OnMChanged" />
-    <ParameterSlider Label="Force (Surface)" Min="0" Max="10" Step="0.1" Value="@_forceSurface" ValueChanged="OnForceSurfaceChanged" />
-    <ParameterSlider Label="Force (Middle)" Min="0" Max="10" Step="0.1" Value="@_forceMiddle" ValueChanged="OnForceMiddleChanged" />
-    <ParameterSlider Label="Force (Deep)" Min="0" Max="10" Step="0.1" Value="@_forceDeep" ValueChanged="OnForceDeepChanged" />
-    <div class="slider-group-header">Eq (1a): Layer Ordering</div>
-    <ParameterSlider Label="Weight (Surface)" Min="0" Max="1" Step="0.1" Value="@_weightSurface" ValueChanged="OnWeightSurfaceChanged" />
-    <ParameterSlider Label="Weight (Middle)" Min="0" Max="1" Step="0.1" Value="@_weightMiddle" ValueChanged="OnWeightMiddleChanged" />
-    <ParameterSlider Label="Weight (Deep)" Min="0" Max="1" Step="0.1" Value="@_weightDeep" ValueChanged="OnWeightDeepChanged" />
+
+    <div class="slider-group-header">Eq (1): Heatmap Axes</div>
+    <ParameterSlider Label="X-axis component (1-7)" Min="1" Max="7" Step="1" Value="@(_heatAxisX + 1)" ValueChanged="v => { _heatAxisX = (int)v - 1; Recalculate(); }" />
+    <ParameterSlider Label="Y-axis component (1-7)" Min="1" Max="7" Step="1" Value="@(_heatAxisY + 1)" ValueChanged="v => { _heatAxisY = (int)v - 1; Recalculate(); }" />
+
+    <div class="slider-group-header">Eq (1): Force Components</div>
+    <ParameterSlider Label="M (Multiplier)" Min="0.5" Max="5" Step="0.1" Value="@_m" ValueChanged="OnMChanged" />
+    <ParameterSlider Label="f1: Domain Expertise" Min="0" Max="10" Step="0.1" Value="@_f1" ValueChanged="v => { _f1 = v; Recalculate(); }" />
+    <ParameterSlider Label="f2: Arch. Judgment" Min="0" Max="10" Step="0.1" Value="@_f2" ValueChanged="v => { _f2 = v; Recalculate(); }" />
+    <ParameterSlider Label="f3: Taste" Min="0" Max="10" Step="0.1" Value="@_f3" ValueChanged="v => { _f3 = v; Recalculate(); }" />
+    <ParameterSlider Label="f4: Spec Clarity" Min="0" Max="10" Step="0.1" Value="@_f4" ValueChanged="v => { _f4 = v; Recalculate(); }" />
+    <ParameterSlider Label="f5: Debug Intuition" Min="0" Max="10" Step="0.1" Value="@_f5" ValueChanged="v => { _f5 = v; Recalculate(); }" />
+    <ParameterSlider Label="f6: Calibrated Uncert." Min="0" Max="10" Step="0.1" Value="@_f6" ValueChanged="v => { _f6 = v; Recalculate(); }" />
+    <ParameterSlider Label="f7: Intrinsic Motiv." Min="0" Max="10" Step="0.1" Value="@_f7" ValueChanged="v => { _f7 = v; Recalculate(); }" />
+
+    <div class="slider-group-header">Eq (1): Weights (sum to 1)</div>
+    <ParameterSlider Label="w1: Domain Expertise" Min="0.01" Max="0.5" Step="0.01" Value="@_w1" ValueChanged="v => { _w1 = v; NormalizeWeights(0); }" />
+    <ParameterSlider Label="w2: Arch. Judgment" Min="0.01" Max="0.5" Step="0.01" Value="@_w2" ValueChanged="v => { _w2 = v; NormalizeWeights(1); }" />
+    <ParameterSlider Label="w3: Taste" Min="0.01" Max="0.5" Step="0.01" Value="@_w3" ValueChanged="v => { _w3 = v; NormalizeWeights(2); }" />
+    <ParameterSlider Label="w4: Spec Clarity" Min="0.01" Max="0.5" Step="0.01" Value="@_w4" ValueChanged="v => { _w4 = v; NormalizeWeights(3); }" />
+    <ParameterSlider Label="w5: Debug Intuition" Min="0.01" Max="0.5" Step="0.01" Value="@_w5" ValueChanged="v => { _w5 = v; NormalizeWeights(4); }" />
+    <ParameterSlider Label="w6: Calibrated Uncert." Min="0.01" Max="0.5" Step="0.01" Value="@_w6" ValueChanged="v => { _w6 = v; NormalizeWeights(5); }" />
+    <ParameterSlider Label="w7: Intrinsic Motiv." Min="0.01" Max="0.5" Step="0.01" Value="@_w7" ValueChanged="v => { _w7 = v; NormalizeWeights(6); }" />
+
+    <div class="slider-group-header">Eq (1a): Layer Effective Multipliers</div>
+    <ParameterSlider Label="M_eff Surface" Min="1" Max="50" Step="0.5" Value="@_mEffSurface" ValueChanged="v => { _mEffSurface = v; Recalculate(); }" />
+    <ParameterSlider Label="M_eff Middle" Min="1" Max="10" Step="0.1" Value="@_mEffMiddle" ValueChanged="v => { _mEffMiddle = v; Recalculate(); }" />
+    <ParameterSlider Label="M_eff Deep" Min="0.5" Max="3" Step="0.1" Value="@_mEffDeep" ValueChanged="v => { _mEffDeep = v; Recalculate(); }" />
+    <ParameterSlider Label="Force (Surface)" Min="0" Max="10" Step="0.1" Value="@_forceSurface" ValueChanged="v => { _forceSurface = v; Recalculate(); }" />
+    <ParameterSlider Label="Force (Middle)" Min="0" Max="10" Step="0.1" Value="@_forceMiddle" ValueChanged="v => { _forceMiddle = v; Recalculate(); }" />
+    <ParameterSlider Label="Force (Deep)" Min="0" Max="10" Step="0.1" Value="@_forceDeep" ValueChanged="v => { _forceDeep = v; Recalculate(); }" />
+
+    <div class="slider-group-header">Eq (2): Domain Multipliers</div>
+    <ParameterSlider Label="Ms: Boilerplate" Min="0.5" Max="50" Step="0.5" Value="@_msBoilerplate" ValueChanged="v => { _msBoilerplate = v; Recalculate(); }" />
+    <ParameterSlider Label="Ms: Integration" Min="0.5" Max="20" Step="0.5" Value="@_msIntegration" ValueChanged="v => { _msIntegration = v; Recalculate(); }" />
+    <ParameterSlider Label="Ms: Architecture" Min="0.5" Max="5" Step="0.1" Value="@_msArchitecture" ValueChanged="v => { _msArchitecture = v; Recalculate(); }" />
+    <ParameterSlider Label="Ms: Debugging" Min="0.1" Max="3" Step="0.1" Value="@_msDebugging" ValueChanged="v => { _msDebugging = v; Recalculate(); }" />
+    <ParameterSlider Label="F: Boilerplate" Min="0" Max="10" Step="0.1" Value="@_fdBoilerplate" ValueChanged="v => { _fdBoilerplate = v; Recalculate(); }" />
+    <ParameterSlider Label="F: Integration" Min="0" Max="10" Step="0.1" Value="@_fdIntegration" ValueChanged="v => { _fdIntegration = v; Recalculate(); }" />
+    <ParameterSlider Label="F: Architecture" Min="0" Max="10" Step="0.1" Value="@_fdArchitecture" ValueChanged="v => { _fdArchitecture = v; Recalculate(); }" />
+    <ParameterSlider Label="F: Debugging" Min="0" Max="10" Step="0.1" Value="@_fdDebugging" ValueChanged="v => { _fdDebugging = v; Recalculate(); }" />
+
+    <div class="slider-group-header">Eq (3): Skill Value Sensitivity</div>
+    <ParameterSlider Label="Ip (current investment)" Min="0.1" Max="10" Step="0.1" Value="@_currentIp" ValueChanged="v => { _currentIp = v; Recalculate(); }" />
+    <ParameterSlider Label="dMs/dIp: Boilerplate" Min="0.1" Max="10" Step="0.1" Value="@_dMsBoilerplate" ValueChanged="v => { _dMsBoilerplate = v; Recalculate(); }" />
+    <ParameterSlider Label="dMs/dIp: Integration" Min="0.1" Max="10" Step="0.1" Value="@_dMsIntegration" ValueChanged="v => { _dMsIntegration = v; Recalculate(); }" />
+    <ParameterSlider Label="dMs/dIp: Architecture" Min="0.1" Max="10" Step="0.1" Value="@_dMsArchitecture" ValueChanged="v => { _dMsArchitecture = v; Recalculate(); }" />
+    <ParameterSlider Label="dMs/dIp: Debugging" Min="0.1" Max="10" Step="0.1" Value="@_dMsDebugging" ValueChanged="v => { _dMsDebugging = v; Recalculate(); }" />
+    <ParameterSlider Label="F_bar: Boilerplate" Min="0.5" Max="10" Step="0.1" Value="@_fBarBoilerplate" ValueChanged="v => { _fBarBoilerplate = v; Recalculate(); }" />
+    <ParameterSlider Label="F_bar: Integration" Min="0.5" Max="10" Step="0.1" Value="@_fBarIntegration" ValueChanged="v => { _fBarIntegration = v; Recalculate(); }" />
+    <ParameterSlider Label="F_bar: Architecture" Min="0.5" Max="10" Step="0.1" Value="@_fBarArchitecture" ValueChanged="v => { _fBarArchitecture = v; Recalculate(); }" />
+    <ParameterSlider Label="F_bar: Debugging" Min="0.5" Max="10" Step="0.1" Value="@_fBarDebugging" ValueChanged="v => { _fBarDebugging = v; Recalculate(); }" />
+
 </FloatingSliderPanel>
 
 @code {
-    private double _m = 1;
-    private double _forceSurface = 3;
-    private double _forceMiddle = 5;
-    private double _forceDeep = 8;
-    private double _weightSurface = 0.2;
-    private double _weightMiddle = 0.3;
-    private double _weightDeep = 0.5;
+    // ── Eq (1): Base output parameters ──
+    private double _m = 2.0;
 
+    // Heatmap axis selection (which two force components to sweep)
+    private int _heatAxisX = 0; // f1: Domain Expertise
+    private int _heatAxisY = 1; // f2: Arch. Judgment
+
+    private static readonly string[] _componentLabels = {
+        "Domain Expertise", "Arch. Judgment", "Taste",
+        "Spec Clarity", "Debug Intuition", "Calibrated Uncert.", "Intrinsic Motiv."
+    };
+
+    // Force components (the 7 listed in the concept document)
+    private double _f1 = 7.0;  // Domain expertise
+    private double _f2 = 6.0;  // Architectural judgment
+    private double _f3 = 5.0;  // Taste
+    private double _f4 = 6.0;  // Specification clarity
+    private double _f5 = 7.0;  // Debugging intuition
+    private double _f6 = 5.0;  // Calibrated uncertainty
+    private double _f7 = 6.0;  // Intrinsic motivation
+
+    // Weights (sum to 1)
+    private double _w1 = 0.20;
+    private double _w2 = 0.18;
+    private double _w3 = 0.10;
+    private double _w4 = 0.15;
+    private double _w5 = 0.15;
+    private double _w6 = 0.12;
+    private double _w7 = 0.10;
+
+    // ── Eq (1a): Layer-specific effective multipliers ──
+    private double _mEffSurface = 20.0;
+    private double _mEffMiddle = 3.0;
+    private double _mEffDeep = 1.2;
+    private double _forceSurface = 4.0;
+    private double _forceMiddle = 6.0;
+    private double _forceDeep = 8.0;
+
+    // ── Eq (2): Domain multipliers and forces ──
+    private double _msBoilerplate = 30.0;
+    private double _msIntegration = 5.0;
+    private double _msArchitecture = 1.3;
+    private double _msDebugging = 0.8;
+    private double _fdBoilerplate = 3.0;
+    private double _fdIntegration = 5.0;
+    private double _fdArchitecture = 7.0;
+    private double _fdDebugging = 8.0;
+
+    // ── Eq (3): Per-domain skill value sensitivity ──
+    private double _currentIp = 3.0;
+    private double _dMsBoilerplate = 8.0;   // high: LLM improves fast here
+    private double _dMsIntegration = 4.0;
+    private double _dMsArchitecture = 1.5;  // low: novel work, slow improvement
+    private double _dMsDebugging = 0.5;     // very low: LLM struggles here
+    private double _fBarBoilerplate = 3.0;  // low avg Force (many juniors)
+    private double _fBarIntegration = 5.0;
+    private double _fBarArchitecture = 7.0; // high avg Force (seniors)
+    private double _fBarDebugging = 8.0;    // highest avg Force
+
+    // ── Chart data ──
     private double[,] _heatMapData = new double[0, 0];
     private double[] _heatMapXValues = Array.Empty<double>();
     private double[] _heatMapYValues = Array.Empty<double>();
+    private List<ChartSeries> _sensitivitySeries = new();
     private List<BarItem> _layerBars = new();
     private bool _layerValid;
+    private List<BarStack> _domainStacks = new();
+    private double _domainTotal;
+    private List<ChartSeries> _skillValueSeries = new();
+    private Dictionary<string, double> _skillReadouts = new();
 
     protected override void OnInitialized() => Recalculate();
 
     private void OnMChanged(double v) { _m = v; Recalculate(); }
-    private void OnForceSurfaceChanged(double v) { _forceSurface = v; Recalculate(); }
-    private void OnForceMiddleChanged(double v) { _forceMiddle = v; Recalculate(); }
-    private void OnForceDeepChanged(double v) { _forceDeep = v; Recalculate(); }
-    private void OnWeightSurfaceChanged(double v) { _weightSurface = v; Recalculate(); }
-    private void OnWeightMiddleChanged(double v) { _weightMiddle = v; Recalculate(); }
-    private void OnWeightDeepChanged(double v) { _weightDeep = v; Recalculate(); }
+
+    private double[] GetForces() => new[] { _f1, _f2, _f3, _f4, _f5, _f6, _f7 };
+    private double[] GetWeights() => new[] { _w1, _w2, _w3, _w4, _w5, _w6, _w7 };
+
+    private void NormalizeWeights(int changedIndex)
+    {
+        // Re-normalize other weights so all sum to 1
+        var weights = GetWeights();
+        double changedVal = weights[changedIndex];
+        double sumOthers = 0;
+        for (int i = 0; i < weights.Length; i++)
+            if (i != changedIndex) sumOthers += weights[i];
+
+        if (sumOthers > 0)
+        {
+            double remaining = 1.0 - changedVal;
+            double scale = remaining / sumOthers;
+            var normalized = new double[weights.Length];
+            for (int i = 0; i < weights.Length; i++)
+                normalized[i] = i == changedIndex ? changedVal : weights[i] * scale;
+
+            _w1 = normalized[0]; _w2 = normalized[1]; _w3 = normalized[2];
+            _w4 = normalized[3]; _w5 = normalized[4]; _w6 = normalized[5];
+            _w7 = normalized[6];
+        }
+        Recalculate();
+    }
+
+    private double ComputeCurrentForce()
+    {
+        var forces = GetForces();
+        var weights = GetWeights();
+        double product = 1.0;
+        for (int i = 0; i < forces.Length; i++)
+            product *= Math.Pow(Math.Max(forces[i], 1e-6), weights[i]);
+        return product;
+    }
+
+    private double ComputeCurrentOutput() => _m * ComputeCurrentForce();
 
     private void Recalculate()
     {
         ComputeHeatMap();
+        ComputeSensitivity();
         ComputeLayerBars();
+        ComputeDomainBars();
+        ComputeSkillValueSeries();
     }
 
+    // ── Eq (1) HeatMap: sweep two user-selected force components ──
     private void ComputeHeatMap()
     {
-        const int steps = 20;
+        const int steps = 25;
         _heatMapXValues = new double[steps];
         _heatMapYValues = new double[steps];
         _heatMapData = new double[steps, steps];
 
-        var weights = new[] { _weightSurface, _weightMiddle, _weightDeep };
+        var forces = GetForces();
+        var weights = GetWeights();
 
+        // Prevent same axis for both dimensions
+        int axisY = _heatAxisY == _heatAxisX
+            ? (_heatAxisX + 1) % forces.Length
+            : _heatAxisY;
+
+        // Both axes sweep 0.1 to 10
         for (int i = 0; i < steps; i++)
-        {
-            _heatMapXValues[i] = 0.5 + i * 4.5 / (steps - 1);
-        }
+            _heatMapXValues[i] = 0.1 + i * 9.9 / (steps - 1);
         for (int j = 0; j < steps; j++)
-        {
             _heatMapYValues[j] = 0.1 + j * 9.9 / (steps - 1);
-        }
 
         for (int r = 0; r < steps; r++)
         {
-            var avgForce = _heatMapYValues[r];
-            var forces = new[] { avgForce, avgForce, avgForce };
             for (int c = 0; c < steps; c++)
             {
-                var mVal = _heatMapXValues[c];
-                _heatMapData[r, c] = BaseModel.ComputeOutput(mVal, forces, weights);
+                var testForces = (double[])forces.Clone();
+                testForces[_heatAxisX] = _heatMapXValues[c];
+                testForces[axisY] = _heatMapYValues[r];
+                _heatMapData[r, c] = BaseModel.ComputeOutput(_m, testForces, weights);
             }
         }
     }
 
+    // ── Eq (1) Sensitivity: one line per force component ──
+    private void ComputeSensitivity()
+    {
+        var forces = GetForces();
+        var weights = GetWeights();
+        var labels = new[] {
+            "Domain Expertise", "Arch. Judgment", "Taste",
+            "Spec Clarity", "Debug Intuition", "Calibrated Uncert.", "Intrinsic Motiv."
+        };
+        var colors = new[] { "#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c", "#0891b2", "#d946ef" };
+        const int pts = 50;
+
+        _sensitivitySeries = new List<ChartSeries>();
+        for (int comp = 0; comp < forces.Length; comp++)
+        {
+            var points = new List<DataPoint>();
+            for (int p = 0; p < pts; p++)
+            {
+                double fi = 0.1 + p * 9.9 / (pts - 1);
+                var testForces = (double[])forces.Clone();
+                testForces[comp] = fi;
+                double output = BaseModel.ComputeOutput(_m, testForces, weights);
+                points.Add(new DataPoint(fi, output));
+            }
+            _sensitivitySeries.Add(new ChartSeries(labels[comp], points, colors[comp], 2.0, false));
+        }
+    }
+
+    // ── Eq (1a) Layer bars: separate M_eff per layer ──
     private void ComputeLayerBars()
     {
-        var forces = new[] { _forceSurface, _forceMiddle, _forceDeep };
-        var weights = new[] { _weightSurface, _weightMiddle, _weightDeep };
-
-        var mEffSurface = BaseModel.ComputeOutput(_m, new[] { _forceSurface }, new[] { 1.0 });
-        var mEffMiddle = BaseModel.ComputeOutput(_m, new[] { _forceMiddle }, new[] { 1.0 });
-        var mEffDeep = BaseModel.ComputeOutput(_m, new[] { _forceDeep }, new[] { 1.0 });
+        var surfaceOutput = _mEffSurface * _forceSurface;
+        var middleOutput = _mEffMiddle * _forceMiddle;
+        var deepOutput = _mEffDeep * _forceDeep;
 
         _layerBars = new List<BarItem>
         {
-            new("Surface", mEffSurface, "#f97316"),
-            new("Middle", mEffMiddle, "#8b5cf6"),
-            new("Deep", mEffDeep, "#06b6d4")
+            new("Surface", surfaceOutput, "#f97316"),
+            new("Middle", middleOutput, "#8b5cf6"),
+            new("Deep", deepOutput, "#06b6d4")
         };
 
-        _layerValid = BaseModel.ValidateLayerOrdering(mEffSurface, mEffMiddle, mEffDeep);
+        _layerValid = _mEffSurface > _mEffMiddle
+                   && _mEffMiddle > _mEffDeep
+                   && Math.Abs(_mEffDeep - 1.0) < 1.0;
+    }
+
+    // ── Eq (2) Domain output contributions ──
+    private void ComputeDomainBars()
+    {
+        var domainMs = new[] { _msBoilerplate, _msIntegration, _msArchitecture, _msDebugging };
+        var domainFs = new[] { _fdBoilerplate, _fdIntegration, _fdArchitecture, _fdDebugging };
+        var domainNames = new[] { "Boilerplate", "Integration", "Architecture", "Debugging" };
+        var colors = new[] { "#2563eb", "#16a34a", "#9333ea", "#ea580c" };
+
+        _domainTotal = BaseModel.ComputeOutputAcrossDomains(domainMs, domainFs);
+
+        _domainStacks = new List<BarStack>();
+        for (int i = 0; i < domainNames.Length; i++)
+        {
+            var contribution = domainMs[i] * domainFs[i];
+            _domainStacks.Add(new BarStack(domainNames[i], new List<BarSegment>
+            {
+                new BarSegment($"Ms={domainMs[i]:F1}", contribution, colors[i])
+            }));
+        }
+    }
+
+    // ── Eq (3) Skill value sensitivity per domain ──
+    private void ComputeSkillValueSeries()
+    {
+        const int pts = 50;
+        var domainNames = new[] { "Boilerplate", "Integration", "Architecture", "Debugging" };
+        var dMsRates = new[] { _dMsBoilerplate, _dMsIntegration, _dMsArchitecture, _dMsDebugging };
+        var fBars = new[] { _fBarBoilerplate, _fBarIntegration, _fBarArchitecture, _fBarDebugging };
+        var colors = new[] { "#2563eb", "#16a34a", "#9333ea", "#ea580c" };
+
+        _skillValueSeries = new List<ChartSeries>();
+        _skillReadouts = new Dictionary<string, double>();
+
+        for (int d = 0; d < domainNames.Length; d++)
+        {
+            var points = new List<DataPoint>();
+            for (int p = 0; p < pts; p++)
+            {
+                double ip = 0.1 + p * 9.9 / (pts - 1);
+                // dMs/dIp diminishes with investment (logarithmic)
+                double dMsAtIp = dMsRates[d] / (1.0 + 0.2 * ip);
+                double dVs = BaseModel.SkillValueSensitivity(dMsAtIp, fBars[d]);
+                points.Add(new DataPoint(ip, dVs));
+            }
+            _skillValueSeries.Add(new ChartSeries(domainNames[d], points, colors[d], 2.0, false));
+
+            // Compute readout at current investment level
+            double dMsCurrent = dMsRates[d] / (1.0 + 0.2 * _currentIp);
+            _skillReadouts[domainNames[d]] = BaseModel.SkillValueSensitivity(dMsCurrent, fBars[d]);
+        }
     }
 }
