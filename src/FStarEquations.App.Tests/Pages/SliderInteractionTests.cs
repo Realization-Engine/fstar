@@ -33,8 +33,9 @@ public class SliderInteractionTests : BunitContext
         cut.Find(".floating-slider-pill").Click();
         var sliders = cut.FindAll("input[type=range]");
         Assert.NotEmpty(sliders);
-        Assert.Equal("0.5", sliders[0].GetAttribute("min"));
-        Assert.Equal("5", sliders[0].GetAttribute("max"));
+        // First slider is the X-axis component selector (min=1, max=7)
+        Assert.Equal("1", sliders[0].GetAttribute("min"));
+        Assert.Equal("7", sliders[0].GetAttribute("max"));
     }
 
     [Fact]
