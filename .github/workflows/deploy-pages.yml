@@ -31,7 +31,9 @@ jobs:
           dotnet-quality: 'preview'
 
       - name: Run tests
-        run: dotnet test src --configuration Release --verbosity normal
+        run: |
+          dotnet test src/FStarEquationsTests/FStarEquationsTests.csproj -c Release --verbosity normal
+          dotnet test src/FStarEquations.App.Tests/FStarEquations.App.Tests.csproj -c Release --verbosity normal
 
       - name: Publish Blazor app
         run: dotnet publish src/FStarEquations.App/FStarEquations.App.csproj -c Release -o output
