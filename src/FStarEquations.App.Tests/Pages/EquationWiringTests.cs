@@ -189,6 +189,7 @@ public class EquationWiringTests : BunitContext
     [Fact]
     public void ModelGrowthPage_Renders_ContainsLineChart()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<ModelGrowthPage>();
 
         var polylines = cut.FindAll("svg.line-chart polyline");

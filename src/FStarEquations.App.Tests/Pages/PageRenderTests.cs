@@ -105,6 +105,7 @@ public class PageRenderTests : BunitContext
     [Fact]
     public void ModelGrowthPage_Renders_WithoutThrowing()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<ModelGrowthPage>();
         Assert.NotNull(cut.Find("h1"));
     }

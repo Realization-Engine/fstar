@@ -95,4 +95,14 @@ public class TheoryCardTests : BunitContext
         var katexSpans = cut.FindAll("span.katex-display-block, span.katex-inline-block");
         Assert.True(katexSpans.Count >= 1, "Expected at least one KatexBlock span in theory content");
     }
+
+    [Fact]
+    public void ModelGrowthPage_ChartCards_HaveTheoryTabs()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<ModelGrowthPage>();
+
+        var tabBars = cut.FindAll(".chart-card-tabs");
+        Assert.True(tabBars.Count >= 3, $"Expected at least 3 tab bars but found {tabBars.Count}");
+    }
 }

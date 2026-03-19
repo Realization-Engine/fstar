@@ -1,4 +1,6 @@
 @page "/model-growth"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <PageTitle>Model Growth — Eq (25)</PageTitle>
 
@@ -8,44 +10,120 @@
     The multiplier grows exponentially. This single fact drives every dynamic in the framework: rising variance, accelerating divergence, collapsing SNR, and the relentless upward pressure on the tipping point. Understanding M(t) is understanding the clock speed of disruption.
 </blockquote>
 
-@* ─── Exponential M(t) Growth — Eq (25) ─── *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 0: Exponential M(t) Growth — Eq (25)                             *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="model-growth-chart-0">
 <ChartCard Title="Exponential M(t) Growth — Eq (25)"
-           Description="M(t) = M₀ · e^(μ·t)">
+           Description="M(t) = M₀ · e^(μ·t). Move sliders to reshape the growth curve.">
     <ChildContent>
-        <LineChart Series="@_growthSeries" XLabel="t (time)" YLabel="M(t)" Width="500" Height="320" />
+        <LineChart Series="@_growthSeries" XLabel="t (time)" YLabel="M(t)" Width="600" Height="320"
+                   Markers="@_growthMarkers" />
+        <p class="chart-readout">
+            At t=10: <strong>M(10) = @(ModelGrowth.MultiplierAtTime(_m0, _mu, 10.0).ToString("F2"))</strong>
+            &ensp;|&ensp;M&#8320;=@_m0.ToString("F1")
+            &ensp;|&ensp;&#956;=@_mu.ToString("F2")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Exponential growth M&#8320;&middot;e^(&#956;t), t from 0 to 20.
+            The dot marks t=10 on the curve.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="M(t) = M_0 \cdot e^{\mu t} \qquad (25)" />
         <h4>In Plain Language</h4>
-        <p>The LLM's capability grows exponentially — each model generation is meaningfully more powerful than the last. The growth rate μ is subject to the data quality constraint (Eq 31): if human signal feeding training pipelines degrades, the exponent may slow or stall. Most dynamics are convex in M: variance scales as M², epistemic gap worsens, evaluation bottleneck tightens, tacit knowledge threshold crossed earlier, tipping point rises.</p>
+        <p>M(t) is the multiplier at time t. M₀ is the initial multiplier level. e^(μt) is an exponential growth function: μ (mu) is the growth rate, and t is time. When μ > 0, the function grows without bound; the larger μ is, the faster the growth. The growth rate μ is subject to the data quality constraint of Eq (31): if the human signal feeding training pipelines degrades, the exponent may slow or stall.</p>
+        <h4>Reading the Charts</h4>
+        <p>The growth curve shows M(t) over 20 time steps. The dot at t=10 marks a reference point. Move M₀ to shift the entire curve vertically; move μ to change how steeply it climbs. Most downstream dynamics are convex in M, so even small increases in μ produce large downstream effects.</p>
+        <h4>The Mirror</h4>
+        <p>Each model generation is a higher-fidelity mirror. The reflection improves, but the improved reflection makes the mirror more flattering, which makes the workforce more reliant, which degrades the signal that trains the next generation. The growth rate μ is not guaranteed; it depends on what has been reflected into the training pipeline.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Data quality spiral Eq (31)</li>
-            <li>Variance Eq (4)</li>
-            <li>Tipping point Eq (14)</li>
-            <li>Indecision cost Eq (21)</li>
+            <li>Data quality spiral <strong>Eq (31)</strong></li>
+            <li>Variance <strong>Eq (4)</strong></li>
+            <li>Tipping point <strong>Eq (14)</strong></li>
+            <li>Indecision cost <strong>Eq (21)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── Composite: M(t) Impact Cascade — Eq (25) + (4) + (14) + (21) ─── *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 1: Parameter Sensitivity — Eq (25)                               *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="model-growth-chart-1">
+<ChartCard Title="Parameter Sensitivity — Eq (25)"
+           Description="How M(t=10) responds as each parameter sweeps its range, holding the other at its current value.">
+    <ChildContent>
+        <LineChart Width="600" Height="320"
+                   XLabel="Parameter Value"
+                   YLabel="M(t=10)"
+                   Series="@_sensitivitySeries"
+                   YMin="0"
+                   Markers="@_sensitivityMarkers"
+                   HighlightSeriesIndices="@_sensitivityHighlight" />
+        <p class="chart-readout">
+            At t=10: <strong>M(10) = @(ModelGrowth.MultiplierAtTime(_m0, _mu, 10.0).ToString("F2"))</strong>
+            &ensp;|&ensp;M&#8320;=@_m0.ToString("F1")
+            &ensp;|&ensp;&#956;=@_mu.ToString("F2")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Each curve sweeps one parameter while holding the other at its current value.
+            The dashed curve (&#956;) dominates because it enters the exponent.
+            Dots mark each parameter's current slider value.
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Why This Matters</h4>
+        <p>M₀ scales the output linearly (doubling M₀ doubles M(10)), but μ enters the exponent, so its effect is super-linear. A small increase in growth rate produces a much larger increase in the future multiplier than the same proportional increase in the starting value. This is why training breakthroughs (higher μ) matter more than starting capability (higher M₀) over any non-trivial time horizon.</p>
+        <h4>Reading the Chart</h4>
+        <p>The M₀ curve is a straight line (linear scaling). The μ curve is exponential, climbing steeply at higher values. The dashed, thicker line highlights μ because it is the dominant driver. Dots mark your current slider values.</p>
+    </TheoryContent>
+</ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 2: M(t) Impact Cascade — Eq (25) + (4) + (14) + (21) + Radar   *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="model-growth-chart-2">
 <ChartCard Title="M(t) Impact Cascade" Description="Eq (25) + (4) + (14) + (21): How multiplier growth cascades through variance, tipping point, and indecision cost.">
     <ChildContent>
-    <div class="cascade-grid">
-        <ChartCard Title="1. M(t) — Eq (25)" Description="Multiplier over time">
-            <ChildContent><LineChart Series="@_cascadeMtSeries" XLabel="t" YLabel="M(t)" Width="400" Height="250" /></ChildContent>
-        </ChartCard>
-        <ChartCard Title="2. Var(O)(t) — Eq (4)" Description="Output variance at M(t)">
-            <ChildContent><LineChart Series="@_cascadeVarSeries" XLabel="t" YLabel="Var(O)" Width="400" Height="250" /></ChildContent>
-        </ChartCard>
-        <ChartCard Title="3. F*(t) — Eq (14)" Description="Tipping point with M(t) as absorbed multiplier">
-            <ChildContent><LineChart Series="@_cascadeFStarSeries" XLabel="t" YLabel="F*" Width="400" Height="250" /></ChildContent>
-        </ChartCard>
-        <ChartCard Title="4. Cost(t) — Eq (21)" Description="Indecision cost at M(t)">
-            <ChildContent><LineChart Series="@_cascadeCostSeries" XLabel="t" YLabel="Cost" Width="400" Height="250" /></ChildContent>
-        </ChartCard>
+    <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+        <div class="cascade-grid">
+            <ChartCard Title="1. M(t) — Eq (25)" Description="Multiplier over time">
+                <ChildContent><LineChart Series="@_cascadeMtSeries" XLabel="t" YLabel="M(t)" Width="400" Height="250" /></ChildContent>
+            </ChartCard>
+            <ChartCard Title="2. Var(O)(t) — Eq (4)" Description="Output variance at M(t)">
+                <ChildContent><LineChart Series="@_cascadeVarSeries" XLabel="t" YLabel="Var(O)" Width="400" Height="250" /></ChildContent>
+            </ChartCard>
+            <ChartCard Title="3. F*(t) — Eq (14)" Description="Tipping point with M(t) as absorbed multiplier">
+                <ChildContent><LineChart Series="@_cascadeFStarSeries" XLabel="t" YLabel="F*" Width="400" Height="250" /></ChildContent>
+            </ChartCard>
+            <ChartCard Title="4. Cost(t) — Eq (21)" Description="Indecision cost at M(t)">
+                <ChildContent><LineChart Series="@_cascadeCostSeries" XLabel="t" YLabel="Cost" Width="400" Height="250" /></ChildContent>
+            </ChartCard>
+        </div>
+        <div>
+            <p style="text-align: center; font-size: 0.85em; font-weight: 600; margin: 0 0 4px;">Cascade Impact at t=10</p>
+            <RadarChart Width="280" Height="280"
+                        Axes="@_cascadeRadarAxes"
+                        CenterLabel="@("t=10")" />
+        </div>
     </div>
+    <p class="chart-readout">
+        At t=10: <strong>M=@(_cascadeM10.ToString("F2"))</strong>
+        &ensp;|&ensp;Var(O)=@(_cascadeVar10.ToString("F2"))
+        &ensp;|&ensp;F*=@(_cascadeFStar10.ToString("F2"))
+        &ensp;|&ensp;Cost=@(_cascadeCost10.ToString("F2"))
+    </p>
+    <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+        All quantities computed from M(t) at each time step. The radar shows the relative magnitude of each cascade output at t=10.
+        A balanced polygon means all effects grow proportionally; a spike means one effect dominates.
+    </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equations</h4>
@@ -54,38 +132,167 @@
         <KatexBlock Latex="F^* = \frac{\beta R + \sigma M_{\text{absorbed}}}{\gamma E} \qquad (14)" />
         <KatexBlock Latex="\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)" />
         <h4>In Plain Language</h4>
-        <p>As M(t) grows exponentially, four downstream quantities evolve: Var(O) scales as M², F* rises as M_absorbed grows with better models, the indecision cost scales linearly with M, and the opportunity cost of delay compounds. The problems compound faster as the technology improves. The F→M transfer may eventually make this self-limiting — but only after the force supply has already degraded.</p>
+        <p>As M(t) grows exponentially, four downstream quantities evolve: Var(O) scales as M squared, F* rises as M_absorbed grows with better models, the indecision cost scales linearly with M, and the opportunity cost of delay compounds. The problems compound faster as the technology improves. The F to M transfer may eventually make this self-limiting, but only after the force supply has already degraded.</p>
+        <h4>Reading the Charts</h4>
+        <p>Each sub-panel tracks one downstream quantity over time. The radar chart at right shows all four at t=10 simultaneously; a dent reveals which effect is lagging, while a spike shows which dominates. Var(O) typically dominates because it scales as M squared, making it super-linear. Adjust cascade parameters (Var(F), beta, sigma, R_exec) to see how different organizational conditions reshape the cascade profile.</p>
+        <h4>The Mirror</h4>
+        <p>The cascade is the mirror's compounding effect. A better mirror (higher M) simultaneously amplifies variance, raises the tipping threshold, and increases the cost of delay. The organization that waits to act faces all four curves moving against it at once.</p>
         <h4>Connections</h4>
         <ul>
             <li>All equations shown in the sub-panels</li>
             <li>Terminal dynamics</li>
-            <li>Data quality spiral Eq (31)</li>
+            <li>Data quality spiral <strong>Eq (31)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Floating Slider Panel with scroll-aware filtering                      *@
+@* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Model Growth Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (25): M(t) Growth</div>
-    <ParameterSlider Label="M₀" Min="0.5" Max="5" Step="0.1" Value="@_m0" ValueChanged="v => { _m0 = v; RecalcCascade(); }" />
-    <ParameterSlider Label="μ (growth rate)" Min="0.01" Max="0.5" Step="0.01" Value="@_mu" ValueChanged="v => { _mu = v; RecalcCascade(); }" />
-    <div class="slider-group-header">Eq (4): Variance Amplification</div>
-    <ParameterSlider Label="Var(F)" Min="0.1" Max="10" Step="0.1" Value="@_cascadeVarF" ValueChanged="v => { _cascadeVarF = v; RecalcCascade(); }" />
-    <div class="slider-group-header">Eq (14): Tipping Point</div>
-    <ParameterSlider Label="β (decay)" Min="0" Max="1" Step="0.01" Value="@_cascadeBeta" ValueChanged="v => { _cascadeBeta = v; RecalcCascade(); }" />
-    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1" Value="@_cascadeReplacement" ValueChanged="v => { _cascadeReplacement = v; RecalcCascade(); }" />
-    <ParameterSlider Label="σ (absorption)" Min="0" Max="2" Step="0.1" Value="@_cascadeSigma" ValueChanged="v => { _cascadeSigma = v; RecalcCascade(); }" />
-    <ParameterSlider Label="γ (engagement rate)" Min="0" Max="1" Step="0.01" Value="@_cascadeGamma" ValueChanged="v => { _cascadeGamma = v; RecalcCascade(); }" />
-    <ParameterSlider Label="E (engagement)" Min="0" Max="5" Step="0.1" Value="@_cascadeEngagement" ValueChanged="v => { _cascadeEngagement = v; RecalcCascade(); }" />
-    <div class="slider-group-header">Eq (21): Indecision Cost</div>
-    <ParameterSlider Label="R_exec" Min="0.1" Max="10" Step="0.1" Value="@_cascadeRateExec" ValueChanged="v => { _cascadeRateExec = v; RecalcCascade(); }" />
-    <ParameterSlider Label="Δt" Min="0.1" Max="5" Step="0.1" Value="@_cascadeDeltaTime" ValueChanged="v => { _cascadeDeltaTime = v; RecalcCascade(); }" />
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+        <span style="font-size: 0.8em; opacity: 0.7;">Sliders for: @ChartNames[Math.Clamp(_activeChartIndex, 0, ChartNames.Length - 1)]</span>
+        <button class="slider-toggle-btn" @onclick="ToggleShowAll">@(_showAllSliders ? "Auto-filter" : "Show all")</button>
+    </div>
+
+    @* Group 0: Eq (25) M(t) Growth *@
+    @if (IsGroupVisible(0))
+    {
+        <div class="slider-group-header">Eq (25): M(t) Growth</div>
+    }
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="M₀" Min="0.5" Max="5" Step="0.1" Value="@_m0" ValueChanged="v => { _m0 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="μ (growth rate)" Min="0.01" Max="0.5" Step="0.01" Value="@_mu" ValueChanged="v => { _mu = v; RecalcAll(); }" />
+    </div>
+
+    @* Group 1: Eq (4) Variance Amplification *@
+    @if (IsGroupVisible(1))
+    {
+        <div class="slider-group-header">Eq (4): Variance Amplification</div>
+    }
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Var(F)" Min="0.1" Max="10" Step="0.1" Value="@_cascadeVarF" ValueChanged="v => { _cascadeVarF = v; RecalcAll(); }" />
+    </div>
+
+    @* Group 2: Eq (14) Tipping Point *@
+    @if (IsGroupVisible(2))
+    {
+        <div class="slider-group-header">Eq (14): Tipping Point</div>
+    }
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="β (decay)" Min="0" Max="1" Step="0.01" Value="@_cascadeBeta" ValueChanged="v => { _cascadeBeta = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1" Value="@_cascadeReplacement" ValueChanged="v => { _cascadeReplacement = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="σ (absorption)" Min="0" Max="2" Step="0.1" Value="@_cascadeSigma" ValueChanged="v => { _cascadeSigma = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="γ (engagement rate)" Min="0" Max="1" Step="0.01" Value="@_cascadeGamma" ValueChanged="v => { _cascadeGamma = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="E (engagement)" Min="0" Max="5" Step="0.1" Value="@_cascadeEngagement" ValueChanged="v => { _cascadeEngagement = v; RecalcAll(); }" />
+    </div>
+
+    @* Group 3: Eq (21) Indecision Cost *@
+    @if (IsGroupVisible(3))
+    {
+        <div class="slider-group-header">Eq (21): Indecision Cost</div>
+    }
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="R_exec" Min="0.1" Max="10" Step="0.1" Value="@_cascadeRateExec" ValueChanged="v => { _cascadeRateExec = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="Δt" Min="0.1" Max="5" Step="0.1" Value="@_cascadeDeltaTime" ValueChanged="v => { _cascadeDeltaTime = v; RecalcAll(); }" />
+    </div>
+
 </FloatingSliderPanel>
 
 @code {
+    // ── Scroll-aware slider state ──
+    private int _activeChartIndex = 0;
+    private bool _showAllSliders;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<ModelGrowthPage>? _dotNetRef;
+
+    private static readonly string[] ChartNames =
+    {
+        "M(t) Growth",
+        "Sensitivity",
+        "Cascade Impact"
+    };
+
+    // Per-chart: which slider groups (indices) are visible
+    // Group 0 = Eq(25) M₀/μ, 1 = Eq(4) Var(F), 2 = Eq(14) Tipping, 3 = Eq(21) Cost
+    private static readonly HashSet<int>[] ChartVisibleGroups =
+    {
+        new() { 0 },          // Chart 0: Growth curve — only M₀, μ
+        new() { 0 },          // Chart 1: Sensitivity — only M₀, μ
+        new() { 0, 1, 2, 3 }, // Chart 2: Cascade — all sliders
+    };
+
+    private bool IsGroupVisible(int groupIndex) =>
+        _showAllSliders ||
+        (_activeChartIndex >= 0 && _activeChartIndex < ChartVisibleGroups.Length &&
+         ChartVisibleGroups[_activeChartIndex].Contains(groupIndex));
+
+    private string GroupSlotClass(int groupIndex) => IsGroupVisible(groupIndex) ? "" : "hidden";
+
+    private void ToggleShowAll() => _showAllSliders = !_showAllSliders;
+
+    private static readonly string[] ChartElementIds =
+    {
+        "model-growth-chart-0", "model-growth-chart-1", "model-growth-chart-2"
+    };
+
+    [JSInvokable]
+    public void OnChartScrolled(int index)
+    {
+        if (index == _activeChartIndex) return;
+        _activeChartIndex = index;
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/FStar.UI/FStar.UI.lib.module.js");
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await _jsModule.InvokeVoidAsync(
+                    "initChartObserver", _dotNetRef, "OnChartScrolled", ChartElementIds);
+            }
+            catch (JSException) { /* SSR / prerender guard */ }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("destroyChartObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+
+    // ── Eq (25) parameters ──
     private double _m0 = 1;
     private double _mu = 0.1;
 
-    // Cascade parameters
+    // ── Cascade parameters ──
     private double _cascadeVarF = 2.0;
     private double _cascadeBeta = 0.3;
     private double _cascadeReplacement = 2.0;
@@ -95,23 +302,99 @@
     private double _cascadeRateExec = 5.0;
     private double _cascadeDeltaTime = 1.0;
 
-    private IReadOnlyList<ChartSeries> _growthSeries => new List<ChartSeries>
-    {
-        new("M(t)", Enumerable.Range(0, 201)
-            .Select(i => i * 0.1)
-            .Select(t => new DataPoint(t, ModelGrowth.MultiplierAtTime(_m0, _mu, t)))
-            .ToList())
-    };
+    // ── Cascade snapshot at t=10 ──
+    private double _cascadeM10;
+    private double _cascadeVar10;
+    private double _cascadeFStar10;
+    private double _cascadeCost10;
 
-    // Cascade series
+    // ── Chart 0: Growth curve with marker ──
+    private IReadOnlyList<ChartSeries> _growthSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _growthMarkers = Array.Empty<ChartMarker>();
+
+    // ── Chart 1: Sensitivity ──
+    private IReadOnlyList<ChartSeries> _sensitivitySeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _sensitivityMarkers = Array.Empty<ChartMarker>();
+    private static readonly IReadOnlySet<int> _sensitivityHighlight = new HashSet<int> { 1 }; // highlight μ
+
+    // ── Chart 2: Cascade ──
     private IReadOnlyList<ChartSeries> _cascadeMtSeries = Array.Empty<ChartSeries>();
     private IReadOnlyList<ChartSeries> _cascadeVarSeries = Array.Empty<ChartSeries>();
     private IReadOnlyList<ChartSeries> _cascadeFStarSeries = Array.Empty<ChartSeries>();
     private IReadOnlyList<ChartSeries> _cascadeCostSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<RadarAxis> _cascadeRadarAxes = Array.Empty<RadarAxis>();
 
     protected override void OnInitialized()
     {
+        RecalcAll();
+    }
+
+    private void RecalcAll()
+    {
+        RecalcGrowth();
+        RecalcSensitivity();
         RecalcCascade();
+    }
+
+    private void RecalcGrowth()
+    {
+        var points = Enumerable.Range(0, 201)
+            .Select(i => i * 0.1)
+            .Select(t => new DataPoint(t, ModelGrowth.MultiplierAtTime(_m0, _mu, t)))
+            .ToList();
+
+        _growthSeries = new List<ChartSeries> { new("M(t)", points) };
+
+        var m10 = ModelGrowth.MultiplierAtTime(_m0, _mu, 10.0);
+        _growthMarkers = new List<ChartMarker>
+        {
+            new(10.0, m10, "#dc2626", "t=10", new List<string>
+            {
+                "Reference point: t=10",
+                $"M(10) = {m10:F2}",
+                $"M₀ = {_m0:F1}, μ = {_mu:F2}"
+            })
+        };
+    }
+
+    private void RecalcSensitivity()
+    {
+        const double tRef = 10.0;
+        var currentOutput = ModelGrowth.MultiplierAtTime(_m0, _mu, tRef);
+
+        // Sweep M₀ from 0.5 to 5
+        var m0Points = new List<DataPoint>();
+        for (double m0 = 0.5; m0 <= 5.0; m0 += 0.1)
+            m0Points.Add(new DataPoint(m0, ModelGrowth.MultiplierAtTime(m0, _mu, tRef)));
+
+        // Sweep μ from 0.01 to 0.5
+        var muPoints = new List<DataPoint>();
+        for (double mu = 0.01; mu <= 0.5; mu += 0.01)
+            muPoints.Add(new DataPoint(mu, ModelGrowth.MultiplierAtTime(_m0, mu, tRef)));
+
+        _sensitivitySeries = new List<ChartSeries>
+        {
+            new("M₀", m0Points, "#2563eb", 2.0),
+            new("μ", muPoints, "#dc2626", 2.0)
+        };
+
+        _sensitivityMarkers = new List<ChartMarker>
+        {
+            new(_m0, currentOutput, "#2563eb", "M₀", new List<string>
+            {
+                "M₀ (initial multiplier)",
+                $"Value: {_m0:F1}",
+                $"M(10) = {currentOutput:F2}",
+                "Linear scaling: doubling M₀ doubles M(t)"
+            }),
+            new(_mu, currentOutput, "#dc2626", "μ", new List<string>
+            {
+                "μ (growth rate)",
+                $"Value: {_mu:F2}",
+                $"M(10) = {currentOutput:F2}",
+                "Exponential driver: enters the exponent"
+            })
+        };
     }
 
     private void RecalcCascade()
@@ -141,5 +424,54 @@
         _cascadeVarSeries = new List<ChartSeries> { new("Var(O)", varPoints, "#16a34a", 2.0) };
         _cascadeFStarSeries = new List<ChartSeries> { new("F*", fStarPoints, "#dc2626", 2.0) };
         _cascadeCostSeries = new List<ChartSeries> { new("Cost", costPoints, "#f59e0b", 2.0) };
+
+        // Snapshot at t=10 for readout and radar
+        _cascadeM10 = ModelGrowth.MultiplierAtTime(_m0, _mu, 10.0);
+        _cascadeVar10 = VarianceAmplification.OutputVariance(_cascadeM10, _cascadeVarF);
+        var mAbs10 = _cascadeSigma * _cascadeM10;
+        var gammaE10 = _cascadeGamma * _cascadeEngagement;
+        _cascadeFStar10 = gammaE10 > 0
+            ? ForceDynamics.TippingPoint(_cascadeBeta, _cascadeReplacement, _cascadeSigma, mAbs10, _cascadeGamma, _cascadeEngagement)
+            : 0;
+        _cascadeCost10 = OrganizationalDynamics.IndecisionCost(_cascadeM10, _cascadeRateExec, _cascadeDeltaTime);
+
+        // Radar: normalize each axis to its theoretical max at max slider settings
+        var maxM = ModelGrowth.MultiplierAtTime(5.0, 0.5, 10.0);
+        var maxVar = VarianceAmplification.OutputVariance(maxM, 10.0);
+        var maxMAbs = 2.0 * maxM;
+        var maxFStar = (1.0 * 5.0 + 2.0 * maxMAbs) / (1.0 * 5.0);
+        var maxCost = OrganizationalDynamics.IndecisionCost(maxM, 10.0, 5.0);
+
+        _cascadeRadarAxes = new List<RadarAxis>
+        {
+            new("M(t)", _cascadeM10, maxM, new List<string>
+            {
+                "Multiplier M(t)",
+                $"Value: {_cascadeM10:F2} / {maxM:F0}",
+                "Eq (25): M₀·e^(μt)",
+                "Drives all downstream quantities"
+            }),
+            new("Var(O)", _cascadeVar10, maxVar, new List<string>
+            {
+                "Output Variance",
+                $"Value: {_cascadeVar10:F2} / {maxVar:F0}",
+                "Eq (4): M²·Var(F)",
+                "Quadratic in M, dominates at high M"
+            }),
+            new("F*", _cascadeFStar10, Math.Max(maxFStar, 1), new List<string>
+            {
+                "Tipping Point F*",
+                $"Value: {_cascadeFStar10:F2} / {maxFStar:F1}",
+                "Eq (14): (βR + σM_abs) / (γE)",
+                "Rising threshold for force atrophy"
+            }),
+            new("Cost", _cascadeCost10, maxCost, new List<string>
+            {
+                "Indecision Cost",
+                $"Value: {_cascadeCost10:F2} / {maxCost:F0}",
+                "Eq (21): M·R_exec·Δt",
+                "Linear in M, compounds with delay"
+            })
+        };
     }
 }
