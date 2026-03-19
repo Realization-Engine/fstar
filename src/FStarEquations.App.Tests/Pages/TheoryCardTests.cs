@@ -70,4 +70,29 @@ public class TheoryCardTests : BunitContext
         var tabBars = cut.FindAll(".chart-card-tabs");
         Assert.True(tabBars.Count >= 4, $"Expected at least 4 tab bars but found {tabBars.Count}");
     }
+
+    [Fact]
+    public void MotivationPage_ChartCards_HaveTheoryTabs()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<MotivationPage>();
+
+        var tabBars = cut.FindAll(".chart-card-tabs");
+        Assert.True(tabBars.Count >= 4, $"Expected at least 4 tab bars but found {tabBars.Count}");
+    }
+
+    [Fact]
+    public void MotivationPage_TheoryTab_ContainsKatexBlock()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<MotivationPage>();
+
+        // Click the first Theory tab
+        var theoryTabs = cut.FindAll(".tab");
+        var theoryTab = theoryTabs.First(t => t.TextContent.Contains("Theory"));
+        theoryTab.Click();
+
+        var katexSpans = cut.FindAll("span.katex-display-block, span.katex-inline-block");
+        Assert.True(katexSpans.Count >= 1, "Expected at least one KatexBlock span in theory content");
+    }
 }

@@ -90,13 +90,13 @@ public class SliderInteractionTests : BunitContext
     }
 
     [Fact]
-    public void MotivationPage_ClickPill_ShowsGroupHeaders()
+    public void MotivationPage_ClickPill_ShowsSliders()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<MotivationPage>();
         cut.Find(".floating-slider-pill").Click();
-        var headers = cut.FindAll(".slider-group-header");
-        Assert.True(headers.Count >= 2);
+        var sliders = cut.FindAll("input[type=range]");
+        Assert.NotEmpty(sliders);
     }
 
     [Fact]

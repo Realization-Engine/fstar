@@ -105,10 +105,45 @@ public class EquationWiringTests : BunitContext
     [Fact]
     public void MotivationPage_DefaultSliders_ShowsDecayCurve()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<MotivationPage>();
 
         var polylines = cut.FindAll("svg.line-chart polyline");
         Assert.True(polylines.Count >= 1, "MotivationPage should render at least one polyline for the decay curve");
+    }
+
+    [Fact]
+    public void MotivationPage_Renders_ContainsHeatMap()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<MotivationPage>();
+
+        var heatMapSvg = cut.Find("svg.heat-map");
+        Assert.NotNull(heatMapSvg);
+
+        var rects = cut.FindAll("svg.heat-map rect");
+        Assert.True(rects.Count > 0, "MotivationPage HeatMap should render rect elements for cells");
+    }
+
+    [Fact]
+    public void MotivationPage_Renders_ContainsRadarChart()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<MotivationPage>();
+
+        var markup = cut.Markup;
+        Assert.Contains("radar-chart", markup);
+    }
+
+    [Fact]
+    public void MotivationPage_Renders_ContainsSensitivityChart()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<MotivationPage>();
+
+        // At least 4 LineCharts: decay curve (chart 1), split panel left + right (chart 2), sensitivity (chart 3)
+        var lineCharts = cut.FindAll("svg.line-chart");
+        Assert.True(lineCharts.Count >= 4, $"MotivationPage should render at least 4 line charts but found {lineCharts.Count}");
     }
 
     [Fact]

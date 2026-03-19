@@ -1,107 +1,578 @@
 @page "/motivation"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <PageTitle>The Meaning Problem — Eq (23)</PageTitle>
 
 <h1>The Meaning Problem — Eq (23)</h1>
 
 <blockquote>
-    Motivation is not exogenous — it feeds back into force. When accumulated loss erodes motivation, force declines, which produces further loss. The decay is exponential: once the spiral begins, recovery requires external intervention at a scale proportional to the loss already sustained.
+    Motivation is not exogenous; it feeds back into force. When accumulated loss erodes motivation,
+    force declines, which produces further loss. The decay is exponential: once the spiral begins,
+    recovery requires external intervention at a scale proportional to the loss already sustained.
 </blockquote>
 
-<!-- Chart 1: Motivation Decay Curve -->
-<ChartCard Title="Motivation Decay Curve" Description="Eq (23) f_mot = f_mot(0) · e^(−λA(t)) as accumulated loss varies.">
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 0: Motivation Decay Surface — HeatMap                            *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="motivation-chart-0">
+<ChartCard Title="Motivation Decay Surface"
+           Description="Eq (23): f_mot = f_mot(0) · e^(−λA). X-axis sweeps accumulated loss; Y-axis sweeps decay sensitivity. Move f_mot₀ to shift the entire surface.">
     <ChildContent>
-        <LineChart Series="@_decaySeries"
-                   XLabel="Accumulated Loss A(t)"
-                   YLabel="Motivation f_mot"
-                   XMin="0" XMax="20"
-                   YMin="0"
-                   ShowGrid="true" />
+        <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+            <HeatMap Width="600" Height="400"
+                     XLabel="Accumulated Loss A(t)"
+                     YLabel="Decay Rate (λ)"
+                     Data="@_heatMapData"
+                     XValues="@_heatMapXValues"
+                     YValues="@_heatMapYValues"
+                     CrosshairX="@_currentLoss"
+                     CrosshairY="@_lambda"
+                     CrosshairTooltip="@_heatTooltipLines"
+                     ColorScaleMin="0"
+                     ColorScaleMax="@_heatColorMax" />
+            <div>
+                <p style="text-align: center; font-size: 0.85em; font-weight: 600; margin: 0 0 4px;">Force Profile</p>
+                <RadarChart Width="280" Height="280"
+                            Axes="@_radarAxes"
+                            CenterLabel="@("F=" + ComputeCurrentForce().ToString("F1"))" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Current motivation: <strong>f_mot = @ComputeCurrentMotivation().ToString("F2")</strong>
+            &ensp;|&ensp;f_mot₀=@_fMot0.ToString("F1")
+            &ensp;|&ensp;λ=@_lambda.ToString("F2")
+            &ensp;|&ensp;A(t)=@_currentLoss.ToString("F1")
+            &ensp;|&ensp;F=@ComputeCurrentForce().ToString("F2")
+            &ensp;|&ensp;O=@ComputeCurrentOutput().ToString("F2")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Heatmap: Accumulated Loss vs Decay Rate. Color shows motivation level.
+            Scale fixed at 0 to @_heatColorMax.ToString("F1") (f_mot₀ at zero loss).
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="f_{\text{mot}}(t) = f_{\text{mot}}(0) \times e^{-\lambda \cdot A(t)} \qquad (23)" />
         <h4>In Plain Language</h4>
-        <p>Intrinsic motivation is a component of force in the Cobb-Douglas form (Eq 1). Its decay doesn't just reduce output linearly — it enters as f_mot^w_mot, which pulls down the entire force product. A demotivated expert doesn't produce "slightly less." They lose the engagement that made their judgment sharp. The highest-force individuals may be most sensitive to this loss.</p>
+        <p>Intrinsic motivation is a component of force in the Cobb-Douglas form (Eq 1). Its decay does not just reduce output linearly: it enters as f_mot^w_mot, which pulls down the entire force product. A demotivated expert does not produce "slightly less." They lose the engagement that made their judgment sharp. The highest-force individuals may be most sensitive to this loss.</p>
+        <h4>Reading the Charts</h4>
+        <p>The heatmap sweeps accumulated loss (X) against decay sensitivity (Y) while f_mot₀ is held at its slider value. The red crosshair marks your current position on the surface. The radar chart beside it shows all 7 force components; motivation (computed from Eq 23 at your current loss level) appears as one vertex. As you increase A(t), watch the motivation vertex dent inward, distorting the entire force polygon.</p>
         <h4>The Mirror</h4>
-        <p>The craft experience is diluted. When the mirror does most of the work, the sense of authorship — the satisfaction of having built something through effort — diminishes.</p>
+        <p>The craft experience is diluted. When the mirror does most of the work, the sense of authorship, the satisfaction of having built something through effort, diminishes.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Base model Eq (1)</li>
-            <li>Force dynamics Eq (11)</li>
-            <li>Evaluation bottleneck Eq (7)</li>
+            <li>Base model: <strong>Eq (1)</strong></li>
+            <li>Force dynamics: <strong>Eq (11)</strong></li>
+            <li>Evaluation bottleneck: <strong>Eq (7)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-<!-- Composite: Motivation -> Force Feedback (Eq 23 + 1) -->
-<ChartCard Title="Motivation → Force Feedback" Description="Eq (23) + Eq (1): Left shows motivation decay; right shows ComputeOutput as motivation varies over accumulated loss.">
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 1: Motivation Decay Curve — LineChart                            *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="motivation-chart-1">
+<ChartCard Title="Motivation Decay Curve"
+           Description="Eq (23): How motivation decays as accumulated loss grows. The marker shows your current A(t) position.">
     <ChildContent>
-    <SplitPanel>
-        <Left>
-            <LineChart Series="@_decaySeries"
-                       XLabel="Accumulated Loss A(t)"
-                       YLabel="Motivation f_mot"
-                       XMin="0" XMax="20"
-                       YMin="0"
-                       ShowGrid="true" />
-        </Left>
-        <Right>
-            <LineChart Series="@_forceFeedbackSeries"
-                       XLabel="Accumulated Loss A(t)"
-                       YLabel="Output O"
-                       XMin="0" XMax="20"
-                       YMin="0"
-                       ShowGrid="true" />
-        </Right>
-    </SplitPanel>
+        <LineChart Width="600" Height="400"
+                   Series="@_decaySeries"
+                   XLabel="Accumulated Loss A(t)"
+                   YLabel="Motivation f_mot"
+                   XMin="0" XMax="20"
+                   YMin="0" YMax="@_fMot0"
+                   ShowGrid="true"
+                   Markers="@_decayMarkers" />
+        <p class="chart-readout">
+            At A(t)=@_currentLoss.ToString("F1"):
+            <strong>f_mot = @ComputeCurrentMotivation().ToString("F2")</strong>
+            &ensp;|&ensp;Half-life ≈ @ComputeHalfLife().ToString("F1") loss units
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Dot marks your current accumulated loss position. Drag the A(t) slider to move along the curve.
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Why This Matters</h4>
+        <p>The exponential form means early losses have disproportionate impact. The half-life (ln(2)/λ) determines how quickly motivation halves. A person with λ=0.1 loses half their motivation after about 6.9 loss units; at λ=0.5, it takes only 1.4.</p>
+        <h4>Reading the Chart</h4>
+        <p>The curve shows the pure decay trajectory. The dot marks where you currently sit on this curve. Change λ to see steeper or shallower decay; change f_mot₀ to shift the starting height. The half-life readout below updates as you adjust λ.</p>
+    </TheoryContent>
+</ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 2: Force Feedback Composite — SplitPanel LineCharts              *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="motivation-chart-2">
+<ChartCard Title="Motivation → Force Feedback"
+           Description="Eq (23) + Eq (1): Left shows motivation decay; right shows Cobb-Douglas output as motivation drags down the entire force product.">
+    <ChildContent>
+        <SplitPanel>
+            <Left>
+                <LineChart Width="400" Height="350"
+                           Series="@_decaySeries"
+                           XLabel="Accumulated Loss A(t)"
+                           YLabel="Motivation f_mot"
+                           XMin="0" XMax="20"
+                           YMin="0" YMax="@_fMot0"
+                           ShowGrid="true"
+                           Markers="@_decayMarkers" />
+            </Left>
+            <Right>
+                <LineChart Width="400" Height="350"
+                           Series="@_forceFeedbackSeries"
+                           XLabel="Accumulated Loss A(t)"
+                           YLabel="Output O"
+                           XMin="0" XMax="20"
+                           YMin="0"
+                           ShowGrid="true"
+                           Markers="@_feedbackMarkers" />
+            </Right>
+        </SplitPanel>
+        <p class="chart-readout">
+            At A(t)=@_currentLoss.ToString("F1"):
+            f_mot=@ComputeCurrentMotivation().ToString("F2")
+            &ensp;→&ensp;F=@ComputeCurrentForce().ToString("F2")
+            &ensp;→&ensp;<strong>O=@ComputeCurrentOutput().ToString("F2")</strong>
+            &ensp;|&ensp;M=@_m.ToString("F1")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Left: pure motivation decay. Right: total output via Cobb-Douglas (Eq 1) with motivation as one component.
+            Dots mark current A(t) on both curves.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>In Plain Language</h4>
-        <p>Declining f_mot reduces F (via Cobb-Douglas), which reduces the γEF growth term in Eq (11), which shifts the balance toward atrophy, which further reduces F. The feedback loop hits highest-force individuals hardest — their departure degrades force supply at the top, where the evaluation bottleneck (Eq 7) and the F→M transfer can least afford it.</p>
+        <p>Declining f_mot reduces F (via Cobb-Douglas), which reduces the growth term in Eq (11), which shifts the balance toward atrophy. The feedback loop hits highest-force individuals hardest: their departure degrades force supply at the top, where the evaluation bottleneck (Eq 7) and the F to M transfer can least afford it.</p>
+        <h4>Reading the Charts</h4>
+        <p>Compare the left and right curves. The left shows raw motivation decay. The right shows the cascading effect through the Cobb-Douglas product: because motivation enters multiplicatively, the output curve falls faster than the motivation curve alone. Add other force components via the sliders to see how the product structure amplifies or dampens the cascade.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Force dynamics Eq (11)</li>
-            <li>Tipping point Eq (14)</li>
-            <li>Evaluation bottleneck Eq (7)</li>
-            <li>Transfer Eq (26)</li>
+            <li>Force dynamics: <strong>Eq (11)</strong></li>
+            <li>Tipping point: <strong>Eq (14)</strong></li>
+            <li>Evaluation bottleneck: <strong>Eq (7)</strong></li>
+            <li>Transfer: <strong>Eq (26)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 3: Parameter Sensitivity — LineChart                             *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="motivation-chart-3">
+<ChartCard Title="Output Sensitivity to Force Components"
+           Description="Eq (1): How output changes as each force component varies, with motivation (f7) driven by Eq (23).">
+    <ChildContent>
+        <LineChart Width="600" Height="400"
+                   XLabel="Component Value (fi)"
+                   YLabel="Output (O)"
+                   Series="@_sensitivitySeries"
+                   YMin="0"
+                   Markers="@_sensitivityMarkers"
+                   HighlightSeriesIndices="@_sensitivityHighlight" />
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            The dashed curve is motivation (f7), whose value is set by Eq (23) rather than a free slider.
+            Dots mark each component's current value.
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Why This Matters</h4>
+        <p>Each curve shows how output responds to a single force component while all others stay fixed. The motivation curve (dashed) is special: its current value is computed from Eq (23), not set freely. If motivation has decayed to a low value, it sits on the steep left side of its sensitivity curve, meaning further loss has outsized impact.</p>
+        <h4>Reading the Chart</h4>
+        <p>Steeper curves indicate higher sensitivity. The motivation component (dashed) moves left along its curve as accumulated loss grows, showing increasing marginal damage. Components with higher weights produce steeper curves. The dots mark current slider values; motivation's dot is positioned by Eq (23).</p>
+    </TheoryContent>
+</ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Slider Panel                                                           *@
+@* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Motivation Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (23): Motivation Decay</div>
-    <ParameterSlider Label="Initial Motivation (f_mot₀)" Min="0" Max="10" Step="0.5"
-                     Value="@_fMot0"
-                     ValueChanged="@OnFMot0Changed" />
-    <ParameterSlider Label="Decay Rate (λ)" Min="0.01" Max="1" Step="0.01"
-                     Value="@_lambda"
-                     ValueChanged="@OnLambdaChanged" />
-    <div class="slider-group-header">Eq (23) + (1): Force Feedback</div>
-    <ParameterSlider Label="Multiplier (M)" Min="0.5" Max="5" Step="0.1"
-                     Value="@_compositeM"
-                     ValueChanged="@OnCompositeMChanged" />
-    <ParameterSlider Label="Weight" Min="0" Max="1" Step="0.1"
-                     Value="@_compositeWeight"
-                     ValueChanged="@OnCompositeWeightChanged" />
+
+    <div class="slider-context-label">
+        @if (_showAllSliders)
+        {
+            <span>Showing all sliders</span>
+        }
+        else if (_activeChartIndex >= 0 && _activeChartIndex < MotivationChartNames.Length)
+        {
+            <span>Sliders for: @MotivationChartNames[_activeChartIndex]</span>
+        }
+        &ensp;
+        <button class="slider-show-all-toggle" @onclick="ToggleShowAll">
+            @(_showAllSliders ? "Auto-filter" : "Show all")
+        </button>
+    </div>
+
+    @* Group 0: Eq (23) Decay Parameters *@
+    @if (IsGroupVisible(0))
+    {
+        <div class="slider-group-header">Eq (23): Motivation Decay</div>
+    }
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="Initial Motivation (f_mot₀)" Min="0.5" Max="10" Step="0.5"
+                         Value="@_fMot0"
+                         ValueChanged="v => { _fMot0 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="Decay Rate (λ)" Min="0.01" Max="1" Step="0.01"
+                         Value="@_lambda"
+                         ValueChanged="v => { _lambda = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="Current Loss A(t)" Min="0" Max="20" Step="0.5"
+                         Value="@_currentLoss"
+                         ValueChanged="v => { _currentLoss = v; RecalcAll(); }" />
+    </div>
+
+    @* Group 1: Multiplier *@
+    @if (IsGroupVisible(1))
+    {
+        <div class="slider-group-header">Eq (1): Multiplier</div>
+    }
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="M (Multiplier)" Min="0.5" Max="5" Step="0.1"
+                         Value="@_m"
+                         ValueChanged="v => { _m = v; RecalcAll(); }" />
+    </div>
+
+    @* Group 2: Other Force Components (f7 is driven by Eq 23) *@
+    @if (IsGroupVisible(2))
+    {
+        <div class="slider-group-header">Eq (1): Force Components (f7 = Eq 23)</div>
+    }
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="f1: Domain Expertise" Min="0" Max="10" Step="0.1"
+                         Value="@_f1" ValueChanged="v => { _f1 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="f2: Arch. Judgment" Min="0" Max="10" Step="0.1"
+                         Value="@_f2" ValueChanged="v => { _f2 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="f3: Taste" Min="0" Max="10" Step="0.1"
+                         Value="@_f3" ValueChanged="v => { _f3 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="f4: Spec Clarity" Min="0" Max="10" Step="0.1"
+                         Value="@_f4" ValueChanged="v => { _f4 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="f5: Debug Intuition" Min="0" Max="10" Step="0.1"
+                         Value="@_f5" ValueChanged="v => { _f5 = v; RecalcAll(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="f6: Calibrated Uncert." Min="0" Max="10" Step="0.1"
+                         Value="@_f6" ValueChanged="v => { _f6 = v; RecalcAll(); }" />
+    </div>
+
+    @* Group 3: Weights *@
+    @if (IsGroupVisible(3))
+    {
+        <div class="slider-group-header">Eq (1): Weights (sum to 1)</div>
+    }
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w1: Domain Expertise" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w1" ValueChanged="v => { _w1 = v; NormalizeWeights(0); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w2: Arch. Judgment" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w2" ValueChanged="v => { _w2 = v; NormalizeWeights(1); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w3: Taste" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w3" ValueChanged="v => { _w3 = v; NormalizeWeights(2); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w4: Spec Clarity" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w4" ValueChanged="v => { _w4 = v; NormalizeWeights(3); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w5: Debug Intuition" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w5" ValueChanged="v => { _w5 = v; NormalizeWeights(4); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w6: Calibrated Uncert." Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w6" ValueChanged="v => { _w6 = v; NormalizeWeights(5); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="w7: Intrinsic Motiv." Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_w7" ValueChanged="v => { _w7 = v; NormalizeWeights(6); }" />
+    </div>
+
 </FloatingSliderPanel>
 
 @code {
-    private double _fMot0 = 8.0;
-    private double _lambda = 0.1;
-    private double _compositeM = 2.0;
-    private double _compositeWeight = 1.0;
+    // ── JS interop for scroll-aware slider panel ──
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<MotivationPage>? _dotNetRef;
+    private int _activeChartIndex = -1;
+    private bool _showAllSliders;
 
-    private IReadOnlyList<ChartSeries> _decaySeries = Array.Empty<ChartSeries>();
-    private IReadOnlyList<ChartSeries> _forceFeedbackSeries = Array.Empty<ChartSeries>();
-
-    protected override void OnInitialized()
+    private static readonly string[] MotivationChartNames =
     {
-        RecalcDecay();
-        RecalcForceFeedback();
+        "Decay Surface",
+        "Decay Curve",
+        "Force Feedback",
+        "Sensitivity"
+    };
+
+    private static readonly HashSet<int>[] ChartVisibleGroups =
+    {
+        new() { 0, 2, 3 },  // Chart 0: HeatMap + Radar
+        new() { 0 },        // Chart 1: Decay Curve
+        new() { 0, 1, 2 },  // Chart 2: Force Feedback
+        new() { 1, 2, 3 },  // Chart 3: Sensitivity
+    };
+
+    private bool IsGroupVisible(int groupIndex) =>
+        _showAllSliders ||
+        (_activeChartIndex >= 0 && _activeChartIndex < ChartVisibleGroups.Length &&
+         ChartVisibleGroups[_activeChartIndex].Contains(groupIndex));
+
+    private string GroupSlotClass(int groupIndex) => IsGroupVisible(groupIndex) ? "" : "hidden";
+
+    private void ToggleShowAll() => _showAllSliders = !_showAllSliders;
+
+    private static readonly string[] ChartElementIds =
+    {
+        "motivation-chart-0", "motivation-chart-1",
+        "motivation-chart-2", "motivation-chart-3"
+    };
+
+    [JSInvokable]
+    public void OnChartScrolled(int index)
+    {
+        if (index == _activeChartIndex) return;
+        _activeChartIndex = index;
+        InvokeAsync(StateHasChanged);
     }
 
-    private void RecalcDecay()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/FStar.UI/FStar.UI.lib.module.js");
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await _jsModule.InvokeVoidAsync(
+                    "initChartObserver", _dotNetRef, "OnChartScrolled", ChartElementIds);
+            }
+            catch (JSException) { /* SSR / prerender guard */ }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("destroyChartObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+
+    // ── Eq (23) parameters ──
+    private double _fMot0 = 8.0;
+    private double _lambda = 0.1;
+    private double _currentLoss = 5.0;
+
+    // ── Eq (1) parameters ──
+    private double _m = 2.0;
+
+    // Force components (f7 = motivation is computed from Eq 23)
+    private double _f1 = 7.0;  // Domain expertise
+    private double _f2 = 6.0;  // Architectural judgment
+    private double _f3 = 5.0;  // Taste
+    private double _f4 = 6.0;  // Specification clarity
+    private double _f5 = 7.0;  // Debugging intuition
+    private double _f6 = 5.0;  // Calibrated uncertainty
+
+    // Weights (sum to 1)
+    private double _w1 = 0.18;
+    private double _w2 = 0.16;
+    private double _w3 = 0.10;
+    private double _w4 = 0.13;
+    private double _w5 = 0.13;
+    private double _w6 = 0.10;
+    private double _w7 = 0.20; // motivation weight — high to show sensitivity
+
+    private static readonly string[] _componentLabels =
+    {
+        "Domain Expertise", "Arch. Judgment", "Taste",
+        "Spec Clarity", "Debug Intuition", "Calibrated Uncert.", "Intrinsic Motiv."
+    };
+
+    private static readonly string[] _shortLabels =
+    {
+        "Domain", "Arch.", "Taste", "Spec", "Debug", "Uncert.", "Motiv."
+    };
+
+    private static readonly string[] _colors =
+    {
+        "#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c", "#0891b2", "#d946ef"
+    };
+
+    // ── Chart data ──
+    private double[,] _heatMapData = new double[0, 0];
+    private double[] _heatMapXValues = Array.Empty<double>();
+    private double[] _heatMapYValues = Array.Empty<double>();
+    private double _heatColorMax = 10.0;
+    private List<string> _heatTooltipLines = new();
+    private List<RadarAxis> _radarAxes = new();
+
+    private IReadOnlyList<ChartSeries> _decaySeries = Array.Empty<ChartSeries>();
+    private List<ChartMarker> _decayMarkers = new();
+
+    private IReadOnlyList<ChartSeries> _forceFeedbackSeries = Array.Empty<ChartSeries>();
+    private List<ChartMarker> _feedbackMarkers = new();
+
+    private List<ChartSeries> _sensitivitySeries = new();
+    private List<ChartMarker> _sensitivityMarkers = new();
+    private HashSet<int> _sensitivityHighlight = new();
+
+    protected override void OnInitialized() => RecalcAll();
+
+    // ── Helpers ──
+
+    private double ComputeCurrentMotivation() =>
+        Motivation.MotivationDecay(_fMot0, _lambda, _currentLoss);
+
+    private double[] GetForces()
+    {
+        var fMot = ComputeCurrentMotivation();
+        return new[] { _f1, _f2, _f3, _f4, _f5, _f6, fMot };
+    }
+
+    private double[] GetWeights() => new[] { _w1, _w2, _w3, _w4, _w5, _w6, _w7 };
+
+    private double ComputeCurrentForce()
+    {
+        var forces = GetForces();
+        var weights = GetWeights();
+        double product = 1.0;
+        for (int i = 0; i < forces.Length; i++)
+            product *= Math.Pow(Math.Max(forces[i], 1e-6), weights[i]);
+        return product;
+    }
+
+    private double ComputeCurrentOutput() => _m * ComputeCurrentForce();
+
+    private double ComputeHalfLife() => _lambda > 0 ? Math.Log(2) / _lambda : double.PositiveInfinity;
+
+    private void NormalizeWeights(int changedIndex)
+    {
+        var weights = GetWeights();
+        double changedVal = weights[changedIndex];
+        double sumOthers = 0;
+        for (int i = 0; i < weights.Length; i++)
+            if (i != changedIndex) sumOthers += weights[i];
+
+        if (sumOthers > 0)
+        {
+            double remaining = 1.0 - changedVal;
+            double scale = remaining / sumOthers;
+            var normalized = new double[weights.Length];
+            for (int i = 0; i < weights.Length; i++)
+                normalized[i] = i == changedIndex ? changedVal : weights[i] * scale;
+
+            _w1 = normalized[0]; _w2 = normalized[1]; _w3 = normalized[2];
+            _w4 = normalized[3]; _w5 = normalized[4]; _w6 = normalized[5];
+            _w7 = normalized[6];
+        }
+        RecalcAll();
+    }
+
+    // ── Master recalc ──
+
+    private void RecalcAll()
+    {
+        ComputeHeatMap();
+        ComputeRadarAxes();
+        ComputeDecayCurve();
+        ComputeForceFeedback();
+        ComputeSensitivity();
+    }
+
+    // ── Chart 0: HeatMap (X = loss, Y = lambda, color = f_mot) ──
+
+    private void ComputeHeatMap()
+    {
+        const int steps = 25;
+        _heatMapXValues = new double[steps]; // Accumulated Loss
+        _heatMapYValues = new double[steps]; // Decay Rate λ
+        _heatMapData = new double[steps, steps];
+
+        for (int i = 0; i < steps; i++)
+            _heatMapXValues[i] = i * 20.0 / (steps - 1);
+        for (int j = 0; j < steps; j++)
+            _heatMapYValues[j] = 0.01 + j * 0.99 / (steps - 1);
+
+        for (int r = 0; r < steps; r++)
+        {
+            for (int c = 0; c < steps; c++)
+            {
+                _heatMapData[r, c] = Motivation.MotivationDecay(
+                    _fMot0, _heatMapYValues[r], _heatMapXValues[c]);
+            }
+        }
+
+        // Fixed color scale: max is f_mot₀ (at zero loss)
+        _heatColorMax = _fMot0;
+
+        // Crosshair tooltip
+        var fMot = ComputeCurrentMotivation();
+        _heatTooltipLines = new List<string>
+        {
+            "Your current position",
+            $"A(t) = {_currentLoss:F1}",
+            $"λ = {_lambda:F2}",
+            $"f_mot = {fMot:F2}",
+            $"F = {ComputeCurrentForce():F2}, O = {ComputeCurrentOutput():F2}",
+            $"f_mot₀ = {_fMot0:F1}"
+        };
+    }
+
+    // ── Chart 0: Radar (force profile with motivation from Eq 23) ──
+
+    private void ComputeRadarAxes()
+    {
+        var forces = GetForces();
+        var weights = GetWeights();
+        _radarAxes = new List<RadarAxis>();
+        for (int i = 0; i < forces.Length; i++)
+        {
+            var pct = (forces[i] / 10.0 * 100).ToString("F0");
+            var isMotivation = i == 6;
+            var tooltip = new List<string>
+            {
+                $"{_componentLabels[i]} (f{i + 1})",
+                $"Value: {forces[i]:F1} / 10.0 ({pct}%)",
+                $"Weight: {weights[i]:F2}",
+                isMotivation ? $"Driven by Eq (23) at A(t)={_currentLoss:F1}" : "Free slider"
+            };
+            _radarAxes.Add(new RadarAxis(_shortLabels[i], forces[i], 10.0, tooltip));
+        }
+    }
+
+    // ── Chart 1: Decay curve with current-value marker ──
+
+    private void ComputeDecayCurve()
     {
         var points = new List<DataPoint>();
         for (double loss = 0.0; loss <= 20.0; loss += 0.2)
@@ -113,28 +584,105 @@
         {
             new("Motivation — Eq (23)", points, "#2563eb", 2.0)
         };
+
+        var fMot = ComputeCurrentMotivation();
+        _decayMarkers = new List<ChartMarker>
+        {
+            new(
+                _currentLoss,
+                fMot,
+                "#dc2626",
+                Tooltip: new List<string>
+                {
+                    "Current position",
+                    $"A(t) = {_currentLoss:F1}",
+                    $"f_mot = {fMot:F2}",
+                    $"λ = {_lambda:F2}",
+                    $"Half-life ≈ {ComputeHalfLife():F1}"
+                }
+            )
+        };
     }
 
-    private void RecalcForceFeedback()
+    // ── Chart 2: Force feedback (output via Cobb-Douglas as loss grows) ──
+
+    private void ComputeForceFeedback()
     {
-        var points = new List<DataPoint>();
+        var forces = GetForces();
+        var weights = GetWeights();
+        var feedbackPoints = new List<DataPoint>();
+
         for (double loss = 0.0; loss <= 20.0; loss += 0.2)
         {
-            var motivatedForce = Motivation.MotivationDecay(_fMot0, _lambda, loss);
-            var output = BaseModel.ComputeOutput(_compositeM, new[] { motivatedForce }, new[] { _compositeWeight });
-            points.Add(new DataPoint(loss, output));
+            var fMot = Motivation.MotivationDecay(_fMot0, _lambda, loss);
+            var testForces = (double[])forces.Clone();
+            testForces[6] = fMot; // Replace motivation component
+            var output = BaseModel.ComputeOutput(_m, testForces, weights);
+            feedbackPoints.Add(new DataPoint(loss, output));
         }
 
         _forceFeedbackSeries = new List<ChartSeries>
         {
-            new("Output O — Eq (1)", points, "#16a34a", 2.0)
+            new("Output O — Eq (1)", feedbackPoints, "#16a34a", 2.0)
+        };
+
+        var currentOutput = ComputeCurrentOutput();
+        _feedbackMarkers = new List<ChartMarker>
+        {
+            new(
+                _currentLoss,
+                currentOutput,
+                "#dc2626",
+                Tooltip: new List<string>
+                {
+                    "Current position",
+                    $"A(t) = {_currentLoss:F1}",
+                    $"f_mot = {ComputeCurrentMotivation():F2}",
+                    $"F = {ComputeCurrentForce():F2}",
+                    $"Output O = {currentOutput:F2}",
+                    $"M = {_m:F1}"
+                }
+            )
         };
     }
 
-    private void RecalcAll() { RecalcDecay(); RecalcForceFeedback(); }
+    // ── Chart 3: Sensitivity (output vs each force component) ──
 
-    private void OnFMot0Changed(double val) { _fMot0 = val; RecalcAll(); }
-    private void OnLambdaChanged(double val) { _lambda = val; RecalcAll(); }
-    private void OnCompositeMChanged(double val) { _compositeM = val; RecalcForceFeedback(); }
-    private void OnCompositeWeightChanged(double val) { _compositeWeight = val; RecalcForceFeedback(); }
+    private void ComputeSensitivity()
+    {
+        var forces = GetForces();
+        var weights = GetWeights();
+        const int pts = 50;
+
+        _sensitivitySeries = new List<ChartSeries>();
+        _sensitivityMarkers = new List<ChartMarker>();
+        _sensitivityHighlight = new HashSet<int> { 6 }; // Highlight motivation
+
+        for (int comp = 0; comp < forces.Length; comp++)
+        {
+            var points = new List<DataPoint>();
+            for (int p = 0; p < pts; p++)
+            {
+                double fi = 0.1 + p * 9.9 / (pts - 1);
+                var testForces = (double[])forces.Clone();
+                testForces[comp] = fi;
+                double output = BaseModel.ComputeOutput(_m, testForces, weights);
+                points.Add(new DataPoint(fi, output));
+            }
+            _sensitivitySeries.Add(new ChartSeries(_componentLabels[comp], points, _colors[comp], 2.0, false));
+
+            // Marker at current value
+            double currentFi = forces[comp];
+            double currentOutput = BaseModel.ComputeOutput(_m, forces, weights);
+            var isMotivation = comp == 6;
+            var markerTooltip = new List<string>
+            {
+                $"{_componentLabels[comp]} (f{comp + 1})",
+                $"Value = {currentFi:F1}, Weight = {weights[comp]:F2}",
+                $"Output O = {currentOutput:F2}",
+                isMotivation ? $"Driven by Eq (23): λ={_lambda:F2}, A(t)={_currentLoss:F1}" : "Free slider"
+            };
+            _sensitivityMarkers.Add(new ChartMarker(currentFi, currentOutput, _colors[comp], Tooltip: markerTooltip));
+        }
+    }
 }
