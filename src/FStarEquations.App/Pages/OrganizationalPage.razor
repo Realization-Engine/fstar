@@ -1,4 +1,6 @@
 @page "/organizational"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <PageTitle>Organizational Consequences — Eq (17)-(22)</PageTitle>
 
@@ -8,203 +10,713 @@
     Organizations face a paradox: the multiplier raises the return on every unit of force, but it simultaneously degrades the ability to measure force accurately. As M grows, signal-to-noise collapses, Goodhart effects amplify, and decision bottlenecks compound.
 </blockquote>
 
-@* ─── Chart 1: ROI Bars — Eq (17) ─── *@
-<ChartCard Title="ROI Bars — Eq (17): Marginal Return"
-           Description="ΔOⱼ = (M−1) · Fⱼ for M = 1…5">
+@* ─── Chart 1: ROI HeatMap — Eq (17) ─── *@
+<div id="org-chart-0">
+<ChartCard Title="Marginal Return Surface — Eq (17)"
+           Description="ΔOⱼ = (M−1) · Fⱼ as a surface over M and Fⱼ. Brighter cells mean higher marginal return.">
     <ChildContent>
-        <BarChart Bars="@_roiBars" XLabel="M" YLabel="ΔOⱼ" Width="500" Height="320" />
+        <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+            <HeatMap Width="600" Height="400"
+                     XLabel="M (multiplier)"
+                     YLabel="Fⱼ (force)"
+                     Data="@_roiHeatData"
+                     XValues="@_roiHeatXValues"
+                     YValues="@_roiHeatYValues"
+                     ColorScaleMin="0"
+                     ColorScaleMax="@RoiHeatColorMax"
+                     CrosshairX="@_roiM"
+                     CrosshairY="@_roiForceJ"
+                     CrosshairTooltip="@_roiHeatTooltip" />
+            <div>
+                <p style="text-align: center; font-size: 0.85em; font-weight: 600; margin: 0 0 4px;">Assessment Profile</p>
+                <RadarChart Width="280" Height="280"
+                            Axes="@_assessmentRadarAxes"
+                            CenterLabel="@($"SNR={ComputeSnrAtMp():F2}")" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Eq (17): <strong>ΔO = @ComputeRoiReturn().ToString("F1")</strong>
+            &ensp;|&ensp;M=@_roiM.ToString("F1")
+            &ensp;|&ensp;Fⱼ=@_roiForceJ.ToString("F1")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Heatmap shows marginal return (M−1)·Fⱼ. Color scale fixed 0 to @RoiHeatColorMax.ToString("F0").
+            The red crosshair marks your current slider values.
+            The radar shows all assessment-related parameters at a glance.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\Delta O_j = (M - 1) \times F_j \qquad (17)" />
         <h4>In Plain Language</h4>
-        <p>The marginal return of giving the LLM to person j is proportional to that person's existing force. A 10x engineer with a 3x multiplier produces 30 units of additional output. A 1.5x engineer with the same multiplier produces 4.5 units. The rational allocation strategy is to concentrate the multiplier on your strongest people first. Uniform distribution is equitable but leaves the largest returns on the table.</p>
+        <p>The marginal return of giving the LLM to person j is proportional to that person's existing force. A 10x engineer with a 3x multiplier produces 20 units of additional output. A 1.5x engineer with the same multiplier produces 3 units. The delta between those returns is enormous, and it widens as M grows. Per equation (4a), high-force individuals also extract a higher effective M from the same tool, since they place sharper questions before the mirror and get sharper reflections back. The rational allocation strategy is to concentrate the multiplier on your strongest people first. Uniform distribution is equitable but leaves the largest returns on the table.</p>
+        <h4>Reading the Charts</h4>
+        <p>The heatmap sweeps M and Fⱼ simultaneously. The red crosshair marks your current slider values on the surface. Notice the gradient is steeper along the Fⱼ axis at high M, confirming that the return to force grows with the multiplier. The radar chart beside it shows all assessment-related parameters for Eq (17)-(19) at a glance; a balanced polygon means no single parameter dominates.</p>
+        <h4>The Mirror</h4>
+        <p>Uniform distribution of the mirror feels equitable. But the mirror amplifies proportionally: it returns more to those who bring more. The rational allocation strategy is not fair; it is efficient. Organizations must choose.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Base model Eq (1)</li>
-            <li>Variance Eq (4)</li>
-            <li>Lower bound Eq (4a)</li>
+            <li>Base model: <strong>Eq (1)</strong></li>
+            <li>Variance: <strong>Eq (4)</strong></li>
+            <li>Lower bound: <strong>Eq (4a)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
 @* ─── Chart 2: SNR Collapse — Eq (18) ─── *@
+<div id="org-chart-1">
 <ChartCard Title="SNR Collapse — Eq (18): Assessment Signal-to-Noise"
-           Description="SNR = Var(F_true) / (Var(F_true) + Mp²·Var(ε) + Var(η))">
+           Description="SNR = Var(F_true) / (Var(F_true) + Mp²·Var(ε) + Var(η)). The curve shows SNR collapsing as Mp grows.">
     <ChildContent>
-        <LineChart Series="@_snrSeries" XLabel="Mp (presentation multiplier)" YLabel="SNR" Width="500" Height="320" />
+        <LineChart Series="@_snrSeries" XLabel="Mp (presentation multiplier)" YLabel="SNR"
+                   Width="600" Height="400"
+                   YMin="0" YMax="1"
+                   Markers="@_snrMarkers" />
+        <p class="chart-readout">
+            Eq (18): <strong>SNR = @ComputeSnrAtMp().ToString("F3")</strong>
+            &ensp;|&ensp;Mp=@_snrMp.ToString("F1")
+            &ensp;|&ensp;Var(F)=@_snrVarForceTrue.ToString("F1")
+            &ensp;|&ensp;Var(ε)=@_snrVarEpsilon.ToString("F1")
+            &ensp;|&ensp;Var(η)=@_snrVarEta.ToString("F1")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            The dot marks the current Mp value. Drag Mp to see how rapidly SNR collapses.
+            At Mp=1.0 (no polish), SNR is highest. As Mp grows, the presentation channel drowns the signal.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\text{SNR}_{\text{assessment}} = \frac{\text{Var}(F_{\text{true}})}{\text{Var}(F_{\text{true}}) + M_p^2 \cdot \text{Var}(\varepsilon_{\text{LLM}}) + \text{Var}(\eta)} \qquad (18)" />
         <h4>In Plain Language</h4>
-        <p>The signal-to-noise ratio for assessing true capability through output artifacts approaches zero as the presentation multiplier grows. M_p — not M_s — drives the collapse. The mirror polishes everyone's output identically, collapsing the visible difference between deep understanding and shallow borrowing. To assess true force, evaluate substance rather than presentation.</p>
+        <p>The signal-to-noise ratio for assessing true capability through output artifacts approaches zero as the presentation multiplier grows. Mp, not Ms, drives the collapse. The mirror polishes everyone's output identically along the presentation channel, collapsing the visible difference between deep understanding and shallow borrowing. To assess true force, evaluate substance rather than presentation.</p>
+        <h4>Reading the Charts</h4>
+        <p>The curve drops steeply from left to right. The marker dot shows your current Mp setting. Notice the curve is concave: early increases in Mp cause the largest drops in SNR. By Mp=3, most of the signal is already lost. Increasing Var(F_true) raises the entire curve, meaning more diverse teams retain more signal. Increasing Var(epsilon) or Var(eta) lowers it.</p>
+        <h4>The Mirror</h4>
+        <p>The mirror polishes everyone's output identically. A design doc from a senior architect and one from a junior developer, both run through the mirror, become nearly indistinguishable. The mirror does not generate insight; it generates polish. Assessment that relies on polish becomes assessment of mirror quality, not human quality.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Epistemic gap Eq (10)</li>
-            <li>Goodhart's trap Eq (19)</li>
-            <li>Evaluation bottleneck Eq (7)</li>
+            <li>Epistemic gap: <strong>Eq (10)</strong></li>
+            <li>Goodhart's trap: <strong>Eq (19)</strong></li>
+            <li>Evaluation bottleneck: <strong>Eq (7)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── Chart 3: Goodhart Bars — Eq (19) ─── *@
-<ChartCard Title="Goodhart Bars — Eq (19): Measured vs True Force"
-           Description="F_meas = F_true + δ for several gaming levels">
+@* ─── Chart 3: Goodhart — Eq (19) ─── *@
+<div id="org-chart-2">
+<ChartCard Title="Goodhart's Trap — Eq (19): Measured vs True Force"
+           Description="F_meas = F_true + δ(Mp). Gaming inflates measured force as Mp grows.">
     <ChildContent>
-        <BarChart Bars="@_goodhartBars" XLabel="δ (gaming)" YLabel="F_meas" Width="500" Height="320" />
+        <BarChart Bars="@_goodhartBars" XLabel="δ (gaming)" YLabel="F_meas" Width="600" Height="400" />
+        <p class="chart-readout">
+            Eq (19): F_true=<strong>@_goodhartForceTrue.ToString("F1")</strong>
+            &ensp;|&ensp;At δ=@_goodhartDelta.ToString("F1"):
+            <strong>F_meas = @OrganizationalDynamics.MeasuredForce(_goodhartForceTrue, _goodhartDelta).ToString("F1")</strong>
+            &ensp;|&ensp;Inflation: @((_goodhartDelta / Math.Max(_goodhartForceTrue, 0.01) * 100).ToString("F0"))%
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Blue bar: true force (δ=0). Amber bars: increasing gaming levels.
+            The slider δ controls the gaming amount; higher δ simulates more aggressive use of LLMs to inflate assessments.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="F_{\text{measured}} = F_{\text{true}} + \delta_{\text{gaming}}(M_p) \qquad (19)" />
         <h4>In Plain Language</h4>
-        <p>The amount by which people can inflate their measured force by using LLMs to game the assessment grows with the presentation multiplier. Engineers will use LLMs to prepare for force-assessment exercises, to polish design docs, to simulate architectural sophistication. The LLM becomes simultaneously the thing that makes force important (Eq 1), hard to measure (Eq 18), and the tool people use to game the measurement (Eq 19).</p>
+        <p>The amount by which people can inflate their measured force by using LLMs to game the assessment grows with the presentation multiplier. Engineers will use LLMs to prepare for force-assessment exercises, to polish design docs, to simulate architectural sophistication. The LLM becomes simultaneously the thing that makes force important (Eq 1), hard to measure (Eq 18), and the tool people use to game the measurement (Eq 19). The metric fails precisely when it matters most.</p>
+        <h4>Reading the Charts</h4>
+        <p>The bar chart shows measured force at several gaming levels. The blue bar is the truth (δ=0). Each amber bar adds more gaming inflation. The readout shows the percentage inflation at your current δ setting. Notice that even modest gaming (δ=1-2) can make a mediocre engineer look strong, and there is no ceiling effect; the inflation is unbounded.</p>
+        <h4>The Mirror</h4>
+        <p>When a measure becomes a target, it ceases to be a good measure. The mirror makes gaming frictionless: preparing for interviews, polishing design docs, simulating sophistication. The leaders who navigate this will shift assessment from output inspection to process observation.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Assessment SNR Eq (18)</li>
-            <li>Epistemic gap Eq (10)</li>
-            <li>Base model Eq (1)</li>
+            <li>Assessment SNR: <strong>Eq (18)</strong></li>
+            <li>Epistemic gap: <strong>Eq (10)</strong></li>
+            <li>Base model: <strong>Eq (1)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── Chart 4: Decision Bottleneck — Eq (20) ─── *@
-<ChartCard Title="Decision Bottleneck — Eq (20): Organizational Throughput"
-           Description="Throughput = min(R_dec, M · R_exec)">
+@* ─── Chart 4: Decision Bottleneck HeatMap — Eq (20) ─── *@
+<div id="org-chart-3">
+<ChartCard Title="Decision Bottleneck Surface — Eq (20)"
+           Description="Throughput = min(R_dec, M·R_exec) as a surface over R_dec and M.">
     <ChildContent>
-        <LineChart Series="@_throughputSeries" XLabel="R_dec (decision rate)" YLabel="Throughput" Width="500" Height="320" />
+        <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+            <HeatMap Width="600" Height="400"
+                     XLabel="R_dec (decision rate)"
+                     YLabel="M (multiplier)"
+                     Data="@_throughputHeatData"
+                     XValues="@_throughputHeatXValues"
+                     YValues="@_throughputHeatYValues"
+                     ColorScaleMin="0"
+                     ColorScaleMax="@ThroughputHeatColorMax"
+                     CrosshairX="@_throughputRateDec"
+                     CrosshairY="@_throughputM"
+                     CrosshairTooltip="@_throughputHeatTooltip" />
+            <div>
+                <p style="text-align: center; font-size: 0.85em; font-weight: 600; margin: 0 0 4px;">Org Health</p>
+                <RadarChart Width="280" Height="280"
+                            Axes="@_orgHealthRadarAxes"
+                            FillColor="#16a34a"
+                            StrokeColor="#166534"
+                            CenterLabel="@($"Thrpt={ComputeThroughput():F1}")" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Eq (20): <strong>Throughput = @ComputeThroughput().ToString("F1")</strong>
+            &ensp;|&ensp;R_dec=@_throughputRateDec.ToString("F1")
+            &ensp;|&ensp;M·R_exec=@((_throughputM * _throughputRateExec).ToString("F1"))
+            &ensp;|&ensp;Binding: @(ComputeThroughput() < _throughputM * _throughputRateExec ? "Decision" : "Execution")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Heatmap shows throughput = min(R_dec, M·R_exec). Color scale fixed 0 to @ThroughputHeatColorMax.ToString("F0").
+            The diagonal ridge marks where the binding constraint switches from execution to decision.
+            The radar shows organizational health parameters for Eq (20)-(22).
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\text{Throughput} = \min(R_{\text{decision}},\; M \times R_{\text{execution}}) \qquad (20)" />
         <h4>In Plain Language</h4>
-        <p>Total output is limited by whichever is slower: deciding what to build or building it. Pre-LLM, execution was almost always the bottleneck. Post-LLM, as M grows, decision-making becomes the constraint. The companies that win won't be the ones with the best engineers or AI tools — they'll be the ones that can decide what to build fastest.</p>
+        <p>Total output is limited by whichever is slower: deciding what to build or building it. Pre-LLM, execution was almost always the bottleneck. Post-LLM, as M grows, decision-making becomes the constraint. The companies that win will not be the ones with the best engineers or AI tools. They will be the ones that can decide what to build fastest and with the highest accuracy. Strategic clarity becomes the binding constraint, a fundamentally different organizational capability than what most tech companies have optimized for.</p>
+        <h4>Reading the Charts</h4>
+        <p>The heatmap has a visible ridge along the diagonal where the min() switches from one constraint to the other. Below the ridge (low M), execution limits throughput. Above the ridge (high M), decision speed becomes the bottleneck. The crosshair shows your current position. The radar chart beside it shows all organizational health parameters at a glance; dents reveal bottlenecks.</p>
+        <h4>The Mirror</h4>
+        <p>When creation cost approaches zero, the buffer between deciding and building vanishes. You had weeks or months of build time during which you could refine your thinking, course-correct, gather feedback. When build time compresses from months to days, that buffer evaporates.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Indecision cost Eq (21)</li>
-            <li>Evaluation bottleneck Eq (7)</li>
-            <li>Competitive moats Eq (22)</li>
+            <li>Indecision cost: <strong>Eq (21)</strong></li>
+            <li>Evaluation bottleneck: <strong>Eq (7)</strong></li>
+            <li>Competitive moats: <strong>Eq (22)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
 @* ─── Chart 5: Indecision Cost — Eq (21) ─── *@
+<div id="org-chart-4">
 <ChartCard Title="Indecision Cost — Eq (21): Opportunity Cost of Delay"
-           Description="OC = M · R_exec · Δt">
+           Description="OC = M · R_exec · Δt. Shows how opportunity cost scales with M.">
     <ChildContent>
-        <LineChart Series="@_indecisionSeries" XLabel="M (multiplier)" YLabel="OC" Width="500" Height="320" />
+        <LineChart Series="@_indecisionSeries" XLabel="M (multiplier)" YLabel="OC (opportunity cost)"
+                   Width="600" Height="400"
+                   YMin="0"
+                   Markers="@_indecisionMarkers" />
+        <p class="chart-readout">
+            Eq (21): <strong>OC = @ComputeIndecisionCost().ToString("F1")</strong>
+            &ensp;|&ensp;M=@_indecisionM.ToString("F1")
+            &ensp;|&ensp;R_exec=@_indecisionRateExec.ToString("F1")
+            &ensp;|&ensp;Δt=@_indecisionDeltaTime.ToString("F1")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            The dot marks the current M value. The line is linear in M.
+            Every unit increase in M adds R_exec · Δt more wasted capacity.
+            Drag Δt to see how delay duration scales the entire curve.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\text{OC}_{\text{indecision}} = M \times R_{\text{execution}} \times \Delta t_{\text{delay}} \qquad (21)" />
         <h4>In Plain Language</h4>
-        <p>Every hour spent debating what to build wastes M times more potential output than it did before. An organization that takes two weeks to align on a feature spec is burning five to ten times more idle execution capacity than pre-LLM. Strategic clarity becomes the binding constraint.</p>
+        <p>Every hour spent debating what to build wastes M times more potential output than it did before. An organization that takes two weeks to align on a feature spec is now burning five to ten times more idle execution capacity than it was pre-LLM. Strategic clarity becomes the binding constraint.</p>
+        <h4>Reading the Charts</h4>
+        <p>The line rises linearly with M. The marker dot shows where you are now. Changing R_exec steepens the slope; changing Δt raises the entire curve. The product of all three parameters means that even moderate M values (2-3x) create substantial opportunity costs if decision cycles are slow.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Decision bottleneck Eq (20)</li>
-            <li>M growing Eq (25)</li>
-            <li>Competitive advantage Eq (22)</li>
+            <li>Decision bottleneck: <strong>Eq (20)</strong></li>
+            <li>M growing: <strong>Eq (25)</strong></li>
+            <li>Competitive advantage: <strong>Eq (22)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
 @* ─── Chart 6: Competitive Advantage — Eq (22) ─── *@
+<div id="org-chart-5">
 <ChartCard Title="Competitive Advantage — Eq (22)"
-           Description="A = M · (F_firm − F_comp) for various firm forces">
+           Description="A = M · (F_firm − F_comp). Force differential amplified by the multiplier.">
     <ChildContent>
-        <BarChart Bars="@_advantageBars" XLabel="F_firm" YLabel="Advantage" Width="500" Height="320" />
+        <LineChart Series="@_advantageSeries" XLabel="F_firm" YLabel="Advantage (A)"
+                   Width="600" Height="400"
+                   Markers="@_advantageMarkers" />
+        <p class="chart-readout">
+            Eq (22): <strong>A = @ComputeAdvantage().ToString("F1")</strong>
+            &ensp;|&ensp;M=@_advantageM.ToString("F1")
+            &ensp;|&ensp;F_firm=@_advantageForceFirm.ToString("F1")
+            &ensp;|&ensp;F_comp=@_advantageForceComp.ToString("F1")
+            &ensp;|&ensp;ΔF=@((_advantageForceFirm - _advantageForceComp).ToString("F1"))
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            The line crosses zero at F_firm = F_comp. Positive values mean competitive advantage; negative means the competitor leads.
+            The dot marks your current F_firm. Drag M to see how the slope steepens.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="A = M \times (F_{\text{firm}} - F_{\text{competitor}}) \qquad (22)" />
         <h4>In Plain Language</h4>
-        <p>When both you and your competitor have the same mirror, the only remaining competitive advantage is the difference in force between your workforces. "We have 500 engineers" stops being a moat and starts being overhead. The advantage reduces to force density — not how many people you have, but how capable they are per capita. The moat shifts from "we built it" to "we understood the problem deeply enough to build the right thing."</p>
+        <p>When both you and your competitor have the same mirror, the only remaining competitive advantage is the difference in force between your workforces. "We have 500 engineers" stops being a moat and starts being overhead. The advantage reduces to force density: not how many people you have, but how capable they are per capita. The moat shifts from "we built it" to "we understood the problem deeply enough to build the right thing."</p>
+        <h4>Reading the Charts</h4>
+        <p>The line passes through zero at F_firm = F_comp. Above zero your firm leads; below zero the competitor does. The slope equals M, so higher multipliers amplify both advantage and disadvantage. The dot marks your current position. Drag F_comp to simulate competitors of different strengths.</p>
+        <h4>The Mirror</h4>
+        <p>When execution-based competitive advantages erode, the advantage reduces to something simpler and harder to buy: the difference in force between workforces. The moat is judgment and decision speed, not execution capacity. The paradox: the force multiplier devalues what it multiplies and increases the value of everything upstream.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Base model Eq (1)</li>
-            <li>Decision speed Eq (20)</li>
-            <li>Variance Eq (4)</li>
+            <li>Base model: <strong>Eq (1)</strong></li>
+            <li>Decision speed: <strong>Eq (20)</strong></li>
+            <li>Variance: <strong>Eq (4)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
+@* ─── Slider Panel ─── *@
 <FloatingSliderPanel Visible="true" Title="Organizational Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (17): Marginal Return</div>
-    <ParameterSlider Label="Fⱼ (forceJ)" Min="0.5" Max="10" Step="0.5" Value="@_roiForceJ" ValueChanged="v => { _roiForceJ = v; }" />
-    <div class="slider-group-header">Eq (18): Assessment SNR</div>
-    <ParameterSlider Label="Var(F_true)" Min="0.1" Max="10" Step="0.1" Value="@_snrVarForceTrue" ValueChanged="v => { _snrVarForceTrue = v; }" />
-    <ParameterSlider Label="Var(ε)" Min="0.1" Max="5" Step="0.1" Value="@_snrVarEpsilon" ValueChanged="v => { _snrVarEpsilon = v; }" />
-    <ParameterSlider Label="Var(η)" Min="0.1" Max="5" Step="0.1" Value="@_snrVarEta" ValueChanged="v => { _snrVarEta = v; }" />
-    <div class="slider-group-header">Eq (19): Goodhart</div>
-    <ParameterSlider Label="F_true" Min="1" Max="10" Step="0.5" Value="@_goodhartForceTrue" ValueChanged="v => { _goodhartForceTrue = v; }" />
-    <div class="slider-group-header">Eq (20): Decision Bottleneck</div>
-    <ParameterSlider Label="M (throughput)" Min="0.5" Max="5" Step="0.1" Value="@_throughputM" ValueChanged="v => { _throughputM = v; }" />
-    <ParameterSlider Label="R_exec (throughput)" Min="0.1" Max="10" Step="0.1" Value="@_throughputRateExec" ValueChanged="v => { _throughputRateExec = v; }" />
-    <div class="slider-group-header">Eq (21): Indecision Cost</div>
-    <ParameterSlider Label="R_exec (indecision)" Min="0.1" Max="10" Step="0.1" Value="@_indecisionRateExec" ValueChanged="v => { _indecisionRateExec = v; }" />
-    <ParameterSlider Label="Δt" Min="0.1" Max="5" Step="0.1" Value="@_indecisionDeltaTime" ValueChanged="v => { _indecisionDeltaTime = v; }" />
-    <div class="slider-group-header">Eq (22): Competitive Advantage</div>
-    <ParameterSlider Label="M (advantage)" Min="0.5" Max="5" Step="0.1" Value="@_advantageM" ValueChanged="v => { _advantageM = v; }" />
-    <ParameterSlider Label="F_comp" Min="1" Max="10" Step="0.5" Value="@_advantageForceComp" ValueChanged="v => { _advantageForceComp = v; }" />
+    <div class="slider-context-label">
+        @if (_showAllSliders)
+        {
+            <span>Showing all sliders</span>
+        }
+        else if (_activeChartIndex >= 0 && _activeChartIndex < OrgChartNames.Length)
+        {
+            <span>Sliders for: @OrgChartNames[_activeChartIndex]</span>
+        }
+        &ensp;
+        <button class="slider-show-all-toggle" @onclick="ToggleShowAll">
+            @(_showAllSliders ? "Auto-filter" : "Show all")
+        </button>
+    </div>
+
+    @* Group 0: Eq (17) Marginal Return *@
+    @if (IsGroupVisible(0))
+    {
+        <div class="slider-group-header">Eq (17): Marginal Return</div>
+    }
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="M (multiplier)" Min="0.5" Max="5" Step="0.1" Value="@_roiM" ValueChanged="v => { _roiM = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="Fⱼ (force)" Min="0.5" Max="10" Step="0.5" Value="@_roiForceJ" ValueChanged="v => { _roiForceJ = v; Recalculate(); }" />
+    </div>
+
+    @* Group 1: Eq (18) Assessment SNR *@
+    @if (IsGroupVisible(1))
+    {
+        <div class="slider-group-header">Eq (18): Assessment SNR</div>
+    }
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Mp (presentation mult.)" Min="0.5" Max="5" Step="0.1" Value="@_snrMp" ValueChanged="v => { _snrMp = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Var(F_true)" Min="0.1" Max="10" Step="0.1" Value="@_snrVarForceTrue" ValueChanged="v => { _snrVarForceTrue = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Var(ε)" Min="0.1" Max="5" Step="0.1" Value="@_snrVarEpsilon" ValueChanged="v => { _snrVarEpsilon = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Var(η)" Min="0.1" Max="5" Step="0.1" Value="@_snrVarEta" ValueChanged="v => { _snrVarEta = v; Recalculate(); }" />
+    </div>
+
+    @* Group 2: Eq (19) Goodhart *@
+    @if (IsGroupVisible(2))
+    {
+        <div class="slider-group-header">Eq (19): Goodhart's Trap</div>
+    }
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="F_true" Min="1" Max="10" Step="0.5" Value="@_goodhartForceTrue" ValueChanged="v => { _goodhartForceTrue = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="δ (gaming)" Min="0" Max="10" Step="0.5" Value="@_goodhartDelta" ValueChanged="v => { _goodhartDelta = v; Recalculate(); }" />
+    </div>
+
+    @* Group 3: Eq (20) Decision Bottleneck *@
+    @if (IsGroupVisible(3))
+    {
+        <div class="slider-group-header">Eq (20): Decision Bottleneck</div>
+    }
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="M (multiplier)" Min="0.5" Max="5" Step="0.1" Value="@_throughputM" ValueChanged="v => { _throughputM = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="R_dec (decision rate)" Min="0.1" Max="10" Step="0.1" Value="@_throughputRateDec" ValueChanged="v => { _throughputRateDec = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="R_exec" Min="0.1" Max="10" Step="0.1" Value="@_throughputRateExec" ValueChanged="v => { _throughputRateExec = v; Recalculate(); }" />
+    </div>
+
+    @* Group 4: Eq (21) Indecision Cost *@
+    @if (IsGroupVisible(4))
+    {
+        <div class="slider-group-header">Eq (21): Indecision Cost</div>
+    }
+    <div class="slider-slot @GroupSlotClass(4)">
+        <ParameterSlider Label="M (multiplier)" Min="0.5" Max="5" Step="0.1" Value="@_indecisionM" ValueChanged="v => { _indecisionM = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(4)">
+        <ParameterSlider Label="R_exec" Min="0.1" Max="10" Step="0.1" Value="@_indecisionRateExec" ValueChanged="v => { _indecisionRateExec = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(4)">
+        <ParameterSlider Label="Δt (delay)" Min="0.1" Max="5" Step="0.1" Value="@_indecisionDeltaTime" ValueChanged="v => { _indecisionDeltaTime = v; Recalculate(); }" />
+    </div>
+
+    @* Group 5: Eq (22) Competitive Advantage *@
+    @if (IsGroupVisible(5))
+    {
+        <div class="slider-group-header">Eq (22): Competitive Advantage</div>
+    }
+    <div class="slider-slot @GroupSlotClass(5)">
+        <ParameterSlider Label="M (multiplier)" Min="0.5" Max="5" Step="0.1" Value="@_advantageM" ValueChanged="v => { _advantageM = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(5)">
+        <ParameterSlider Label="F_firm" Min="1" Max="10" Step="0.5" Value="@_advantageForceFirm" ValueChanged="v => { _advantageForceFirm = v; Recalculate(); }" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(5)">
+        <ParameterSlider Label="F_comp" Min="1" Max="10" Step="0.5" Value="@_advantageForceComp" ValueChanged="v => { _advantageForceComp = v; Recalculate(); }" />
+    </div>
 </FloatingSliderPanel>
 
 @code {
-    // ─── Chart 1: ROI ───
-    private double _roiForceJ = 5;
-    private IReadOnlyList<BarItem> _roiBars => Enumerable.Range(1, 5)
-        .Select(m => new BarItem($"M={m}", OrganizationalDynamics.MarginalReturn(m, _roiForceJ)))
-        .ToList();
+    // ── Scroll-aware slider state ──
+    private int _activeChartIndex = 0;
+    private bool _showAllSliders;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<OrganizationalPage>? _dotNetRef;
 
-    // ─── Chart 2: SNR ───
-    private double _snrVarForceTrue = 4;
-    private double _snrVarEpsilon = 1;
-    private double _snrVarEta = 0.5;
-    private IReadOnlyList<ChartSeries> _snrSeries => new List<ChartSeries>
+    private static readonly string[] OrgChartNames =
     {
-        new("SNR", Enumerable.Range(1, 90)
-            .Select(i => 0.5 + i * 0.05)
-            .Select(mp => new DataPoint(mp, OrganizationalDynamics.AssessmentSnr(_snrVarForceTrue, mp, _snrVarEpsilon, _snrVarEta)))
-            .ToList())
+        "Marginal Return (Eq 17)",
+        "SNR Collapse (Eq 18)",
+        "Goodhart's Trap (Eq 19)",
+        "Decision Bottleneck (Eq 20)",
+        "Indecision Cost (Eq 21)",
+        "Competitive Advantage (Eq 22)"
     };
 
-    // ─── Chart 3: Goodhart ───
-    private double _goodhartForceTrue = 5;
-    private static readonly double[] GoodhartDeltas = { 0, 1, 2, 3, 5 };
-    private IReadOnlyList<BarItem> _goodhartBars => GoodhartDeltas
-        .Select(d => new BarItem($"δ={d}", OrganizationalDynamics.MeasuredForce(_goodhartForceTrue, d), d == 0 ? "#2563eb" : "#f59e0b"))
-        .ToList();
-
-    // ─── Chart 4: Decision Bottleneck ───
-    private double _throughputM = 2;
-    private double _throughputRateExec = 5;
-    private IReadOnlyList<ChartSeries> _throughputSeries => new List<ChartSeries>
+    // Per-chart: which slider groups (indices) are visible
+    // Group 0 = Eq17, 1 = Eq18, 2 = Eq19, 3 = Eq20, 4 = Eq21, 5 = Eq22
+    private static readonly HashSet<int>[] ChartVisibleGroups =
     {
-        new("Throughput", Enumerable.Range(1, 100)
-            .Select(i => 0.1 + i * 0.099)
-            .Select(rd => new DataPoint(rd, OrganizationalDynamics.OrganizationalThroughput(rd, _throughputM, _throughputRateExec)))
-            .ToList())
+        new() { 0, 1 },    // Chart 0: ROI HeatMap + Assessment Radar (Eq 17 + context)
+        new() { 1 },       // Chart 1: SNR Collapse (Eq 18)
+        new() { 2 },       // Chart 2: Goodhart (Eq 19)
+        new() { 3 },       // Chart 3: Throughput HeatMap (Eq 20)
+        new() { 4 },       // Chart 4: Indecision Cost (Eq 21)
+        new() { 5 },       // Chart 5: Competitive Advantage (Eq 22)
     };
 
-    // ─── Chart 5: Indecision Cost ───
-    private double _indecisionRateExec = 5;
-    private double _indecisionDeltaTime = 1;
-    private IReadOnlyList<ChartSeries> _indecisionSeries => new List<ChartSeries>
+    private bool IsGroupVisible(int groupIndex) =>
+        _showAllSliders ||
+        (_activeChartIndex >= 0 && _activeChartIndex < ChartVisibleGroups.Length &&
+         ChartVisibleGroups[_activeChartIndex].Contains(groupIndex));
+
+    private string GroupSlotClass(int groupIndex) => IsGroupVisible(groupIndex) ? "" : "hidden";
+
+    private void ToggleShowAll() => _showAllSliders = !_showAllSliders;
+
+    private static readonly string[] ChartElementIds =
     {
-        new("OC", Enumerable.Range(1, 90)
-            .Select(i => 0.5 + i * 0.05)
-            .Select(m => new DataPoint(m, OrganizationalDynamics.IndecisionCost(m, _indecisionRateExec, _indecisionDeltaTime)))
-            .ToList())
+        "org-chart-0", "org-chart-1", "org-chart-2",
+        "org-chart-3", "org-chart-4", "org-chart-5"
     };
 
-    // ─── Chart 6: Competitive Advantage ───
-    private double _advantageM = 2;
-    private double _advantageForceComp = 5;
-    private static readonly double[] FirmForces = { 2, 4, 6, 8 };
-    private IReadOnlyList<BarItem> _advantageBars => FirmForces
-        .Select(ff =>
+    [JSInvokable]
+    public void OnChartScrolled(int index)
+    {
+        if (index == _activeChartIndex) return;
+        _activeChartIndex = index;
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            var val = OrganizationalDynamics.CompetitiveAdvantage(_advantageM, ff, _advantageForceComp);
-            return new BarItem($"F={ff}", val, val >= 0 ? "#2563eb" : "#ef4444");
-        })
-        .ToList();
+            try
+            {
+                _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/FStar.UI/FStar.UI.lib.module.js");
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await _jsModule.InvokeVoidAsync(
+                    "initChartObserver", _dotNetRef, "OnChartScrolled", ChartElementIds);
+            }
+            catch (JSException) { /* SSR / prerender guard */ }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("destroyChartObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+
+    // ── Eq (17): ROI parameters ──
+    private double _roiM = 3.0;
+    private double _roiForceJ = 5.0;
+
+    // ── Eq (18): SNR parameters ──
+    private double _snrMp = 2.0;
+    private double _snrVarForceTrue = 4.0;
+    private double _snrVarEpsilon = 1.0;
+    private double _snrVarEta = 0.5;
+
+    // ── Eq (19): Goodhart parameters ──
+    private double _goodhartForceTrue = 5.0;
+    private double _goodhartDelta = 2.0;
+
+    // ── Eq (20): Throughput parameters ──
+    private double _throughputM = 2.0;
+    private double _throughputRateDec = 4.0;
+    private double _throughputRateExec = 5.0;
+
+    // ── Eq (21): Indecision parameters ──
+    private double _indecisionM = 3.0;
+    private double _indecisionRateExec = 5.0;
+    private double _indecisionDeltaTime = 1.0;
+
+    // ── Eq (22): Competitive Advantage parameters ──
+    private double _advantageM = 2.0;
+    private double _advantageForceFirm = 7.0;
+    private double _advantageForceComp = 5.0;
+
+    // ── Chart data fields ──
+    private double[,] _roiHeatData = new double[0, 0];
+    private double[] _roiHeatXValues = Array.Empty<double>();
+    private double[] _roiHeatYValues = Array.Empty<double>();
+    private IReadOnlyList<string>? _roiHeatTooltip;
+    private const double RoiHeatColorMax = 40.0; // (5-1)*10 = 40
+
+    private IReadOnlyList<ChartSeries> _snrSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _snrMarkers = Array.Empty<ChartMarker>();
+
+    private IReadOnlyList<BarItem> _goodhartBars = Array.Empty<BarItem>();
+
+    private double[,] _throughputHeatData = new double[0, 0];
+    private double[] _throughputHeatXValues = Array.Empty<double>();
+    private double[] _throughputHeatYValues = Array.Empty<double>();
+    private IReadOnlyList<string>? _throughputHeatTooltip;
+    private const double ThroughputHeatColorMax = 50.0; // max(10, 5*10) = 50
+
+    private IReadOnlyList<ChartSeries> _indecisionSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _indecisionMarkers = Array.Empty<ChartMarker>();
+
+    private IReadOnlyList<ChartSeries> _advantageSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _advantageMarkers = Array.Empty<ChartMarker>();
+
+    private IReadOnlyList<RadarAxis> _assessmentRadarAxes = Array.Empty<RadarAxis>();
+    private IReadOnlyList<RadarAxis> _orgHealthRadarAxes = Array.Empty<RadarAxis>();
+
+    // ── Lifecycle ──
+    protected override void OnInitialized() => Recalculate();
+
+    // ── Readout helpers ──
+    private double ComputeRoiReturn() => OrganizationalDynamics.MarginalReturn(_roiM, _roiForceJ);
+    private double ComputeSnrAtMp() => OrganizationalDynamics.AssessmentSnr(_snrVarForceTrue, _snrMp, _snrVarEpsilon, _snrVarEta);
+    private double ComputeThroughput() => OrganizationalDynamics.OrganizationalThroughput(_throughputRateDec, _throughputM, _throughputRateExec);
+    private double ComputeIndecisionCost() => OrganizationalDynamics.IndecisionCost(_indecisionM, _indecisionRateExec, _indecisionDeltaTime);
+    private double ComputeAdvantage() => OrganizationalDynamics.CompetitiveAdvantage(_advantageM, _advantageForceFirm, _advantageForceComp);
+
+    // ── Master recalculation ──
+    private void Recalculate()
+    {
+        ComputeRoiHeatMap();
+        ComputeAssessmentRadar();
+        ComputeSnrChart();
+        ComputeGoodhartBars();
+        ComputeThroughputHeatMap();
+        ComputeOrgHealthRadar();
+        ComputeIndecisionChart();
+        ComputeAdvantageChart();
+    }
+
+    // ── Eq (17) HeatMap: ΔO over M × Fj ──
+    private void ComputeRoiHeatMap()
+    {
+        const int steps = 25;
+        _roiHeatXValues = new double[steps];
+        _roiHeatYValues = new double[steps];
+        _roiHeatData = new double[steps, steps];
+
+        for (int i = 0; i < steps; i++)
+        {
+            _roiHeatXValues[i] = 0.5 + i * 4.5 / (steps - 1); // M: 0.5 to 5.0
+            _roiHeatYValues[i] = 0.5 + i * 9.5 / (steps - 1); // Fj: 0.5 to 10.0
+        }
+
+        for (int r = 0; r < steps; r++)
+            for (int c = 0; c < steps; c++)
+                _roiHeatData[r, c] = OrganizationalDynamics.MarginalReturn(_roiHeatXValues[c], _roiHeatYValues[r]);
+
+        var roi = ComputeRoiReturn();
+        _roiHeatTooltip = new List<string>
+        {
+            $"ΔO = {roi:F1} (Eq 17)",
+            $"M = {_roiM:F1}, Fⱼ = {_roiForceJ:F1}",
+            $"Net amplification: {(_roiM - 1):F1}x",
+            $"A {_roiForceJ:F0}x engineer gains {roi:F1} additional output"
+        };
+    }
+
+    // ── Assessment radar (Eq 17-19 params) ──
+    private void ComputeAssessmentRadar()
+    {
+        var snr = ComputeSnrAtMp();
+        _assessmentRadarAxes = new List<RadarAxis>
+        {
+            new("M", _roiM, 5.0, new List<string> { "Multiplier (M)", $"Value: {_roiM:F1} / 5.0", "Drives marginal return in Eq (17)" }),
+            new("Fⱼ", _roiForceJ, 10.0, new List<string> { "Individual Force", $"Value: {_roiForceJ:F1} / 10.0", "Higher F means higher ROI from the tool" }),
+            new("Mp", _snrMp, 5.0, new List<string> { "Presentation Multiplier", $"Value: {_snrMp:F1} / 5.0", "Drives SNR collapse in Eq (18)" }),
+            new("SNR", snr, 1.0, new List<string> { "Signal-to-Noise Ratio", $"Value: {snr:F3} / 1.0", "Assessment reliability (Eq 18)" }),
+            new("Var(F)", _snrVarForceTrue, 10.0, new List<string> { "Force Variance", $"Value: {_snrVarForceTrue:F1} / 10.0", "True spread in capability" }),
+            new("δ", _goodhartDelta, 10.0, new List<string> { "Gaming Level", $"Value: {_goodhartDelta:F1} / 10.0", "Inflation from gaming (Eq 19)" })
+        };
+    }
+
+    // ── Eq (18) SNR chart ──
+    private void ComputeSnrChart()
+    {
+        var points = new List<DataPoint>();
+        for (double mp = 0.5; mp <= 5.0; mp += 0.05)
+            points.Add(new DataPoint(mp, OrganizationalDynamics.AssessmentSnr(_snrVarForceTrue, mp, _snrVarEpsilon, _snrVarEta)));
+
+        _snrSeries = new List<ChartSeries>
+        {
+            new("SNR -- Eq (18)", points, "#2563eb", 2.0)
+        };
+
+        var snrAtMp = ComputeSnrAtMp();
+        _snrMarkers = new List<ChartMarker>
+        {
+            new(_snrMp, snrAtMp, "#dc2626", null, new List<string>
+            {
+                $"SNR = {snrAtMp:F3}",
+                $"Mp = {_snrMp:F1}",
+                $"Var(F) = {_snrVarForceTrue:F1}",
+                $"At this Mp, {(snrAtMp * 100):F0}% of the observed variance is real signal"
+            })
+        };
+    }
+
+    // ── Eq (19) Goodhart bars ──
+    private void ComputeGoodhartBars()
+    {
+        var deltas = new[] { 0.0, 1.0, 2.0, 3.0, 5.0, _goodhartDelta };
+        var seen = new HashSet<double>();
+        var bars = new List<BarItem>();
+        foreach (var d in deltas)
+        {
+            if (!seen.Add(Math.Round(d, 1))) continue;
+            var color = d == 0 ? "#2563eb" : (Math.Abs(d - _goodhartDelta) < 0.01 ? "#dc2626" : "#f59e0b");
+            bars.Add(new BarItem($"\u03b4={d:F1}", OrganizationalDynamics.MeasuredForce(_goodhartForceTrue, d), color));
+        }
+        _goodhartBars = bars;
+    }
+
+    // ── Eq (20) Throughput HeatMap: min(R_dec, M·R_exec) over R_dec × M ──
+    private void ComputeThroughputHeatMap()
+    {
+        const int steps = 25;
+        _throughputHeatXValues = new double[steps];
+        _throughputHeatYValues = new double[steps];
+        _throughputHeatData = new double[steps, steps];
+
+        for (int i = 0; i < steps; i++)
+        {
+            _throughputHeatXValues[i] = 0.1 + i * 9.9 / (steps - 1); // R_dec: 0.1 to 10.0
+            _throughputHeatYValues[i] = 0.5 + i * 4.5 / (steps - 1); // M: 0.5 to 5.0
+        }
+
+        for (int r = 0; r < steps; r++)
+            for (int c = 0; c < steps; c++)
+                _throughputHeatData[r, c] = OrganizationalDynamics.OrganizationalThroughput(
+                    _throughputHeatXValues[c], _throughputHeatYValues[r], _throughputRateExec);
+
+        var throughput = ComputeThroughput();
+        var mRexec = _throughputM * _throughputRateExec;
+        _throughputHeatTooltip = new List<string>
+        {
+            $"Throughput = {throughput:F1} (Eq 20)",
+            $"R_dec = {_throughputRateDec:F1}, M = {_throughputM:F1}",
+            $"M·R_exec = {mRexec:F1}",
+            $"Binding constraint: {(throughput < mRexec ? "Decision rate" : "Execution capacity")}"
+        };
+    }
+
+    // ── Org health radar (Eq 20-22 params) ──
+    private void ComputeOrgHealthRadar()
+    {
+        var throughput = ComputeThroughput();
+        var oc = ComputeIndecisionCost();
+        var advantage = ComputeAdvantage();
+
+        _orgHealthRadarAxes = new List<RadarAxis>
+        {
+            new("Thrpt", throughput, ThroughputHeatColorMax, new List<string> { "Throughput", $"Value: {throughput:F1}", "min(R_dec, M·R_exec)" }),
+            new("R_dec", _throughputRateDec, 10.0, new List<string> { "Decision Rate", $"Value: {_throughputRateDec:F1} / 10.0", "How fast the org decides" }),
+            new("M", _throughputM, 5.0, new List<string> { "Multiplier", $"Value: {_throughputM:F1} / 5.0", "Shared by Eq (20)-(22)" }),
+            new("1/OC", 1.0 / Math.Max(oc, 0.01), 1.0, new List<string> { "Inv. Indecision Cost", $"OC = {oc:F1}", "Lower OC is better; inverted for radar shape" }),
+            new("Adv", Math.Max(advantage, 0), 20.0, new List<string> { "Competitive Advantage", $"Value: {advantage:F1}", "M·(F_firm - F_comp)" })
+        };
+    }
+
+    // ── Eq (21) Indecision chart ──
+    private void ComputeIndecisionChart()
+    {
+        var points = new List<DataPoint>();
+        for (double m = 0.5; m <= 5.0; m += 0.05)
+            points.Add(new DataPoint(m, OrganizationalDynamics.IndecisionCost(m, _indecisionRateExec, _indecisionDeltaTime)));
+
+        _indecisionSeries = new List<ChartSeries>
+        {
+            new("OC -- Eq (21)", points, "#f59e0b", 2.0)
+        };
+
+        var ocAtM = ComputeIndecisionCost();
+        _indecisionMarkers = new List<ChartMarker>
+        {
+            new(_indecisionM, ocAtM, "#dc2626", null, new List<string>
+            {
+                $"OC = {ocAtM:F1}",
+                $"M = {_indecisionM:F1}",
+                $"R_exec = {_indecisionRateExec:F1}, \u0394t = {_indecisionDeltaTime:F1}",
+                $"Each hour of delay wastes {(_indecisionM * _indecisionRateExec):F1} units"
+            })
+        };
+    }
+
+    // ── Eq (22) Competitive Advantage chart ──
+    private void ComputeAdvantageChart()
+    {
+        var points = new List<DataPoint>();
+        for (double f = 1.0; f <= 10.0; f += 0.1)
+            points.Add(new DataPoint(f, OrganizationalDynamics.CompetitiveAdvantage(_advantageM, f, _advantageForceComp)));
+
+        _advantageSeries = new List<ChartSeries>
+        {
+            new("Advantage -- Eq (22)", points, "#2563eb", 2.0)
+        };
+
+        var advAtF = ComputeAdvantage();
+        _advantageMarkers = new List<ChartMarker>
+        {
+            new(_advantageForceFirm, advAtF, advAtF >= 0 ? "#16a34a" : "#dc2626", null, new List<string>
+            {
+                $"A = {advAtF:F1}",
+                $"F_firm = {_advantageForceFirm:F1}, F_comp = {_advantageForceComp:F1}",
+                $"M = {_advantageM:F1}",
+                advAtF >= 0 ? "Your firm leads" : "Competitor leads"
+            })
+        };
+    }
 }

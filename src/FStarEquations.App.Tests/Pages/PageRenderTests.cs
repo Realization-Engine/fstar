@@ -81,6 +81,7 @@ public class PageRenderTests : BunitContext
     [Fact]
     public void OrganizationalPage_Renders_WithoutThrowing()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<OrganizationalPage>();
         Assert.NotNull(cut.Find("h1"));
     }

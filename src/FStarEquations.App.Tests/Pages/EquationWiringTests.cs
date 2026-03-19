@@ -67,8 +67,32 @@ public class EquationWiringTests : BunitContext
     }
 
     [Fact]
+    public void OrganizationalPage_Renders_ContainsHeatMap()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<OrganizationalPage>();
+
+        var heatSvg = cut.Find("svg.heat-map");
+        Assert.NotNull(heatSvg);
+
+        var rects = cut.FindAll("svg.heat-map rect");
+        Assert.True(rects.Count > 0, "OrganizationalPage HeatMap should render rect elements");
+    }
+
+    [Fact]
+    public void OrganizationalPage_Renders_ContainsRadarChart()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        var cut = Render<OrganizationalPage>();
+
+        var markup = cut.Markup;
+        Assert.Contains("radar-chart", markup);
+    }
+
+    [Fact]
     public void OrganizationalPage_Renders_ContainsBarChart()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<OrganizationalPage>();
 
         var barSvg = cut.Find("svg.bar-chart");
