@@ -129,6 +129,7 @@ public class EquationWiringTests : BunitContext
     [Fact]
     public void ForceDynamicsPage_Renders_ContainsSparklines()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<ForceDynamicsPage>();
 
         // ForceDynamicsPage has multiple sparkline LineCharts (surface, middle, deep layers)

@@ -57,6 +57,7 @@ public class PageRenderTests : BunitContext
     [Fact]
     public void ForceDynamicsPage_Renders_WithoutThrowing()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<ForceDynamicsPage>();
         Assert.NotNull(cut.Find("h1"));
     }

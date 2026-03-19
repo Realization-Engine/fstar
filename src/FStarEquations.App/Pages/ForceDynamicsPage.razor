@@ -1,4 +1,6 @@
 @page "/force-dynamics"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <PageTitle>The Atrophy Problem — Eq (11), (11a-c)</PageTitle>
 
@@ -8,7 +10,8 @@
     Force is not static. It decays through replacement, atrophies without struggle, and stratifies into surface, middle, and deep layers. The surface layer is the first to erode and the easiest to replace; the deep layer is the most durable and the hardest to rebuild.
 </blockquote>
 
-@* ─── Sparkline 1: Surface Layer — Eq (11a) ─── *@
+@* ─── Chart 0: Surface Layer — Eq (11a) ─── *@
+<div id="force-dynamics-chart-0">
 <ChartCard Title="Surface Layer dF/dt — Eq (11a)"
            Description="df_surf/dt = −β_s · R as replacement varies.">
     <ChildContent>
@@ -17,13 +20,24 @@
                    YLabel="df_surf/dt"
                    XMin="0" XMax="5"
                    ShowGrid="true"
-                   Width="400" Height="200" />
+                   Width="400" Height="200"
+                   Markers="@_surfaceMarkers" />
+        <p class="chart-readout">
+            Current: <strong>df_surf/dt = @(ForceDynamics.DfSurfaceDt(_betaSurface, _odeReplacement).ToString("F2"))</strong>
+            &ensp;|&ensp;β_s=@(_betaSurface.ToString("F1"))
+            &ensp;|&ensp;R=@(_odeReplacement.ToString("F1"))
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Surface layer decays linearly with replacement. No growth term; the LLM fully substitutes for this layer.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\frac{df_{\text{surface}}}{dt} = -\beta_s \cdot R \qquad (11a)" />
         <h4>In Plain Language</h4>
-        <p>The surface layer — framework syntax, API signatures, tool configurations — erodes fast under LLM dependence. But its loss is benign: the LLM substitutes for it fully (Eq 1a). Why memorize what the mirror can always show you? Half-life measured in months.</p>
+        <p>The surface layer (framework syntax, API signatures, tool configurations) erodes fast under LLM dependence. But its loss is benign: the LLM substitutes for it fully (Eq 1a). Why memorize what the mirror can always show you? Half-life measured in months.</p>
+        <h4>Reading the Charts</h4>
+        <p>The line shows how the surface decay rate changes as replacement R increases. The dot marks your current R value. Since there is no growth term, the line is always negative: more replacement always means faster surface erosion.</p>
         <h4>Connections</h4>
         <ul>
             <li>Layer hierarchy Eq (1a)</li>
@@ -32,8 +46,10 @@
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── Sparkline 2: Middle Layer — Eq (11b) ─── *@
+@* ─── Chart 1: Middle Layer — Eq (11b) ─── *@
+<div id="force-dynamics-chart-1">
 <ChartCard Title="Middle Layer dF/dt — Eq (11b)"
            Description="df_mid/dt = α_m·S + γ_m·E·f_mid − β_m·R as replacement varies.">
     <ChildContent>
@@ -42,13 +58,27 @@
                    YLabel="df_mid/dt"
                    XMin="0" XMax="5"
                    ShowGrid="true"
-                   Width="400" Height="200" />
+                   Width="400" Height="200"
+                   Markers="@_middleMarkers" />
+        <p class="chart-readout">
+            Current: <strong>df_mid/dt = @(ForceDynamics.DfMiddleDt(_alphaM, _struggle, _gammaM, _engagement, _forceMid, _betaM, _odeReplacement).ToString("F2"))</strong>
+            &ensp;|&ensp;α_m=@(_alphaM.ToString("F1"))
+            &ensp;|&ensp;S=@(_struggle.ToString("F1"))
+            &ensp;|&ensp;γ_m=@(_gammaM.ToString("F2"))
+            &ensp;|&ensp;E=@(_engagement.ToString("F1"))
+            &ensp;|&ensp;f_mid=@(_forceMid.ToString("F1"))
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            The critical battleground. Where the line crosses zero is the replacement level that tips the middle layer from growth to decay.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\frac{df_{\text{middle}}}{dt} = \alpha_m \cdot S + \gamma_m \cdot E \cdot f_{\text{middle}} - \beta_m \cdot R \qquad (11b)" />
         <h4>In Plain Language</h4>
-        <p>The middle layer is the critical battleground — judgment, taste, pattern recognition, the ability to evaluate the LLM's output. This is where the tipping point (Eq 14) operates. The γ_m·E·f_middle term determines whether judgment compounds or atrophies. Half-life measured in years. Decays silently because judgment is precisely the faculty that would detect its own absence.</p>
+        <p>The middle layer is the critical battleground: judgment, taste, pattern recognition, the ability to evaluate the LLM's output. This is where the tipping point (Eq 14) operates. The multiplicative term gamma_m * E * f_middle determines whether judgment compounds or atrophies. Half-life measured in years. Decays silently because judgment is precisely the faculty that would detect its own absence.</p>
+        <h4>Reading the Charts</h4>
+        <p>The line shows df_mid/dt as replacement R varies. The dot marks your current R. Where the line crosses zero is the tipping replacement: below that, the middle layer grows; above it, the middle layer decays. Adjust struggle S, engagement E, or f_mid to see how the zero-crossing shifts.</p>
         <h4>Connections</h4>
         <ul>
             <li>Tipping point Eq (14)</li>
@@ -57,8 +87,10 @@
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── Sparkline 3: Deep Layer — Eq (11c) ─── *@
+@* ─── Chart 2: Deep Layer — Eq (11c) ─── *@
+<div id="force-dynamics-chart-2">
 <ChartCard Title="Deep Layer dF/dt — Eq (11c)"
            Description="df_deep/dt = α_d·S − β_d·R as replacement varies.">
     <ChildContent>
@@ -67,13 +99,25 @@
                    YLabel="df_deep/dt"
                    XMin="0" XMax="5"
                    ShowGrid="true"
-                   Width="400" Height="200" />
+                   Width="400" Height="200"
+                   Markers="@_deepMarkers" />
+        <p class="chart-readout">
+            Current: <strong>df_deep/dt = @(ForceDynamics.DfDeepDt(_alphaD, _struggle, _betaD, _odeReplacement).ToString("F2"))</strong>
+            &ensp;|&ensp;α_d=@(_alphaD.ToString("F1"))
+            &ensp;|&ensp;S=@(_struggle.ToString("F1"))
+            &ensp;|&ensp;β_d=@(_betaD.ToString("F1"))
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Deep layer has no LLM-assisted compounding term. Growth comes only from struggle; decay from replacement. Note β_d should be much less than β_s.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\frac{df_{\text{deep}}}{dt} = \alpha_d \cdot S - \beta_d \cdot R \qquad \text{where } \beta_d \ll \beta_s \qquad (11c)" />
         <h4>In Plain Language</h4>
-        <p>The deep layer — structural intuition, the felt sense of impending failure — barely changes in the short run but is the hardest to rebuild once lost. Built through years of direct experience no language model can replicate. Half-life measured in decades. Almost somatic in its encoding.</p>
+        <p>The deep layer (structural intuition, the felt sense of impending failure) barely changes in the short run but is the hardest to rebuild once lost. Built through years of direct experience no language model can replicate. Half-life measured in decades. Almost somatic in its encoding.</p>
+        <h4>Reading the Charts</h4>
+        <p>The line shows df_deep/dt as replacement R varies. The dot marks your current R. The zero-crossing is at R = (alpha_d * S) / beta_d. Compare beta_d (deep decay) with beta_s (surface decay) to see the durability difference.</p>
         <h4>Connections</h4>
         <ul>
             <li>Transfer ceiling Eq (27)</li>
@@ -82,101 +126,235 @@
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── ODE Simulator — Eq (11), (11a-c) integrated over time ─── *@
-<ChartCard Title="Differential Equation Simulator — Force Layers Over Time"
-           Description="Forward-Euler integration of all four force ODEs (Ordinary Differential Equations — equations describing how force changes over time, e.g. dF/dt = …) for Eq (11, 11a-c) over 20 years.">
+<p class="chart-readout" style="font-size: 0.85em; opacity: 0.7; text-align: center;">
+    Dashed highlighted curves in the sensitivity chart below correspond to the three layer equations above.
+</p>
+
+@* ─── Chart 3: Layer Sensitivity — All three layers compared ─── *@
+<div id="force-dynamics-chart-3">
+<ChartCard Title="Layer Sensitivity — dF/dt vs Replacement for All Layers"
+           Description="All three layer decay rates on a single chart, showing how each layer responds differently to replacement.">
     <ChildContent>
-        <LineChart Series="@_odeSeries"
-                   XLabel="Time (years)"
-                   YLabel="Force"
-                   XMin="0" XMax="20"
+        <LineChart Series="@_sensitivitySeries"
+                   XLabel="Replacement (R)"
+                   YLabel="dF/dt"
+                   XMin="0" XMax="5"
                    ShowGrid="true"
-                   Width="600" Height="400" />
+                   Width="600" Height="300"
+                   Markers="@_sensitivityMarkers"
+                   HighlightSeriesIndices="@_sensitivityHighlight" />
+        <p class="chart-readout">
+            At R=@(_odeReplacement.ToString("F1")):
+            &ensp;|&ensp;Surface: <strong>@(ForceDynamics.DfSurfaceDt(_betaSurface, _odeReplacement).ToString("F2"))</strong>
+            &ensp;|&ensp;Middle: <strong>@(ForceDynamics.DfMiddleDt(_alphaM, _struggle, _gammaM, _engagement, _forceMid, _betaM, _odeReplacement).ToString("F2"))</strong>
+            &ensp;|&ensp;Deep: <strong>@(ForceDynamics.DfDeepDt(_alphaD, _struggle, _betaD, _odeReplacement).ToString("F2"))</strong>
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            All three layers on one chart. Dashed lines are highlighted. Dots mark current R for each layer. The surface falls fastest; the deep layer is the most resilient.
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Layer Comparison</h4>
+        <p>This chart overlays all three layer equations (11a, 11b, 11c) so you can see their different sensitivities to replacement R in a single view. The surface layer (blue) always decays. The middle layer (green) can grow or decay depending on struggle, engagement, and current force. The deep layer (red) is the most resilient but also the hardest to rebuild.</p>
+        <h4>Reading the Charts</h4>
+        <p>Each dot marks the current replacement value R for its layer. The dashed, thicker lines highlight all three series. Where a line crosses zero indicates the replacement threshold that tips that layer from growth to decay.</p>
+    </TheoryContent>
+</ChartCard>
+</div>
+
+@* ─── Chart 4: ODE Simulator with Radar ─── *@
+<div id="force-dynamics-chart-4">
+<ChartCard Title="Differential Equation Simulator — Force Layers Over Time"
+           Description="Forward-Euler integration of all four force ODEs for Eq (11, 11a-c) over 20 years.">
+    <ChildContent>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start;">
+            <div style="flex: 1; min-width: 400px;">
+                <LineChart Series="@_odeSeries"
+                           XLabel="Time (years)"
+                           YLabel="Force"
+                           XMin="0" XMax="20"
+                           ShowGrid="true"
+                           Width="600" Height="400" />
+            </div>
+            <div style="flex: 0 0 auto;">
+                <RadarChart Width="280" Height="280"
+                            Axes="@_radarAxes"
+                            CenterLabel="@("F*=" + _tippingPointValue.ToString("F1"))" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Tipping point: <strong>F* = @(_tippingPointValue.ToString("F2"))</strong>
+            &ensp;|&ensp;α=@(_odeAlpha.ToString("F2"))
+            &ensp;|&ensp;β=@(_odeBeta.ToString("F2"))
+            &ensp;|&ensp;γ=@(_odeGamma.ToString("F2"))
+            &ensp;|&ensp;σ=@(_odeSigma.ToString("F2"))
+            &ensp;|&ensp;E=@(_odeEngagement.ToString("F1"))
+            &ensp;|&ensp;S=@(_odeStruggle.ToString("F1"))
+            &ensp;|&ensp;R=@(_odeReplacement.ToString("F1"))
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Time integration of Eq (11, 11a-c) via Forward Euler (dt=@(_odeDt.ToString("F2"))).
+            Purple line is F* (Eq 14). Radar shows the ODE parameter profile; dents reveal decay-dominant terms.
+            @if (_isHysteresisPresent)
+            {
+                <span>Hysteresis detected (Eq 14a): decay is faster than recovery at current settings.</span>
+            }
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\frac{dF}{dt} = \alpha \cdot S(t) + \gamma \cdot E(t) \cdot F(t) - \beta \cdot R(t) - \sigma \cdot M_{\text{absorbed}}(t) \qquad (11)" />
         <h4>In Plain Language</h4>
-        <p>Force grows from traditional struggle (αS) and from deliberately using the LLM to accelerate thinking (γEF). It shrinks from passive reliance (βR) and from organizational de-investment once the model appears to handle it (σM_absorbed). Short-term output O(t) = M × F(t) can increase even as F(t) decays. The damage is invisible until the multiplier is unavailable.</p>
+        <p>Force grows from traditional struggle (alpha*S) and from deliberately using the LLM to accelerate thinking (gamma*E*F). It shrinks from passive reliance (beta*R) and from organizational de-investment once the model appears to handle it (sigma*M_absorbed). Short-term output O(t) = M * F(t) can increase even as F(t) decays. The damage is invisible until the multiplier is unavailable.</p>
         <h4>The Mirror</h4>
-        <p>αS is learning without the mirror — direct contact with problems. γEF is the dancer watching her reflection to spot and fix errors. βR is Narcissus — staring at the flattering reflection. σM_absorbed is the studio closing down dance classes because "the mirror teaches well enough on its own."</p>
+        <p>alpha*S is learning without the mirror, direct contact with problems. gamma*E*F is the dancer watching her reflection to spot and fix errors. beta*R is Narcissus, staring at the flattering reflection. sigma*M_absorbed is the studio closing down dance classes because "the mirror teaches well enough on its own."</p>
+        <h4>Reading the Charts</h4>
+        <p>The time-series chart shows four force trajectories integrated over 20 years. The purple horizontal line is the tipping point F* (Eq 14): above it, growth compounds; below it, decay compounds. The radar chart shows all ODE parameters at a glance; dented axes reveal which terms are weak. Hover radar vertices for parameter details.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Tipping point Eq (14)</li>
-            <li>Hysteresis Eq (14a)</li>
+            <li>Tipping point Eq (14): F* = (beta*R + sigma*M_abs) / (gamma*E)</li>
+            <li>Hysteresis Eq (14a): decay faster than recovery at same distance from F*</li>
             <li>Tacit knowledge Eq (12)</li>
             <li>Diverging trajectories Eq (15a-b)</li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
 <FloatingSliderPanel Visible="true" Title="Force Dynamics Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (11a): Surface Layer</div>
-    <ParameterSlider Label="β_s (surface decay)" Min="0.1" Max="2" Step="0.1"
-                     Value="@_betaSurface"
-                     ValueChanged="@OnBetaSurfaceChanged" />
-    <div class="slider-group-header">Eq (11b): Middle Layer</div>
-    <ParameterSlider Label="α_m (struggle coeff)" Min="0" Max="2" Step="0.1"
-                     Value="@_alphaM"
-                     ValueChanged="@OnAlphaMChanged" />
-    <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1"
-                     Value="@_struggle"
-                     ValueChanged="@OnStruggleChanged" />
-    <ParameterSlider Label="γ_m (engagement coeff)" Min="0" Max="1" Step="0.01"
-                     Value="@_gammaM"
-                     ValueChanged="@OnGammaMChanged" />
-    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1"
-                     Value="@_engagement"
-                     ValueChanged="@OnEngagementChanged" />
-    <ParameterSlider Label="f_mid (current)" Min="0" Max="10" Step="0.5"
-                     Value="@_forceMid"
-                     ValueChanged="@OnForceMidChanged" />
-    <ParameterSlider Label="β_m (middle decay)" Min="0.1" Max="2" Step="0.1"
-                     Value="@_betaM"
-                     ValueChanged="@OnBetaMChanged" />
-    <div class="slider-group-header">Eq (11c): Deep Layer</div>
-    <ParameterSlider Label="α_d (deep struggle coeff)" Min="0" Max="2" Step="0.1"
-                     Value="@_alphaD"
-                     ValueChanged="@OnAlphaDChanged" />
-    <ParameterSlider Label="β_d (deep decay)" Min="0.1" Max="2" Step="0.1"
-                     Value="@_betaD"
-                     ValueChanged="@OnBetaDChanged" />
-    <div class="slider-group-header">Eq (11): Time Integration</div>
-    <ParameterSlider Label="α (total struggle coeff)" Min="0" Max="1" Step="0.01"
-                     Value="@_odeAlpha"
-                     ValueChanged="@OnOdeAlphaChanged" />
-    <ParameterSlider Label="β (total decay)" Min="0" Max="1" Step="0.01"
-                     Value="@_odeBeta"
-                     ValueChanged="@OnOdeBetaChanged" />
-    <ParameterSlider Label="γ (engagement coeff)" Min="0" Max="1" Step="0.01"
-                     Value="@_odeGamma"
-                     ValueChanged="@OnOdeGammaChanged" />
-    <ParameterSlider Label="σ (absorbed coeff)" Min="0" Max="2" Step="0.01"
-                     Value="@_odeSigma"
-                     ValueChanged="@OnOdeSigmaChanged" />
-    <ParameterSlider Label="E (engagement, integrated)" Min="0" Max="5" Step="0.1"
-                     Value="@_odeEngagement"
-                     ValueChanged="@OnOdeEngagementChanged" />
-    <ParameterSlider Label="S (struggle, integrated)" Min="0" Max="5" Step="0.1"
-                     Value="@_odeStruggle"
-                     ValueChanged="@OnOdeStruggleChanged" />
-    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1"
-                     Value="@_odeReplacement"
-                     ValueChanged="@OnOdeReplacementChanged" />
-    <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1"
-                     Value="@_odeMAbsorbed"
-                     ValueChanged="@OnOdeMAbsorbedChanged" />
-    <ParameterSlider Label="dt (time step)" Min="0.01" Max="0.5" Step="0.01"
-                     Value="@_odeDt"
-                     ValueChanged="@OnOdeDtChanged" />
+    <div class="slider-context-label">
+        @if (_showAllSliders)
+        {
+            <span>Showing all sliders</span>
+        }
+        else if (_activeChartIndex >= 0 && _activeChartIndex < ChartNames.Length)
+        {
+            <span>Sliders for: @ChartNames[_activeChartIndex]</span>
+        }
+        &ensp;
+        <button class="slider-show-all-toggle" @onclick="ToggleShowAll">
+            @(_showAllSliders ? "Auto-filter" : "Show all")
+        </button>
+    </div>
+
+    @if (IsGroupVisible(0))
+    {
+        <div class="slider-group-header">Eq (11a): Surface Layer</div>
+    }
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="β_s (surface decay)" Min="0.1" Max="2" Step="0.1"
+                         Value="@_betaSurface"
+                         ValueChanged="@OnBetaSurfaceChanged" />
+    </div>
+
+    @if (IsGroupVisible(1))
+    {
+        <div class="slider-group-header">Eq (11b): Middle Layer</div>
+    }
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="α_m (struggle coeff)" Min="0" Max="2" Step="0.1"
+                         Value="@_alphaM"
+                         ValueChanged="@OnAlphaMChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1"
+                         Value="@_struggle"
+                         ValueChanged="@OnStruggleChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="γ_m (engagement coeff)" Min="0" Max="1" Step="0.01"
+                         Value="@_gammaM"
+                         ValueChanged="@OnGammaMChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1"
+                         Value="@_engagement"
+                         ValueChanged="@OnEngagementChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="f_mid (current)" Min="0" Max="10" Step="0.5"
+                         Value="@_forceMid"
+                         ValueChanged="@OnForceMidChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="β_m (middle decay)" Min="0.1" Max="2" Step="0.1"
+                         Value="@_betaM"
+                         ValueChanged="@OnBetaMChanged" />
+    </div>
+
+    @if (IsGroupVisible(2))
+    {
+        <div class="slider-group-header">Eq (11c): Deep Layer</div>
+    }
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="α_d (deep struggle coeff)" Min="0" Max="2" Step="0.1"
+                         Value="@_alphaD"
+                         ValueChanged="@OnAlphaDChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="β_d (deep decay)" Min="0.1" Max="2" Step="0.1"
+                         Value="@_betaD"
+                         ValueChanged="@OnBetaDChanged" />
+    </div>
+
+    @if (IsGroupVisible(3))
+    {
+        <div class="slider-group-header">Eq (11): Time Integration</div>
+    }
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="α (total struggle coeff)" Min="0" Max="1" Step="0.01"
+                         Value="@_odeAlpha"
+                         ValueChanged="@OnOdeAlphaChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="β (total decay)" Min="0" Max="1" Step="0.01"
+                         Value="@_odeBeta"
+                         ValueChanged="@OnOdeBetaChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="γ (engagement coeff)" Min="0" Max="1" Step="0.01"
+                         Value="@_odeGamma"
+                         ValueChanged="@OnOdeGammaChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="σ (absorbed coeff)" Min="0" Max="2" Step="0.01"
+                         Value="@_odeSigma"
+                         ValueChanged="@OnOdeSigmaChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="E (engagement, integrated)" Min="0" Max="5" Step="0.1"
+                         Value="@_odeEngagement"
+                         ValueChanged="@OnOdeEngagementChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="S (struggle, integrated)" Min="0" Max="5" Step="0.1"
+                         Value="@_odeStruggle"
+                         ValueChanged="@OnOdeStruggleChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1"
+                         Value="@_odeReplacement"
+                         ValueChanged="@OnOdeReplacementChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1"
+                         Value="@_odeMAbsorbed"
+                         ValueChanged="@OnOdeMAbsorbedChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(3)">
+        <ParameterSlider Label="dt (time step)" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_odeDt"
+                         ValueChanged="@OnOdeDtChanged" />
+    </div>
 </FloatingSliderPanel>
 
 @code {
-    // Surface layer params
+    // ─── Surface layer params ───
     private double _betaSurface = 0.5;
 
-    // Middle layer params
+    // ─── Middle layer params ───
     private double _alphaM = 0.3;
     private double _struggle = 2.0;
     private double _gammaM = 0.2;
@@ -184,16 +362,26 @@
     private double _forceMid = 5.0;
     private double _betaM = 0.4;
 
-    // Deep layer params
+    // ─── Deep layer params ───
     private double _alphaD = 0.5;
     private double _betaD = 0.3;
 
-    // Computed series
+    // ─── Computed sparkline series ───
     private IReadOnlyList<ChartSeries> _surfaceSeries = Array.Empty<ChartSeries>();
     private IReadOnlyList<ChartSeries> _middleSeries = Array.Empty<ChartSeries>();
     private IReadOnlyList<ChartSeries> _deepSeries = Array.Empty<ChartSeries>();
 
-    // ODE Simulator params
+    // ─── Sparkline markers ───
+    private IReadOnlyList<ChartMarker> _surfaceMarkers = Array.Empty<ChartMarker>();
+    private IReadOnlyList<ChartMarker> _middleMarkers = Array.Empty<ChartMarker>();
+    private IReadOnlyList<ChartMarker> _deepMarkers = Array.Empty<ChartMarker>();
+
+    // ─── Sensitivity chart ───
+    private IReadOnlyList<ChartSeries> _sensitivitySeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _sensitivityMarkers = Array.Empty<ChartMarker>();
+    private IReadOnlySet<int> _sensitivityHighlight = new HashSet<int> { 0, 1, 2 };
+
+    // ─── ODE Simulator params ───
     private double _odeAlpha = 0.3;
     private double _odeBeta = 0.3;
     private double _odeGamma = 0.2;
@@ -205,12 +393,104 @@
     private double _odeDt = 0.1;
 
     private IReadOnlyList<ChartSeries> _odeSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<RadarAxis> _radarAxes = Array.Empty<RadarAxis>();
+    private double _tippingPointValue;
+    private bool _isHysteresisPresent;
+
+    // ─── Scroll-aware slider panel ───
+    private int _activeChartIndex = 0;
+    private bool _showAllSliders;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<ForceDynamicsPage>? _dotNetRef;
+
+    private static readonly string[] ChartNames =
+    {
+        "Surface Layer (11a)",
+        "Middle Layer (11b)",
+        "Deep Layer (11c)",
+        "Layer Sensitivity",
+        "ODE Simulator (11)"
+    };
+
+    private static readonly string[] ChartElementIds =
+    {
+        "force-dynamics-chart-0", "force-dynamics-chart-1", "force-dynamics-chart-2",
+        "force-dynamics-chart-3", "force-dynamics-chart-4"
+    };
+
+    // Chart 0 = surface (group 0), Chart 1 = middle (group 1), Chart 2 = deep (group 2),
+    // Chart 3 = sensitivity (groups 0,1,2), Chart 4 = ODE (group 3)
+    private static readonly HashSet<int>[] ChartVisibleGroups =
+    {
+        new() { 0 },          // Chart 0: Surface
+        new() { 1 },          // Chart 1: Middle
+        new() { 2 },          // Chart 2: Deep
+        new() { 0, 1, 2 },    // Chart 3: Sensitivity (all layer params)
+        new() { 3 },          // Chart 4: ODE Simulator
+    };
+
+    private bool IsGroupVisible(int groupIndex) =>
+        _showAllSliders ||
+        (_activeChartIndex >= 0 && _activeChartIndex < ChartVisibleGroups.Length &&
+         ChartVisibleGroups[_activeChartIndex].Contains(groupIndex));
+
+    private string GroupSlotClass(int groupIndex) => IsGroupVisible(groupIndex) ? "" : "hidden";
+
+    private void ToggleShowAll() => _showAllSliders = !_showAllSliders;
+
+    [JSInvokable]
+    public void OnChartScrolled(int index)
+    {
+        if (index == _activeChartIndex) return;
+        _activeChartIndex = index;
+        InvokeAsync(StateHasChanged);
+    }
+
+    // ─── Lifecycle ───
 
     protected override void OnInitialized()
+    {
+        RecalcAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/FStar.UI/FStar.UI.lib.module.js");
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await _jsModule.InvokeVoidAsync(
+                    "initChartObserver", _dotNetRef, "OnChartScrolled", ChartElementIds);
+            }
+            catch (JSException) { /* SSR / prerender guard */ }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("destroyChartObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+
+    // ─── Recalculation ───
+
+    private void RecalcAll()
     {
         RecalcSurface();
         RecalcMiddle();
         RecalcDeep();
+        RecalcSensitivity();
         RecalcOde();
     }
 
@@ -225,6 +505,19 @@
         {
             new("df_surf/dt — Eq (11a)", points, "#2563eb", 2.0)
         };
+
+        double currentY = ForceDynamics.DfSurfaceDt(_betaSurface, _odeReplacement);
+        _surfaceMarkers = new List<ChartMarker>
+        {
+            new(_odeReplacement, currentY, "#2563eb", Tooltip: new List<string>
+            {
+                "Surface Layer (11a)",
+                $"R = {_odeReplacement:F1}",
+                $"df_surf/dt = {currentY:F2}",
+                $"β_s = {_betaSurface:F1}",
+                "Always negative: no growth term"
+            })
+        };
     }
 
     private void RecalcMiddle()
@@ -237,6 +530,20 @@
         _middleSeries = new List<ChartSeries>
         {
             new("df_mid/dt — Eq (11b)", points, "#16a34a", 2.0)
+        };
+
+        double currentY = ForceDynamics.DfMiddleDt(_alphaM, _struggle, _gammaM, _engagement, _forceMid, _betaM, _odeReplacement);
+        _middleMarkers = new List<ChartMarker>
+        {
+            new(_odeReplacement, currentY, "#16a34a", Tooltip: new List<string>
+            {
+                "Middle Layer (11b)",
+                $"R = {_odeReplacement:F1}",
+                $"df_mid/dt = {currentY:F2}",
+                $"Growth: α_m·S + γ_m·E·f_mid = {(_alphaM * _struggle + _gammaM * _engagement * _forceMid):F2}",
+                $"Decay: β_m·R = {(_betaM * _odeReplacement):F2}",
+                currentY >= 0 ? "Above tipping: judgment compounds" : "Below tipping: judgment decays"
+            })
         };
     }
 
@@ -251,13 +558,75 @@
         {
             new("df_deep/dt — Eq (11c)", points, "#dc2626", 2.0)
         };
+
+        double currentY = ForceDynamics.DfDeepDt(_alphaD, _struggle, _betaD, _odeReplacement);
+        _deepMarkers = new List<ChartMarker>
+        {
+            new(_odeReplacement, currentY, "#dc2626", Tooltip: new List<string>
+            {
+                "Deep Layer (11c)",
+                $"R = {_odeReplacement:F1}",
+                $"df_deep/dt = {currentY:F2}",
+                $"Growth: α_d·S = {(_alphaD * _struggle):F2}",
+                $"Decay: β_d·R = {(_betaD * _odeReplacement):F2}",
+                "No LLM-assisted growth term (γ absent)"
+            })
+        };
+    }
+
+    private void RecalcSensitivity()
+    {
+        // Build three series: one for each layer, all vs R
+        var surfPts = new List<DataPoint>();
+        var midPts = new List<DataPoint>();
+        var deepPts = new List<DataPoint>();
+        for (double r = 0; r <= 5.0; r += 0.1)
+        {
+            surfPts.Add(new DataPoint(r, ForceDynamics.DfSurfaceDt(_betaSurface, r)));
+            midPts.Add(new DataPoint(r, ForceDynamics.DfMiddleDt(_alphaM, _struggle, _gammaM, _engagement, _forceMid, _betaM, r)));
+            deepPts.Add(new DataPoint(r, ForceDynamics.DfDeepDt(_alphaD, _struggle, _betaD, r)));
+        }
+
+        _sensitivitySeries = new List<ChartSeries>
+        {
+            new("Surface (11a)", surfPts, "#2563eb", 2.0),
+            new("Middle (11b)", midPts, "#16a34a", 2.0),
+            new("Deep (11c)", deepPts, "#dc2626", 2.0)
+        };
+
+        _sensitivityHighlight = new HashSet<int> { 0, 1, 2 };
+
+        double surfY = ForceDynamics.DfSurfaceDt(_betaSurface, _odeReplacement);
+        double midY = ForceDynamics.DfMiddleDt(_alphaM, _struggle, _gammaM, _engagement, _forceMid, _betaM, _odeReplacement);
+        double deepY = ForceDynamics.DfDeepDt(_alphaD, _struggle, _betaD, _odeReplacement);
+
+        _sensitivityMarkers = new List<ChartMarker>
+        {
+            new(_odeReplacement, surfY, "#2563eb", Tooltip: new List<string>
+            {
+                "Surface Layer",
+                $"R = {_odeReplacement:F1}, dF/dt = {surfY:F2}",
+                "Fastest decay, fully substituted by LLM"
+            }),
+            new(_odeReplacement, midY, "#16a34a", Tooltip: new List<string>
+            {
+                "Middle Layer",
+                $"R = {_odeReplacement:F1}, dF/dt = {midY:F2}",
+                "Critical: tipping point operates here"
+            }),
+            new(_odeReplacement, deepY, "#dc2626", Tooltip: new List<string>
+            {
+                "Deep Layer",
+                $"R = {_odeReplacement:F1}, dF/dt = {deepY:F2}",
+                "Most resilient, hardest to rebuild"
+            })
+        };
     }
 
     private void RecalcOde()
     {
         var y0 = new double[] { 5.0, 3.0, 4.0, 6.0 }; // F_total, f_surface, f_middle, f_deep
 
-        // Capture locals for the closure
         double alpha = _odeAlpha, beta = _odeBeta, gamma = _odeGamma, sigma = _odeSigma;
         double eng = _odeEngagement, str = _odeStruggle, rep = _odeReplacement, mAbs = _odeMAbsorbed;
         double dt = _odeDt;
@@ -280,6 +649,14 @@
         double fStar = (eng > 0 && gamma > 0)
             ? ForceDynamics.TippingPoint(beta, rep, sigma, mAbs, gamma, eng)
             : double.NaN;
+        _tippingPointValue = double.IsNaN(fStar) || double.IsInfinity(fStar) ? 0 : fStar;
+
+        // Hysteresis check: compare decay rate (below F*) vs recovery rate (above F*)
+        double dfDtAtDecay = ForceDynamics.DfDt(alpha, str, gamma, eng,
+            Math.Max(0, _tippingPointValue - 1), beta, rep, sigma, mAbs);
+        double dfDtAtRecovery = ForceDynamics.DfDt(alpha, str, gamma, eng,
+            _tippingPointValue + 1, beta, rep, sigma, mAbs);
+        _isHysteresisPresent = ForceDynamics.IsHysteresisPresent(dfDtAtDecay, dfDtAtRecovery);
 
         for (int i = 0; i < steps; i++)
         {
@@ -308,17 +685,72 @@
         }
 
         _odeSeries = series;
+
+        // Radar chart: ODE parameters
+        _radarAxes = new List<RadarAxis>
+        {
+            new("α", _odeAlpha, 1.0, new List<string>
+            {
+                "Struggle coefficient (α)",
+                $"Value: {_odeAlpha:F2} / 1.0 ({(_odeAlpha * 100):F0}%)",
+                "Force gained from traditional struggle"
+            }),
+            new("β", _odeBeta, 1.0, new List<string>
+            {
+                "Decay coefficient (β)",
+                $"Value: {_odeBeta:F2} / 1.0 ({(_odeBeta * 100):F0}%)",
+                "Force lost to passive reliance"
+            }),
+            new("γ", _odeGamma, 1.0, new List<string>
+            {
+                "Engagement coefficient (γ)",
+                $"Value: {_odeGamma:F2} / 1.0 ({(_odeGamma * 100):F0}%)",
+                "Deliberate LLM-assisted growth"
+            }),
+            new("σ", _odeSigma, 2.0, new List<string>
+            {
+                "Absorbed coefficient (σ)",
+                $"Value: {_odeSigma:F2} / 2.0 ({(_odeSigma / 2.0 * 100):F0}%)",
+                "Organizational de-investment rate"
+            }),
+            new("E", _odeEngagement, 5.0, new List<string>
+            {
+                "Engagement (E)",
+                $"Value: {_odeEngagement:F1} / 5.0 ({(_odeEngagement / 5.0 * 100):F0}%)",
+                "Deliberate LLM use intensity"
+            }),
+            new("S", _odeStruggle, 5.0, new List<string>
+            {
+                "Struggle (S)",
+                $"Value: {_odeStruggle:F1} / 5.0 ({(_odeStruggle / 5.0 * 100):F0}%)",
+                "Productive struggle intensity"
+            }),
+            new("R", _odeReplacement, 5.0, new List<string>
+            {
+                "Replacement (R)",
+                $"Value: {_odeReplacement:F1} / 5.0 ({(_odeReplacement / 5.0 * 100):F0}%)",
+                "Passive reliance level"
+            }),
+            new("M_abs", _odeMAbsorbed, 5.0, new List<string>
+            {
+                "Absorbed capability (M_abs)",
+                $"Value: {_odeMAbsorbed:F1} / 5.0 ({(_odeMAbsorbed / 5.0 * 100):F0}%)",
+                "Model capability from F->M transfer"
+            })
+        };
     }
 
-    private void OnBetaSurfaceChanged(double val) { _betaSurface = val; RecalcSurface(); }
-    private void OnAlphaMChanged(double val) { _alphaM = val; RecalcMiddle(); }
-    private void OnStruggleChanged(double val) { _struggle = val; RecalcMiddle(); RecalcDeep(); }
-    private void OnGammaMChanged(double val) { _gammaM = val; RecalcMiddle(); }
-    private void OnEngagementChanged(double val) { _engagement = val; RecalcMiddle(); }
-    private void OnForceMidChanged(double val) { _forceMid = val; RecalcMiddle(); }
-    private void OnBetaMChanged(double val) { _betaM = val; RecalcMiddle(); }
-    private void OnAlphaDChanged(double val) { _alphaD = val; RecalcDeep(); }
-    private void OnBetaDChanged(double val) { _betaD = val; RecalcDeep(); }
+    // ─── Slider handlers ───
+
+    private void OnBetaSurfaceChanged(double val) { _betaSurface = val; RecalcSurface(); RecalcSensitivity(); }
+    private void OnAlphaMChanged(double val) { _alphaM = val; RecalcMiddle(); RecalcSensitivity(); }
+    private void OnStruggleChanged(double val) { _struggle = val; RecalcMiddle(); RecalcDeep(); RecalcSensitivity(); }
+    private void OnGammaMChanged(double val) { _gammaM = val; RecalcMiddle(); RecalcSensitivity(); }
+    private void OnEngagementChanged(double val) { _engagement = val; RecalcMiddle(); RecalcSensitivity(); }
+    private void OnForceMidChanged(double val) { _forceMid = val; RecalcMiddle(); RecalcSensitivity(); }
+    private void OnBetaMChanged(double val) { _betaM = val; RecalcMiddle(); RecalcSensitivity(); }
+    private void OnAlphaDChanged(double val) { _alphaD = val; RecalcDeep(); RecalcSensitivity(); }
+    private void OnBetaDChanged(double val) { _betaD = val; RecalcDeep(); RecalcSensitivity(); }
 
     // ODE Simulator slider handlers
     private void OnOdeAlphaChanged(double val) { _odeAlpha = val; RecalcOde(); }
@@ -327,7 +759,11 @@
     private void OnOdeSigmaChanged(double val) { _odeSigma = val; RecalcOde(); }
     private void OnOdeEngagementChanged(double val) { _odeEngagement = val; RecalcOde(); }
     private void OnOdeStruggleChanged(double val) { _odeStruggle = val; RecalcOde(); }
-    private void OnOdeReplacementChanged(double val) { _odeReplacement = val; RecalcOde(); }
+    private void OnOdeReplacementChanged(double val)
+    {
+        _odeReplacement = val;
+        RecalcSurface(); RecalcMiddle(); RecalcDeep(); RecalcSensitivity(); RecalcOde();
+    }
     private void OnOdeMAbsorbedChanged(double val) { _odeMAbsorbed = val; RecalcOde(); }
     private void OnOdeDtChanged(double val) { _odeDt = val; RecalcOde(); }
 }
