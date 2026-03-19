@@ -65,6 +65,7 @@ public class PageRenderTests : BunitContext
     [Fact]
     public void TacitKnowledgePage_Renders_WithoutThrowing()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<TacitKnowledgePage>();
         Assert.NotNull(cut.Find("h1"));
     }

@@ -1,39 +1,126 @@
 @page "/tacit-knowledge"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
 
 <PageTitle>Tacit Knowledge — Eq (12), (12a), (12b), (13)</PageTitle>
 
 <h1>Tacit Knowledge — Eq (12), (12a), (12b), (13)</h1>
 
 <blockquote>
-    Tacit knowledge — the kind that cannot be written down — transmits only through shared work between senior and junior practitioners. As the multiplier automates away shared work, the transmission channel narrows. Once broken, the pipeline cannot be restarted by hiring alone.
+    Tacit knowledge transmits only through shared work between senior and junior practitioners.
+    As the multiplier automates away shared work, the transmission channel narrows.
+    Once broken, the pipeline cannot be restarted by hiring alone.
 </blockquote>
 
-@* ─── Shared Work Decay — Eq (12b) ─── *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 0: Shared Work Decay — Eq (12b)                                  *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="tacit-chart-0">
 <ChartCard Title="Shared Work Decay — Eq (12b)"
-           Description="W = W₀ · e^(−ψ·M) as multiplier M varies.">
+           Description="W = W₀ · e^(−ψ·M) as multiplier M varies. Marker shows current M.">
     <ChildContent>
         <LineChart Series="@_sharedWorkSeries"
                    XLabel="Multiplier (M)"
                    YLabel="Shared Work (W)"
                    XMin="0.5" XMax="5"
                    YMin="0"
-                   ShowGrid="true" />
+                   ShowGrid="true"
+                   Width="600" Height="400"
+                   Markers="@_sharedWorkMarkers" />
+        <p class="chart-readout">
+            Current shared work: <strong>W = @ComputeCurrentW().ToString("F2")</strong>
+            &ensp;|&ensp;W₀=@_w0.ToString("F1")
+            &ensp;|&ensp;ψ=@_psi.ToString("F2")
+            &ensp;|&ensp;M=@_m.ToString("F1")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Exponential decay: at M=1 roughly @((Math.Exp(-_psi) * 100).ToString("F0"))% of W₀ remains.
+            The dot marks your current M value on the curve.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="W(t) = W_0 \cdot e^{-\psi \cdot M} \qquad (12b)" />
         <h4>In Plain Language</h4>
-        <p>Shared work between seniors and juniors declines exponentially with the multiplier's power. The first increments of M eliminate the most delegable tasks — high-volume, well-specified work that was the traditional vehicle for junior learning — with diminishing returns thereafter. W(t) approaches zero asymptotically (shrinking ever closer to zero but never fully reaching it).</p>
+        <p>Shared work between seniors and juniors declines exponentially with the multiplier's power. The first increments of M eliminate the most delegable tasks, the high-volume, well-specified work that was the traditional vehicle for junior learning, with diminishing returns thereafter. W(t) approaches zero asymptotically.</p>
+        <h4>Reading the Charts</h4>
+        <p>The curve shows how shared work drops as M increases. The dot marks your current M; drag the M slider and watch it move along the curve. Higher ψ makes the curve steeper: the organization is more sensitive to automation. Lower W₀ compresses the curve downward: less shared work to begin with.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Knowledge stock Eq (12)</li>
-            <li>Transmission Eq (12a)</li>
-            <li>Pipeline break Eq (13)</li>
+            <li>Knowledge stock: <strong>Eq (12)</strong></li>
+            <li>Transmission: <strong>Eq (12a)</strong></li>
+            <li>Pipeline break: <strong>Eq (13)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-@* ─── Knowledge Pipeline — Eq (12), (12a), (13) ─── *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 1: Knowledge Transmission Surface — HeatMap + Radar              *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="tacit-chart-1">
+<ChartCard Title="Knowledge Transmission Surface"
+           Description="Final K at t=20 over M × F_senior, holding δ, φ, W₀, ψ, K₀ at slider values.">
+    <ChildContent>
+        <div style="display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+            <HeatMap Width="600" Height="400"
+                     XLabel="Multiplier (M)"
+                     YLabel="Senior Force (F_senior)"
+                     Data="@_heatData"
+                     XValues="@_heatXValues"
+                     YValues="@_heatYValues"
+                     ColorScaleMin="0"
+                     ColorScaleMax="@_heatColorMax"
+                     CrosshairX="@_m"
+                     CrosshairY="@_forceSenior"
+                     CrosshairTooltip="@_heatTooltipLines" />
+            <div>
+                <p style="text-align: center; font-size: 0.85em; font-weight: 600; margin: 0 0 4px;">Transmission Components</p>
+                <RadarChart Width="280" Height="280"
+                            Axes="@_radarAxes"
+                            CenterLabel="@("T=" + ComputeCurrentT().ToString("F2"))" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Final knowledge: <strong>K(20) = @ComputeKFinal().ToString("F2")</strong>
+            &ensp;|&ensp;T=@ComputeCurrentT().ToString("F2")
+            &ensp;|&ensp;M=@_m.ToString("F1")
+            &ensp;|&ensp;F_senior=@_forceSenior.ToString("F1")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Heatmap axes: M vs F_senior. All other parameters held at slider values.
+            Color scale fixed at 0 to @_heatColorMax.ToString("F0").
+            The radar shows the three multiplicative transmission components.
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Equations</h4>
+        <KatexBlock Latex="K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t) \times (1 - \delta) + T(t) \qquad (12)" />
+        <KatexBlock Latex="T(t) = \phi \times W(t) \times F_{\text{senior}}(t) \qquad (12a)" />
+        <KatexBlock Latex="W(t) = W_0 \cdot e^{-\psi \cdot M} \qquad (12b)" />
+        <h4>In Plain Language</h4>
+        <p>The heatmap integrates all four equations forward 20 years and plots the final knowledge stock. Moving right (higher M) reduces shared work W and therefore transmission T. Moving up (higher F_senior) increases transmission directly. The crosshair marks your current position; the radar beside it shows the three factors that multiply to produce T.</p>
+        <h4>Reading the Charts</h4>
+        <p>Bright regions represent high surviving knowledge. The ridge along the top-left (low M, high F_senior) is where the pipeline thrives. The dark valley at bottom-right (high M, low F_senior) is where it collapses. The radar polygon shape reveals which component of transmission is the bottleneck: a dent in W means the multiplier has eroded shared work; a dent in F_senior means the senior workforce is weak.</p>
+        <h4>The Mirror</h4>
+        <p>The mirror cannot transmit what the senior does not carry. When F_senior is high, the mirror's efficiency gains (high M) create a tension: the same tool that makes seniors more productive simultaneously erodes the channel through which juniors learn from them.</p>
+        <h4>Connections</h4>
+        <ul>
+            <li>Senior force atrophy: <strong>Eq (11)</strong></li>
+            <li>Cohort discontinuity: <strong>Eq (32)</strong></li>
+            <li>Transfer ceiling: <strong>Eq (27)</strong></li>
+        </ul>
+    </TheoryContent>
+</ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 2: Knowledge Pipeline — Eq (12), (12a), (13)                     *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="tacit-chart-2">
 <ChartCard Title="Knowledge Pipeline — Eq (12), (12a), (13)"
            Description="Forward-Euler integration of K(t) with transmission and decay threshold.">
     <ChildContent>
@@ -42,109 +129,384 @@
                    YLabel="Knowledge / Transmission"
                    XMin="0" XMax="20"
                    ShowGrid="true"
-                   Width="600" Height="400" />
+                   Width="600" Height="400"
+                   HighlightSeriesIndices="@PipelineHighlight" />
         <ThresholdIndicator Label="@(_pipelineBroken ? "Pipeline BROKEN (T < δ·K)" : "Pipeline intact (T ≥ δ·K)")"
                             Passed="@(!_pipelineBroken)" />
+        <p class="chart-readout">
+            K(20) = <strong>@ComputeKFinal().ToString("F2")</strong>
+            &ensp;|&ensp;T=@ComputeCurrentT().ToString("F2")
+            &ensp;|&ensp;δ·K(20)=@((_pipeDelta * ComputeKFinal()).ToString("F2"))
+            &ensp;|&ensp;δ=@_pipeDelta.ToString("F2")
+        </p>
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Blue: knowledge stock K(t). Green: constant transmission T.
+            Red dashed: decay threshold δ·K(t). When green falls below red, the pipeline is broken.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equations</h4>
         <KatexBlock Latex="K_{\text{tacit}}(t+1) = K_{\text{tacit}}(t) \times (1 - \delta) + T(t) \qquad (12)" />
-        <KatexBlock Latex="T(t) = \phi \times W(t) \times F_{\text{senior}}(t) \qquad (12a)" />
         <KatexBlock Latex="T(t) < \delta \cdot K_{\text{tacit}}(t) \implies K_{\text{tacit}} \to 0 \qquad (13)" />
         <h4>In Plain Language</h4>
-        <p>The stock of tacit knowledge next year equals what survives attrition (K reduced by δ from retirements/turnover) plus whatever gets transmitted from seniors to juniors (T). Transmission depends on three things multiplied together: a coupling constant (φ), shared work volume (W), and senior force (F_senior). If any approaches zero, transmission stops. There is a critical threshold where decay exceeds transmission — once crossed, the tacit knowledge stock enters irreversible decline. You won't notice it's broken for years.</p>
+        <p>The stock of tacit knowledge next year equals what survives attrition (K reduced by δ) plus whatever gets transmitted (T). Transmission depends on three things multiplied together: coupling constant φ, shared work W, and senior force F_senior. If any approaches zero, transmission stops. When the red dashed line crosses above green, decay exceeds transmission and the stock enters irreversible decline.</p>
+        <h4>Reading the Charts</h4>
+        <p>The dashed red line (δ·K threshold) is the key diagnostic. If green (T) stays above it, K stabilizes. If it drops below, K declines until the pipeline collapses entirely. Try increasing M: shared work drops, transmission drops, and the green line sinks below red. The pipeline breaks even if K starts high, because the steady-state K converges to T/δ.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Shared work decay Eq (12b)</li>
-            <li>Senior force atrophy Eq (11)</li>
-            <li>Cohort discontinuity Eq (32)</li>
-            <li>Transfer ceiling Eq (27)</li>
+            <li>Shared work decay: <strong>Eq (12b)</strong></li>
+            <li>Senior force atrophy: <strong>Eq (11)</strong></li>
+            <li>Cohort discontinuity: <strong>Eq (32)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Chart 3: Parameter Sensitivity                                          *@
+@* ──────────────────────────────────────────────────────────────────────── *@
+
+<div id="tacit-chart-3">
+<ChartCard Title="Parameter Sensitivity — K(20)"
+           Description="How final knowledge K(20) changes as each parameter varies, holding all others at slider values.">
+    <ChildContent>
+        <LineChart Series="@_sensitivitySeries"
+                   XLabel="Parameter Value (normalized 0-1)"
+                   YLabel="K(20)"
+                   XMin="0" XMax="1"
+                   YMin="0"
+                   ShowGrid="true"
+                   Width="600" Height="400"
+                   Markers="@_sensitivityMarkers"
+                   HighlightSeriesIndices="@SensitivityHighlight" />
+        <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
+            Dashed curves correspond to the heatmap axes (M, F_senior).
+            Dots mark each parameter's current slider value.
+            Each curve sweeps one parameter from its min to max while holding all others fixed.
+        </p>
+    </ChildContent>
+    <TheoryContent>
+        <h4>Why This Matters</h4>
+        <p>Each curve reveals how sensitive the final knowledge stock is to a single parameter. Parameters with steep curves have outsized influence on the pipeline's survival. The dot on each curve marks the current slider value.</p>
+        <h4>Reading the Chart</h4>
+        <p>Steeper curves indicate higher sensitivity. The two dashed curves correspond to the heatmap axes (M and F_senior), linking the two charts visually. Notice that M has a negative slope (more automation means less knowledge) while F_senior has a positive slope (stronger seniors preserve the pipeline). The intersection of these sensitivities reveals the core tension of the model.</p>
+    </TheoryContent>
+</ChartCard>
+</div>
+
+@* ──────────────────────────────────────────────────────────────────────── *@
+@* Slider Panel                                                            *@
+@* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Tacit Knowledge Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (12b): Shared Work Decay</div>
-    <ParameterSlider Label="W₀ (initial shared work)" Min="0" Max="10" Step="0.5"
-                     Value="@_w0"
-                     ValueChanged="@OnW0Changed" />
-    <ParameterSlider Label="ψ (decay rate)" Min="0.01" Max="1" Step="0.01"
-                     Value="@_psi"
-                     ValueChanged="@OnPsiChanged" />
-    <div class="slider-group-header">Eq (12), (12a), (13): Knowledge Pipeline</div>
-    <ParameterSlider Label="δ (depreciation)" Min="0.01" Max="0.5" Step="0.01"
-                     Value="@_pipeDelta"
-                     ValueChanged="@OnPipeDeltaChanged" />
-    <ParameterSlider Label="φ (transmission coeff)" Min="0.1" Max="2" Step="0.01"
-                     Value="@_pipePhi"
-                     ValueChanged="@OnPipePhiChanged" />
-    <ParameterSlider Label="W₀ (pipeline shared work)" Min="0" Max="10" Step="0.5"
-                     Value="@_pipeW0"
-                     ValueChanged="@OnPipeW0Changed" />
-    <ParameterSlider Label="ψ (pipeline decay rate)" Min="0.01" Max="1" Step="0.01"
-                     Value="@_pipePsi"
-                     ValueChanged="@OnPipePsiChanged" />
-    <ParameterSlider Label="M (multiplier)" Min="0.5" Max="5" Step="0.1"
-                     Value="@_pipeM"
-                     ValueChanged="@OnPipeMChanged" />
-    <ParameterSlider Label="F_senior (senior force)" Min="0" Max="10" Step="0.1"
-                     Value="@_pipeForceSenior"
-                     ValueChanged="@OnPipeForceSeniorChanged" />
-    <ParameterSlider Label="K₀ (initial knowledge)" Min="0" Max="20" Step="0.5"
-                     Value="@_pipeK0"
-                     ValueChanged="@OnPipeK0Changed" />
+    <div class="slider-context-label">
+        @if (_showAllSliders)
+        {
+            <span>Showing all sliders</span>
+        }
+        else if (_activeChartIndex >= 0 && _activeChartIndex < ChartNames.Length)
+        {
+            <span>Sliders for: @ChartNames[_activeChartIndex]</span>
+        }
+        &ensp;
+        <button class="slider-show-all-toggle" @onclick="ToggleShowAll">
+            @(_showAllSliders ? "Auto-filter" : "Show all")
+        </button>
+    </div>
+
+    @if (IsGroupVisible(0))
+    {
+        <div class="slider-group-header">Shared Work &amp; Multiplier</div>
+    }
+    <div class="slider-slot @SlotClass("w0")">
+        <ParameterSlider Label="W₀ (initial shared work)" Min="0.5" Max="10" Step="0.5"
+                         Value="@_w0" ValueChanged="@(v => { _w0 = v; Recalculate(); })" />
+    </div>
+    <div class="slider-slot @SlotClass("psi")">
+        <ParameterSlider Label="ψ (decay rate)" Min="0.01" Max="1" Step="0.01"
+                         Value="@_psi" ValueChanged="@(v => { _psi = v; Recalculate(); })" />
+    </div>
+    <div class="slider-slot @SlotClass("m")">
+        <ParameterSlider Label="M (multiplier)" Min="0.5" Max="5" Step="0.1"
+                         Value="@_m" ValueChanged="@(v => { _m = v; Recalculate(); })" />
+    </div>
+
+    @if (IsGroupVisible(1))
+    {
+        <div class="slider-group-header">Transmission &amp; Pipeline</div>
+    }
+    <div class="slider-slot @SlotClass("phi")">
+        <ParameterSlider Label="φ (transmission coeff)" Min="0.1" Max="2" Step="0.01"
+                         Value="@_pipePhi" ValueChanged="@(v => { _pipePhi = v; Recalculate(); })" />
+    </div>
+    <div class="slider-slot @SlotClass("fSenior")">
+        <ParameterSlider Label="F_senior (senior force)" Min="0.1" Max="10" Step="0.1"
+                         Value="@_forceSenior" ValueChanged="@(v => { _forceSenior = v; Recalculate(); })" />
+    </div>
+    <div class="slider-slot @SlotClass("delta")">
+        <ParameterSlider Label="δ (depreciation)" Min="0.01" Max="0.5" Step="0.01"
+                         Value="@_pipeDelta" ValueChanged="@(v => { _pipeDelta = v; Recalculate(); })" />
+    </div>
+    <div class="slider-slot @SlotClass("k0")">
+        <ParameterSlider Label="K₀ (initial knowledge)" Min="0.5" Max="20" Step="0.5"
+                         Value="@_pipeK0" ValueChanged="@(v => { _pipeK0 = v; Recalculate(); })" />
+    </div>
 </FloatingSliderPanel>
 
 @code {
+    // ── Shared parameters (unified across charts) ──
     private double _w0 = 5.0;
     private double _psi = 0.2;
-
-    private IReadOnlyList<ChartSeries> _sharedWorkSeries = Array.Empty<ChartSeries>();
-
-    // Knowledge Pipeline params
-    private double _pipeDelta = 0.1;
+    private double _m = 1.0;
     private double _pipePhi = 0.5;
-    private double _pipeW0 = 5.0;
-    private double _pipePsi = 0.2;
-    private double _pipeM = 1.0;
-    private double _pipeForceSenior = 5.0;
+    private double _forceSenior = 5.0;
+    private double _pipeDelta = 0.1;
     private double _pipeK0 = 10.0;
 
-    private IReadOnlyList<ChartSeries> _pipelineSeries = Array.Empty<ChartSeries>();
-    private bool _pipelineBroken;
+    // ── Scroll-aware slider state ──
+    private int _activeChartIndex = 0;
+    private bool _showAllSliders;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<TacitKnowledgePage>? _dotNetRef;
 
-    protected override void OnInitialized()
+    private static readonly string[] ChartNames =
     {
-        RecalcSharedWork();
-        RecalcPipeline();
+        "Shared Work Decay",
+        "Transmission Surface",
+        "Knowledge Pipeline",
+        "Parameter Sensitivity"
+    };
+
+    private static readonly HashSet<string>[] ChartSliderKeys =
+    {
+        new() { "w0", "psi", "m" },
+        new() { "w0", "psi", "m", "phi", "fSenior", "delta", "k0" },
+        new() { "w0", "psi", "m", "phi", "fSenior", "delta", "k0" },
+        new() { "w0", "psi", "m", "phi", "fSenior", "delta", "k0" },
+    };
+
+    private static readonly string[][] GroupKeys =
+    {
+        new[] { "w0", "psi", "m" },
+        new[] { "phi", "fSenior", "delta", "k0" },
+    };
+
+    private bool IsSliderVisible(string key) =>
+        _showAllSliders ||
+        (_activeChartIndex >= 0 && _activeChartIndex < ChartSliderKeys.Length &&
+         ChartSliderKeys[_activeChartIndex].Contains(key));
+
+    private bool IsGroupVisible(int group) =>
+        _showAllSliders || GroupKeys[group].Any(IsSliderVisible);
+
+    private string SlotClass(string key) => IsSliderVisible(key) ? "" : "hidden";
+
+    private void ToggleShowAll() => _showAllSliders = !_showAllSliders;
+
+    private static readonly string[] ChartElementIds =
+    {
+        "tacit-chart-0", "tacit-chart-1", "tacit-chart-2", "tacit-chart-3"
+    };
+
+    [JSInvokable]
+    public void OnChartScrolled(int index)
+    {
+        if (index == _activeChartIndex) return;
+        _activeChartIndex = index;
+        InvokeAsync(StateHasChanged);
     }
 
-    private void RecalcSharedWork()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/FStar.UI/FStar.UI.lib.module.js");
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await _jsModule.InvokeVoidAsync(
+                    "initChartObserver", _dotNetRef, "OnChartScrolled", ChartElementIds);
+            }
+            catch (JSException) { /* SSR / prerender guard */ }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("destroyChartObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+
+    // ── Chart 0: Shared Work Decay data ──
+    private IReadOnlyList<ChartSeries> _sharedWorkSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _sharedWorkMarkers = Array.Empty<ChartMarker>();
+
+    // ── Chart 1: HeatMap + Radar data ──
+    private double[,] _heatData = new double[0, 0];
+    private double[] _heatXValues = Array.Empty<double>();
+    private double[] _heatYValues = Array.Empty<double>();
+    private double _heatColorMax = 20.0;
+    private IReadOnlyList<string>? _heatTooltipLines;
+    private IReadOnlyList<RadarAxis> _radarAxes = Array.Empty<RadarAxis>();
+
+    // ── Chart 2: Pipeline data ──
+    private IReadOnlyList<ChartSeries> _pipelineSeries = Array.Empty<ChartSeries>();
+    private bool _pipelineBroken;
+    private static readonly IReadOnlySet<int> PipelineHighlight = new HashSet<int> { 2 };
+
+    // ── Chart 3: Sensitivity data ──
+    private IReadOnlyList<ChartSeries> _sensitivitySeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _sensitivityMarkers = Array.Empty<ChartMarker>();
+    private static readonly IReadOnlySet<int> SensitivityHighlight = new HashSet<int> { 0, 1 };
+
+    // ── Cached K(20) ──
+    private double _cachedKFinal;
+    private double[] _cachedKValues = Array.Empty<double>();
+
+    // ── Readout helpers ──
+    private double ComputeCurrentW() => TacitKnowledge.SharedWork(_w0, _psi, _m);
+    private double ComputeCurrentT()
+    {
+        double w = TacitKnowledge.SharedWork(_w0, _psi, _m);
+        return TacitKnowledge.Transmission(_pipePhi, w, _forceSenior);
+    }
+    private double ComputeKFinal() => _cachedKFinal;
+
+    // ── Lifecycle ──
+    protected override void OnInitialized() => Recalculate();
+
+    private void Recalculate()
+    {
+        IntegratePipeline();
+        ComputeSharedWork();
+        ComputeHeatMap();
+        ComputeRadar();
+        ComputePipelineChart();
+        ComputeSensitivity();
+    }
+
+    // ── Core integration (shared by heatmap and pipeline) ──
+    private void IntegratePipeline()
+    {
+        double w = TacitKnowledge.SharedWork(_w0, _psi, _m);
+        double t = TacitKnowledge.Transmission(_pipePhi, w, _forceSenior);
+        _cachedKValues = Integration.ForwardEuler(_pipeK0, 0, 20, 0.1, (time, k) => t - _pipeDelta * k);
+        _cachedKFinal = _cachedKValues[^1];
+    }
+
+    private double IntegrateKFinal(double w0, double psi, double m, double phi, double fSenior, double delta, double k0)
+    {
+        double w = TacitKnowledge.SharedWork(w0, psi, m);
+        double t = TacitKnowledge.Transmission(phi, w, fSenior);
+        var kValues = Integration.ForwardEuler(k0, 0, 20, 0.1, (time, k) => t - delta * k);
+        return kValues[^1];
+    }
+
+    // ── Chart 0: Shared Work Decay ──
+    private void ComputeSharedWork()
     {
         var points = new List<DataPoint>();
-        for (double m = 0.5; m <= 5.0; m += 0.05)
-        {
-            points.Add(new DataPoint(m, TacitKnowledge.SharedWork(_w0, _psi, m)));
-        }
+        for (double mv = 0.5; mv <= 5.0; mv += 0.05)
+            points.Add(new DataPoint(mv, TacitKnowledge.SharedWork(_w0, _psi, mv)));
 
         _sharedWorkSeries = new List<ChartSeries>
         {
             new("Shared Work — Eq (12b)", points, "#2563eb", 2.0)
         };
+
+        double currentW = ComputeCurrentW();
+        _sharedWorkMarkers = new List<ChartMarker>
+        {
+            new(_m, currentW, "#2563eb", null, new List<string>
+            {
+                "Current position",
+                $"M = {_m:F1}",
+                $"W = {currentW:F2}",
+                $"W₀ = {_w0:F1}, ψ = {_psi:F2}"
+            })
+        };
     }
 
-    private void RecalcPipeline()
+    // ── Chart 1: HeatMap (M × F_senior → K_final) ──
+    private void ComputeHeatMap()
     {
-        double delta = _pipeDelta, phi = _pipePhi, w0 = _pipeW0, psi = _pipePsi;
-        double m = _pipeM, fSenior = _pipeForceSenior, k0 = _pipeK0;
+        const int steps = 25;
+        _heatXValues = new double[steps];
+        _heatYValues = new double[steps];
+        _heatData = new double[steps, steps];
 
-        double sharedWork = TacitKnowledge.SharedWork(w0, psi, m);
-        double transmission = TacitKnowledge.Transmission(phi, sharedWork, fSenior);
+        for (int i = 0; i < steps; i++)
+            _heatXValues[i] = 0.5 + i * 4.5 / (steps - 1);
+        for (int j = 0; j < steps; j++)
+            _heatYValues[j] = 0.1 + j * 9.9 / (steps - 1);
 
-        // Integrate dK/dt = transmission - delta * K
-        var kValues = Integration.ForwardEuler(k0, 0, 20, 0.1, (t, k) => transmission - delta * k);
+        for (int r = 0; r < steps; r++)
+            for (int c = 0; c < steps; c++)
+                _heatData[r, c] = IntegrateKFinal(_w0, _psi, _heatXValues[c], _pipePhi, _heatYValues[r], _pipeDelta, _pipeK0);
 
-        int steps = kValues.Length;
+        // Fixed color scale: theoretical max at M=0.5, F_senior=10
+        _heatColorMax = IntegrateKFinal(_w0, _psi, 0.5, _pipePhi, 10.0, _pipeDelta, _pipeK0);
+        if (_heatColorMax < 1.0) _heatColorMax = 20.0;
+
+        var kFinal = ComputeKFinal();
+        var currentT = ComputeCurrentT();
+        _heatTooltipLines = new List<string>
+        {
+            "Your current position",
+            $"M = {_m:F1}, F_senior = {_forceSenior:F1}",
+            $"T = {currentT:F2}",
+            $"K(20) = {kFinal:F2}",
+            $"δ, φ, W₀, ψ, K₀ held at sliders"
+        };
+    }
+
+    // ── Chart 1: Radar (transmission components) ──
+    private void ComputeRadar()
+    {
+        double w = ComputeCurrentW();
+        double t = ComputeCurrentT();
+        var phiPct = (_pipePhi / 2.0 * 100).ToString("F0");
+        var wPct = (w / _w0 * 100).ToString("F0");
+        var fPct = (_forceSenior / 10.0 * 100).ToString("F0");
+
+        _radarAxes = new List<RadarAxis>
+        {
+            new("φ", _pipePhi, 2.0, new List<string>
+            {
+                "Coupling constant (φ)",
+                $"Value: {_pipePhi:F2} / 2.0 ({phiPct}%)",
+                "Mentorship culture efficiency"
+            }),
+            new("W", w, _w0, new List<string>
+            {
+                "Shared Work (W)",
+                $"Value: {w:F2} / {_w0:F1} ({wPct}%)",
+                $"Reduced from W₀ by M={_m:F1}",
+                "Heatmap X-axis driver"
+            }),
+            new("F_sr", _forceSenior, 10.0, new List<string>
+            {
+                "Senior Force (F_senior)",
+                $"Value: {_forceSenior:F1} / 10.0 ({fPct}%)",
+                "Heatmap Y-axis"
+            }),
+        };
+    }
+
+    // ── Chart 2: Pipeline time series ──
+    private void ComputePipelineChart()
+    {
+        double transmission = ComputeCurrentT();
+        int steps = _cachedKValues.Length;
         var kPts = new List<DataPoint>(steps);
         var tPts = new List<DataPoint>(steps);
         var threshPts = new List<DataPoint>(steps);
@@ -152,9 +514,9 @@
         for (int i = 0; i < steps; i++)
         {
             double time = i * 0.1;
-            kPts.Add(new DataPoint(time, kValues[i]));
+            kPts.Add(new DataPoint(time, _cachedKValues[i]));
             tPts.Add(new DataPoint(time, transmission));
-            threshPts.Add(new DataPoint(time, delta * kValues[i]));
+            threshPts.Add(new DataPoint(time, _pipeDelta * _cachedKValues[i]));
         }
 
         _pipelineSeries = new List<ChartSeries>
@@ -164,20 +526,58 @@
             new("δ·K threshold", threshPts, "#dc2626", 1.5)
         };
 
-        // Check pipeline status at final time step
-        double kFinal = kValues[^1];
-        _pipelineBroken = TacitKnowledge.IsPipelineBroken(transmission, delta, kFinal);
+        _pipelineBroken = TacitKnowledge.IsPipelineBroken(transmission, _pipeDelta, _cachedKFinal);
     }
 
-    private void OnW0Changed(double val) { _w0 = val; RecalcSharedWork(); }
-    private void OnPsiChanged(double val) { _psi = val; RecalcSharedWork(); }
+    // ── Chart 3: Sensitivity (K_final vs each parameter) ──
+    private void ComputeSensitivity()
+    {
+        var paramDefs = new (string Name, string Key, double Min, double Max, double Current, string Color, Func<double, double> Sweep)[]
+        {
+            ("M", "m", 0.5, 5.0, _m, "#dc2626",
+                v => IntegrateKFinal(_w0, _psi, v, _pipePhi, _forceSenior, _pipeDelta, _pipeK0)),
+            ("F_senior", "fSenior", 0.1, 10.0, _forceSenior, "#16a34a",
+                v => IntegrateKFinal(_w0, _psi, _m, _pipePhi, v, _pipeDelta, _pipeK0)),
+            ("φ", "phi", 0.1, 2.0, _pipePhi, "#9333ea",
+                v => IntegrateKFinal(_w0, _psi, _m, v, _forceSenior, _pipeDelta, _pipeK0)),
+            ("W₀", "w0", 0.5, 10.0, _w0, "#ea580c",
+                v => IntegrateKFinal(v, _psi, _m, _pipePhi, _forceSenior, _pipeDelta, _pipeK0)),
+            ("ψ", "psi", 0.01, 1.0, _psi, "#0891b2",
+                v => IntegrateKFinal(_w0, v, _m, _pipePhi, _forceSenior, _pipeDelta, _pipeK0)),
+            ("δ", "delta", 0.01, 0.5, _pipeDelta, "#d946ef",
+                v => IntegrateKFinal(_w0, _psi, _m, _pipePhi, _forceSenior, v, _pipeK0)),
+        };
 
-    // Pipeline slider handlers
-    private void OnPipeDeltaChanged(double val) { _pipeDelta = val; RecalcPipeline(); }
-    private void OnPipePhiChanged(double val) { _pipePhi = val; RecalcPipeline(); }
-    private void OnPipeW0Changed(double val) { _pipeW0 = val; RecalcPipeline(); }
-    private void OnPipePsiChanged(double val) { _pipePsi = val; RecalcPipeline(); }
-    private void OnPipeMChanged(double val) { _pipeM = val; RecalcPipeline(); }
-    private void OnPipeForceSeniorChanged(double val) { _pipeForceSenior = val; RecalcPipeline(); }
-    private void OnPipeK0Changed(double val) { _pipeK0 = val; RecalcPipeline(); }
+        const int pts = 40;
+        var series = new List<ChartSeries>();
+        var markers = new List<ChartMarker>();
+
+        for (int p = 0; p < paramDefs.Length; p++)
+        {
+            var def = paramDefs[p];
+            var points = new List<DataPoint>(pts);
+            for (int i = 0; i < pts; i++)
+            {
+                double norm = (double)i / (pts - 1);
+                double val = def.Min + norm * (def.Max - def.Min);
+                double kf = def.Sweep(val);
+                points.Add(new DataPoint(norm, kf));
+            }
+            series.Add(new ChartSeries(def.Name, points, def.Color, 2.0, false));
+
+            double currentNorm = (def.Current - def.Min) / (def.Max - def.Min);
+            double currentKf = _cachedKFinal;
+            bool isHeatAxis = p == 0 || p == 1;
+            markers.Add(new ChartMarker(currentNorm, currentKf, def.Color, null, new List<string>
+            {
+                def.Name,
+                $"Value = {def.Current:F2} (range {def.Min:F2}-{def.Max:F2})",
+                $"K(20) = {currentKf:F2}",
+                isHeatAxis ? "Heatmap axis" : "Held fixed on heatmap"
+            }));
+        }
+
+        _sensitivitySeries = series;
+        _sensitivityMarkers = markers;
+    }
 }

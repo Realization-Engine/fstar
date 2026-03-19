@@ -120,6 +120,7 @@ public class EquationWiringTests : BunitContext
     [Fact]
     public void TacitKnowledgePage_Renders_ContainsLineChart()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<TacitKnowledgePage>();
 
         var polylines = cut.FindAll("svg.line-chart polyline");
