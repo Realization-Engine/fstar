@@ -1,4 +1,7 @@
 @page "/creation-evaluation"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@using FStar.UI.Models
 
 <PageTitle>Creation vs Evaluation — Eq (7), (7a)</PageTitle>
 
@@ -8,37 +11,65 @@
     Every hour a high-force individual spends evaluating others is an hour not spent creating. The evaluation bottleneck arises because the same people who are best at doing the work are also the only ones who can reliably judge it.
 </blockquote>
 
-<!-- Chart 1: Evaluation Bottleneck -->
-<ChartCard Title="Evaluation Bottleneck" Description="Eq (7) Throughput = Budget / Cost for different budget levels.">
+<!-- Chart 1: Evaluation Bottleneck — HeatMap -->
+<div id="creation-eval-chart-0">
+<ChartCard Title="Evaluation Bottleneck" Description="Eq (7) Throughput = Budget / Cost as a function of both budget and cost.">
     <ChildContent>
-        <BarChart Bars="@_throughputBars"
-                  XLabel="Budget"
-                  YLabel="Throughput"
-                  Orientation="BarOrientation.Vertical" />
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;">
+            <div style="flex: 1; min-width: 350px;">
+                <HeatMap Data="@_throughputHeatData"
+                         XValues="@_throughputXValues"
+                         YValues="@_throughputYValues"
+                         XLabel="Budget (eval)"
+                         YLabel="Cost per Evaluation"
+                         ColorScaleMin="0"
+                         ColorScaleMax="@_throughputColorMax"
+                         CrosshairX="@_budget"
+                         CrosshairY="@_costEval"
+                         CrosshairTooltip="@_throughputCrosshairTooltip" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Current output: Throughput = @((CreationEvaluation.EvaluationThroughput(_budget, _costEval)).ToString("F1")) | Budget = @(_budget.ToString("F0")) | Cost = @(_costEval.ToString("F1"))
+        </p>
+        <p class="chart-readout-secondary">
+            Heatmap shows throughput across the full budget-cost surface. Color scale fixed at 0–@(_throughputColorMax.ToString("F0")). Crosshair marks your current slider values.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\text{Throughput} = \frac{\text{Budget}_{\text{eval}}}{C_{\text{evaluate}}} \qquad (7)" />
         <h4>In Plain Language</h4>
-        <p>A developer can generate thousands of lines of plausible code in minutes. But determining whether that code is correct, secure, and aligned with requirements still demands deep human judgment. Possibly more judgment, because the mirror's presentation channel (M_p) adds a uniform polish that makes defects harder to spot — hand-written bad code often looks bad, but LLM-generated bad code looks professional.</p>
+        <p>A developer can generate thousands of lines of plausible code in minutes. But determining whether that code is correct, secure, and aligned with requirements still demands deep human judgment. Possibly more judgment, because the mirror's presentation channel (M_p) adds a uniform polish that makes defects harder to spot; hand-written bad code often looks bad, but LLM-generated bad code looks professional.</p>
+        <h4>Reading the Charts</h4>
+        <p>The heatmap shows throughput as a continuous surface over budget and cost. Bright regions represent high throughput; dark regions represent low throughput. The red crosshair marks your current slider position. Hover the crosshair dot to see exact values. Drag the Budget and Cost sliders to watch the crosshair move across the surface.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Reallocation paradox → <strong>Eq (7a)</strong></li>
-            <li>Three-way competition → <strong>Eq (28)</strong></li>
-            <li>Epistemic gap → <strong>Eq (10)</strong></li>
+            <li>Reallocation paradox: <strong>Eq (7a)</strong></li>
+            <li>Three-way competition: <strong>Eq (28)</strong></li>
+            <li>Epistemic gap: <strong>Eq (10)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-<!-- Chart 2: Reallocation Effect -->
-<ChartCard Title="Reallocation Effect" Description="Eq (7a) Reallocated Force = F_H · fraction as fraction varies.">
+<!-- Chart 2: Reallocation Effect — LineChart with dual series + markers -->
+<div id="creation-eval-chart-1">
+<ChartCard Title="Reallocation Effect" Description="Eq (7a) Reallocated Force vs Remaining Creation Force as fraction varies.">
     <ChildContent>
         <LineChart Series="@_reallocationSeries"
                    XLabel="Fraction to Evaluation"
-                   YLabel="Reallocated Force"
+                   YLabel="Force"
                    XMin="0" XMax="1"
                    YMin="0"
-                   ShowGrid="true" />
+                   ShowGrid="true"
+                   Markers="@_reallocationMarkers" />
+        <p class="chart-readout">
+            Current: Reallocated = @((CreationEvaluation.ReallocatedForce(_forceHigh, _fractionToEval)).ToString("F2")) | Remaining = @((_forceHigh * (1.0 - _fractionToEval)).ToString("F2")) | F_high = @(_forceHigh.ToString("F1")) | fraction = @(_fractionToEval.ToString("F2"))
+        </p>
+        <p class="chart-readout-secondary">
+            Blue line: force diverted to evaluation. Orange line: force remaining for creation. Markers show your current fraction. The crossover reveals the tradeoff.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
@@ -46,84 +77,253 @@
         <h4>In Plain Language</h4>
         <p>Your most valuable people need to spend more time reviewing others' AI-augmented output and less time doing their own creation, even though their own creation yields the highest return. This is a genuine organizational paradox.</p>
         <h4>The Mirror</h4>
-        <p>Can the LLM evaluate too? Partially, but the defects that matter most — architectural misalignment, subtle concurrency bugs, security vulnerabilities — are precisely the ones LLMs evaluate poorly. The gap between creation-M_s and evaluation-M_s is what makes this equation bind.</p>
+        <p>Can the LLM evaluate too? Partially, but the defects that matter most, architectural misalignment, subtle concurrency bugs, security vulnerabilities, are precisely the ones LLMs evaluate poorly. The gap between creation-M_s and evaluation-M_s is what makes this equation bind.</p>
+        <h4>Reading the Charts</h4>
+        <p>Two series show the zero-sum nature of reallocation. As you move the Fraction slider right, evaluation force (blue) rises and creation force (orange) falls. The markers (dots) show your current position on each curve. Hover a marker for details.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Three-way competition → <strong>Eq (28)</strong></li>
-            <li>Decision bottleneck → <strong>Eq (20)</strong></li>
-            <li>Evaluation SNR → <strong>Eq (18)</strong></li>
+            <li>Three-way competition: <strong>Eq (28)</strong></li>
+            <li>Decision bottleneck: <strong>Eq (20)</strong></li>
+            <li>Evaluation SNR: <strong>Eq (18)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
-<!-- Composite: Resource Allocation (Eq 7a + 28) -->
-<ChartCard Title="Resource Allocation" Description="Composite: Eq (28) Total Time Allocation and Eq (7a) Reallocated Force as τ_create varies.">
+<!-- Chart 3: Constrained Allocation — LineChart + Radar -->
+<div id="creation-eval-chart-2">
+<ChartCard Title="The Three-Way Squeeze" Description="Eq (28) + (7): Fixed time budget forces tradeoffs between creation, evaluation, and extraction.">
     <ChildContent>
-        <LineChart Series="@_resourceSeries"
-                   XLabel="τ_create"
-                   YLabel="Value"
-                   XMin="0" XMax="10"
-                   YMin="0"
-                   ShowGrid="true" />
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;">
+            <div style="flex: 1; min-width: 350px;">
+                <LineChart Series="@_resourceSeries"
+                           XLabel="τ_create (hours to creation)"
+                           YLabel="Output"
+                           XMin="0" XMax="@_tauAvailable"
+                           YMin="0"
+                           ShowGrid="true"
+                           Markers="@_resourceMarkers" />
+            </div>
+            <div style="flex: 0 0 260px;">
+                <RadarChart Axes="@_timeRadarAxes"
+                            CenterLabel="@_timeRadarLabel"
+                            FillColor="#8b5cf6"
+                            StrokeColor="#6d28d9"
+                            Width="260"
+                            Height="260" />
+            </div>
+        </div>
+        <p class="chart-readout">
+            Current: τ_create = @(_resTauCreate.ToString("F1")) | τ_eval = @(_derivedTauEval.ToString("F1")) | τ_extract = @(_resTauExtract.ToString("F1")) | τ_available = @(_tauAvailable.ToString("F1")) | Creation = @((_resForceHigh * _resTauCreate).ToString("F1")) | Eval throughput = @((_derivedTauEval > 0 ? CreationEvaluation.EvaluationThroughput(_derivedTauEval, _resCostEval) : 0).ToString("F1"))
+        </p>
+        <p class="chart-readout-secondary">
+            Blue = creation output (F_high x τ_create, rising). Orange = evaluation throughput (remaining time / C_eval, falling). Green = extraction output (η x F_high x τ_extract, constant floor). The crossover marks the tension point.
+        </p>
     </ChildContent>
     <TheoryContent>
         <h4>Equation</h4>
         <KatexBlock Latex="\tau_{\text{available}} = \tau_{\text{create}} + \tau_{\text{evaluate}} + \tau_{\text{extract}} \qquad (28)" />
         <h4>In Plain Language</h4>
         <p>The total working time of a high-force individual is now split three ways: building (highest multiplier on their output), reviewing others' LLM-augmented work (bottleneck-clearing), and teaching the model (RLHF, knowledge systems). Every hour spent on one is an hour not spent on the others. Organizations now face a three-way optimization with no slack.</p>
+        <h4>Reading the Charts</h4>
+        <p>The line chart sweeps creation time from 0 to τ_available. Evaluation time is not independent; it is whatever remains after creation and extraction: τ_eval = τ_available - τ_create - τ_extract. As the blue line (creation output) rises, the orange line (evaluation throughput, via Eq 7) falls, because evaluation hours are being consumed by creation. The green line (extraction output) is flat, showing the constant cost of teaching the model. The crossover between blue and orange reveals the allocation tension. The radar chart shows your current three-way split; a balanced triangle means equal allocation, while a dent reveals which activity is being squeezed.</p>
         <h4>Connections</h4>
         <ul>
-            <li>Transfer rate → <strong>Eq (26)</strong></li>
-            <li>Evaluation bottleneck → <strong>Eq (7)</strong></li>
-            <li>Reallocation → <strong>Eq (7a)</strong></li>
+            <li>Transfer rate: <strong>Eq (26)</strong></li>
+            <li>Evaluation bottleneck: <strong>Eq (7)</strong></li>
+            <li>Reallocation: <strong>Eq (7a)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
+</div>
 
 <FloatingSliderPanel Visible="true" Title="Creation vs Evaluation Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (7): Evaluation Bottleneck</div>
-    <ParameterSlider Label="Cost per Evaluation" Min="1" Max="50" Step="1"
-                     Value="@_costEval"
-                     ValueChanged="@OnCostEvalChanged" />
-    <div class="slider-group-header">Eq (7a): Reallocation Effect</div>
-    <ParameterSlider Label="Force High" Min="1" Max="10" Step="0.5"
-                     Value="@_forceHigh"
-                     ValueChanged="@OnForceHighChanged" />
-    <div class="slider-group-header">Eq (7a)+(28): Resource Allocation</div>
-    <ParameterSlider Label="τ_eval" Min="0" Max="5" Step="0.1"
-                     Value="@_resTauEval"
-                     ValueChanged="@OnResTauEvalChanged" />
-    <ParameterSlider Label="τ_extract" Min="0" Max="5" Step="0.1"
-                     Value="@_resTauExtract"
-                     ValueChanged="@OnResTauExtractChanged" />
-    <ParameterSlider Label="Force High (Resource)" Min="1" Max="10" Step="0.5"
-                     Value="@_resForceHigh"
-                     ValueChanged="@OnResForceHighChanged" />
-    <ParameterSlider Label="Fraction to Eval" Min="0" Max="1" Step="0.01"
-                     Value="@_resFractionToEval"
-                     ValueChanged="@OnResFractionChanged" />
+    <div class="slider-context-label">
+        @if (_showAllSliders)
+        {
+            <span>All sliders</span>
+        }
+        else if (_activeChartIndex >= 0 && _activeChartIndex < ChartNames.Length)
+        {
+            <span>Sliders for: @ChartNames[_activeChartIndex]</span>
+        }
+        <button class="slider-toggle-btn" @onclick="ToggleShowAll">
+            @(_showAllSliders ? "Auto-filter" : "Show all")
+        </button>
+    </div>
+
+    <div class="slider-slot @GroupSlotClass(0)">
+        <div class="slider-group-header">Eq (7): Evaluation Bottleneck</div>
+    </div>
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="Budget (eval)" Min="10" Max="200" Step="5"
+                         Value="@_budget"
+                         ValueChanged="@OnBudgetChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(0)">
+        <ParameterSlider Label="Cost per Evaluation" Min="1" Max="50" Step="1"
+                         Value="@_costEval"
+                         ValueChanged="@OnCostEvalChanged" />
+    </div>
+
+    <div class="slider-slot @GroupSlotClass(1)">
+        <div class="slider-group-header">Eq (7a): Reallocation Effect</div>
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Force High" Min="1" Max="10" Step="0.5"
+                         Value="@_forceHigh"
+                         ValueChanged="@OnForceHighChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(1)">
+        <ParameterSlider Label="Fraction to Eval" Min="0" Max="1" Step="0.01"
+                         Value="@_fractionToEval"
+                         ValueChanged="@OnFractionChanged" />
+    </div>
+
+    <div class="slider-slot @GroupSlotClass(2)">
+        <div class="slider-group-header">Eq (28)+(7): The Three-Way Squeeze</div>
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="τ_available (total hours)" Min="4" Max="12" Step="0.5"
+                         Value="@_tauAvailable"
+                         ValueChanged="@OnTauAvailableChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="τ_create (your allocation)" Min="0" Max="@(_tauAvailable - _resTauExtract)" Step="0.1"
+                         Value="@_resTauCreate"
+                         ValueChanged="@OnResTauCreateChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="τ_extract" Min="0" Max="4" Step="0.1"
+                         Value="@_resTauExtract"
+                         ValueChanged="@OnResTauExtractChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="F_high" Min="1" Max="10" Step="0.5"
+                         Value="@_resForceHigh"
+                         ValueChanged="@OnResForceHighChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="C_eval (cost per review)" Min="1" Max="20" Step="1"
+                         Value="@_resCostEval"
+                         ValueChanged="@OnResCostEvalChanged" />
+    </div>
+    <div class="slider-slot @GroupSlotClass(2)">
+        <ParameterSlider Label="η (transfer efficiency)" Min="0" Max="1" Step="0.05"
+                         Value="@_etaEff"
+                         ValueChanged="@OnEtaEffChanged" />
+    </div>
 </FloatingSliderPanel>
 
 @code {
-    // Evaluation Bottleneck parameters
+    // ── Scroll-aware slider state ──
+    private int _activeChartIndex = 0;
+    private bool _showAllSliders;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<CreationEvaluationPage>? _dotNetRef;
+
+    private static readonly string[] ChartNames =
+    {
+        "Evaluation Bottleneck",
+        "Reallocation Effect",
+        "Resource Allocation"
+    };
+
+    // Group 0 = Eq 7 (Budget, Cost), Group 1 = Eq 7a (ForceHigh, Fraction), Group 2 = Eq 28+7a (taus, force, fraction)
+    private static readonly HashSet<int>[] ChartVisibleGroups =
+    {
+        new() { 0 },       // Chart 0: Heatmap
+        new() { 1 },       // Chart 1: Reallocation
+        new() { 2 },       // Chart 2: Resource Allocation
+    };
+
+    private bool IsGroupVisible(int groupIndex) =>
+        _showAllSliders ||
+        (_activeChartIndex >= 0 && _activeChartIndex < ChartVisibleGroups.Length &&
+         ChartVisibleGroups[_activeChartIndex].Contains(groupIndex));
+
+    private string GroupSlotClass(int groupIndex) => IsGroupVisible(groupIndex) ? "" : "hidden";
+
+    private void ToggleShowAll() => _showAllSliders = !_showAllSliders;
+
+    private static readonly string[] ChartElementIds =
+    {
+        "creation-eval-chart-0", "creation-eval-chart-1", "creation-eval-chart-2"
+    };
+
+    [JSInvokable]
+    public void OnChartScrolled(int index)
+    {
+        if (index == _activeChartIndex) return;
+        _activeChartIndex = index;
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                    "import", "./_content/FStar.UI/FStar.UI.lib.module.js");
+                _dotNetRef = DotNetObjectReference.Create(this);
+                await _jsModule.InvokeVoidAsync(
+                    "initChartObserver", _dotNetRef, "OnChartScrolled", ChartElementIds);
+            }
+            catch (JSException) { /* SSR / prerender guard */ }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.InvokeVoidAsync("destroyChartObserver");
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException) { }
+        }
+        _dotNetRef?.Dispose();
+    }
+
+    // ── Chart 1: Evaluation Bottleneck parameters ──
+    private double _budget = 100.0;
     private double _costEval = 5.0;
 
-    // Reallocation parameters
+    // ── Chart 2: Reallocation parameters ──
     private double _forceHigh = 8.0;
+    private double _fractionToEval = 0.5;
 
-    // Resource Allocation composite parameters
-    private double _resTauEval = 1.0;
+    // ── Chart 3: Constrained Allocation parameters ──
+    private double _tauAvailable = 8.0;
+    private double _resTauCreate = 3.0;
     private double _resTauExtract = 1.0;
     private double _resForceHigh = 8.0;
-    private double _resFractionToEval = 0.3;
+    private double _resCostEval = 5.0;
+    private double _etaEff = 0.5;
+    private double _derivedTauEval => Math.Max(0, _tauAvailable - _resTauCreate - _resTauExtract);
 
-    // Computed data
-    private IReadOnlyList<BarItem> _throughputBars = Array.Empty<BarItem>();
+    // ── Chart 1: Heatmap data ──
+    private double[,] _throughputHeatData = new double[0, 0];
+    private double[] _throughputXValues = Array.Empty<double>();
+    private double[] _throughputYValues = Array.Empty<double>();
+    private double _throughputColorMax = 200.0;
+    private IReadOnlyList<string> _throughputCrosshairTooltip = Array.Empty<string>();
+
+    // ── Chart 2: Line data ──
     private IReadOnlyList<ChartSeries> _reallocationSeries = Array.Empty<ChartSeries>();
-    private IReadOnlyList<ChartSeries> _resourceSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _reallocationMarkers = Array.Empty<ChartMarker>();
 
-    private static readonly double[] BudgetLevels = { 10, 20, 50, 100, 200 };
-    private static readonly string[] BarColors = { "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe" };
+    // ── Chart 3: Constrained Allocation data ──
+    private IReadOnlyList<ChartSeries> _resourceSeries = Array.Empty<ChartSeries>();
+    private IReadOnlyList<ChartMarker> _resourceMarkers = Array.Empty<ChartMarker>();
+    private IReadOnlyList<RadarAxis> _timeRadarAxes = Array.Empty<RadarAxis>();
+    private string _timeRadarLabel = "";
+
+    private const int HeatResolution = 25;
 
     protected override void OnInitialized()
     {
@@ -132,54 +332,187 @@
         RecalcResource();
     }
 
+    // ── Chart 1: Evaluation Bottleneck ──
     private void RecalcThroughput()
     {
-        var bars = new List<BarItem>();
-        for (int i = 0; i < BudgetLevels.Length; i++)
+        // Build heatmap: X = Budget (10..200), Y = Cost (1..50)
+        var xVals = new double[HeatResolution];
+        var yVals = new double[HeatResolution];
+        for (int i = 0; i < HeatResolution; i++)
         {
-            var budget = BudgetLevels[i];
-            var throughput = CreationEvaluation.EvaluationThroughput(budget, _costEval);
-            bars.Add(new BarItem($"B={budget:F0}", throughput, BarColors[i]));
+            xVals[i] = 10.0 + i * (200.0 - 10.0) / (HeatResolution - 1);
+            yVals[i] = 1.0 + i * (50.0 - 1.0) / (HeatResolution - 1);
         }
-        _throughputBars = bars;
+
+        var data = new double[HeatResolution, HeatResolution];
+        for (int r = 0; r < HeatResolution; r++)
+        {
+            for (int c = 0; c < HeatResolution; c++)
+            {
+                data[r, c] = CreationEvaluation.EvaluationThroughput(xVals[c], yVals[r]);
+            }
+        }
+
+        _throughputXValues = xVals;
+        _throughputYValues = yVals;
+        _throughputHeatData = data;
+        _throughputColorMax = 200.0; // max budget / min cost = 200/1
+
+        var throughput = CreationEvaluation.EvaluationThroughput(_budget, _costEval);
+        _throughputCrosshairTooltip = new List<string>
+        {
+            "Your current position",
+            $"Budget = {_budget:F0}",
+            $"Cost = {_costEval:F1}",
+            $"Throughput = {throughput:F1}",
+        };
     }
 
+    // ── Chart 2: Reallocation Effect ──
     private void RecalcReallocation()
     {
-        var points = new List<DataPoint>();
+        var evalPoints = new List<DataPoint>();
+        var createPoints = new List<DataPoint>();
+
         for (double frac = 0.0; frac <= 1.0; frac += 0.02)
         {
-            points.Add(new DataPoint(frac, CreationEvaluation.ReallocatedForce(_forceHigh, frac)));
+            evalPoints.Add(new DataPoint(frac, CreationEvaluation.ReallocatedForce(_forceHigh, frac)));
+            createPoints.Add(new DataPoint(frac, _forceHigh * (1.0 - frac)));
         }
 
         _reallocationSeries = new List<ChartSeries>
         {
-            new("Reallocated Force — Eq (7a)", points, "#2563eb", 2.0)
+            new("Evaluation Force — Eq (7a)", evalPoints, "#2563eb", 2.0),
+            new("Remaining Creation Force", createPoints, "#ea580c", 2.0)
+        };
+
+        var currentEval = CreationEvaluation.ReallocatedForce(_forceHigh, _fractionToEval);
+        var currentCreate = _forceHigh * (1.0 - _fractionToEval);
+
+        _reallocationMarkers = new List<ChartMarker>
+        {
+            new(_fractionToEval, currentEval, "#2563eb", null, new List<string>
+            {
+                "Evaluation Force",
+                $"Fraction = {_fractionToEval:F2}",
+                $"F_eval = {currentEval:F2}",
+                $"F_high = {_forceHigh:F1}",
+                $"{(_fractionToEval * 100):F0}% of force to evaluation"
+            }),
+            new(_fractionToEval, currentCreate, "#ea580c", null, new List<string>
+            {
+                "Remaining Creation Force",
+                $"Fraction = {_fractionToEval:F2}",
+                $"F_create = {currentCreate:F2}",
+                $"F_high = {_forceHigh:F1}",
+                $"{((1.0 - _fractionToEval) * 100):F0}% of force to creation"
+            })
         };
     }
 
+    // ── Chart 3: Constrained Allocation ──
     private void RecalcResource()
     {
-        var timePoints = new List<DataPoint>();
-        var forcePoints = new List<DataPoint>();
+        // Clamp τ_create so it cannot exceed τ_available - τ_extract
+        var maxCreate = Math.Max(0, _tauAvailable - _resTauExtract);
+        if (_resTauCreate > maxCreate) _resTauCreate = maxCreate;
 
-        for (double tauCreate = 0.0; tauCreate <= 10.0; tauCreate += 0.1)
+        var creationPoints = new List<DataPoint>();
+        var evalPoints = new List<DataPoint>();
+        var extractPoints = new List<DataPoint>();
+
+        var extractOutput = _etaEff * _resForceHigh * _resTauExtract;
+        var step = _tauAvailable / 100.0;
+
+        for (double tc = 0.0; tc <= _tauAvailable; tc += step)
         {
-            timePoints.Add(new DataPoint(tauCreate, ForceToModelTransfer.TotalTimeAllocation(tauCreate, _resTauEval, _resTauExtract)));
-            forcePoints.Add(new DataPoint(tauCreate, CreationEvaluation.ReallocatedForce(_resForceHigh, _resFractionToEval)));
+            var tEval = Math.Max(0, _tauAvailable - tc - _resTauExtract);
+            var creationOutput = _resForceHigh * tc;
+            var evalThroughput = tEval > 0 ? CreationEvaluation.EvaluationThroughput(tEval, _resCostEval) : 0;
+
+            creationPoints.Add(new DataPoint(tc, creationOutput));
+            evalPoints.Add(new DataPoint(tc, evalThroughput));
+            extractPoints.Add(new DataPoint(tc, extractOutput));
         }
 
         _resourceSeries = new List<ChartSeries>
         {
-            new("Total Time — Eq (28)", timePoints, "#2563eb", 2.0),
-            new("Reallocated Force — Eq (7a)", forcePoints, "#dc2626", 2.0)
+            new("Creation Output (F_high × τ_create)", creationPoints, "#2563eb", 2.5),
+            new("Eval Throughput (τ_eval / C_eval)", evalPoints, "#ea580c", 2.5),
+            new("Extraction Output (η × F_high × τ_extract)", extractPoints, "#16a34a", 2.0)
         };
+
+        // Markers at current τ_create position
+        var curCreate = _resForceHigh * _resTauCreate;
+        var curEvalTime = _derivedTauEval;
+        var curEvalThroughput = curEvalTime > 0 ? CreationEvaluation.EvaluationThroughput(curEvalTime, _resCostEval) : 0;
+
+        _resourceMarkers = new List<ChartMarker>
+        {
+            new(_resTauCreate, curCreate, "#2563eb", null, new List<string>
+            {
+                "Creation Output",
+                $"τ_create = {_resTauCreate:F1} hrs",
+                $"F_high = {_resForceHigh:F1}",
+                $"Output = {curCreate:F1}",
+                "Rises as you allocate more to building"
+            }),
+            new(_resTauCreate, curEvalThroughput, "#ea580c", null, new List<string>
+            {
+                "Evaluation Throughput (Eq 7)",
+                $"τ_eval = {curEvalTime:F1} hrs (derived)",
+                $"C_eval = {_resCostEval:F0}",
+                $"Throughput = {curEvalThroughput:F1}",
+                "Falls as creation steals evaluation hours"
+            }),
+            new(_resTauCreate, extractOutput, "#16a34a", null, new List<string>
+            {
+                "Extraction Output (Eq 26)",
+                $"η = {_etaEff:F2}, F_high = {_resForceHigh:F1}",
+                $"τ_extract = {_resTauExtract:F1} hrs",
+                $"Output = {extractOutput:F1}",
+                "Fixed cost of teaching the model"
+            })
+        };
+
+        // Radar: three-way time split within the fixed budget
+        _timeRadarAxes = new List<RadarAxis>
+        {
+            new("τ_create", _resTauCreate, _tauAvailable, new List<string>
+            {
+                "Creation Time",
+                $"τ_create = {_resTauCreate:F1} / {_tauAvailable:F1}",
+                $"{(_resTauCreate / _tauAvailable * 100):F0}% of budget",
+                "Time spent building (highest multiplier)"
+            }),
+            new("τ_eval", curEvalTime, _tauAvailable, new List<string>
+            {
+                "Evaluation Time (derived)",
+                $"τ_eval = {curEvalTime:F1} / {_tauAvailable:F1}",
+                $"{(curEvalTime / _tauAvailable * 100):F0}% of budget",
+                "Time remaining for review (the squeeze)"
+            }),
+            new("τ_extract", _resTauExtract, _tauAvailable, new List<string>
+            {
+                "Extraction Time",
+                $"τ_extract = {_resTauExtract:F1} / {_tauAvailable:F1}",
+                $"{(_resTauExtract / _tauAvailable * 100):F0}% of budget",
+                "Time spent teaching the model (RLHF, knowledge)"
+            })
+        };
+
+        _timeRadarLabel = $"τ={_tauAvailable:F0}h";
     }
 
+    // ── Slider callbacks ──
+    private void OnBudgetChanged(double val) { _budget = val; RecalcThroughput(); }
     private void OnCostEvalChanged(double val) { _costEval = val; RecalcThroughput(); }
     private void OnForceHighChanged(double val) { _forceHigh = val; RecalcReallocation(); }
-    private void OnResTauEvalChanged(double val) { _resTauEval = val; RecalcResource(); }
+    private void OnFractionChanged(double val) { _fractionToEval = val; RecalcReallocation(); }
+    private void OnTauAvailableChanged(double val) { _tauAvailable = val; RecalcResource(); }
+    private void OnResTauCreateChanged(double val) { _resTauCreate = val; RecalcResource(); }
     private void OnResTauExtractChanged(double val) { _resTauExtract = val; RecalcResource(); }
     private void OnResForceHighChanged(double val) { _resForceHigh = val; RecalcResource(); }
-    private void OnResFractionChanged(double val) { _resFractionToEval = val; RecalcResource(); }
+    private void OnResCostEvalChanged(double val) { _resCostEval = val; RecalcResource(); }
+    private void OnEtaEffChanged(double val) { _etaEff = val; RecalcResource(); }
 }

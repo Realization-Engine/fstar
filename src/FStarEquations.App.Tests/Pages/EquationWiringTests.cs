@@ -148,28 +148,30 @@ public class EquationWiringTests : BunitContext
     }
 
     [Fact]
-    public void CreationEvaluationPage_Renders_ContainsBarChart()
+    public void CreationEvaluationPage_Renders_ContainsHeatMap()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<CreationEvaluationPage>();
 
-        var barSvg = cut.Find("svg.bar-chart");
-        Assert.NotNull(barSvg);
+        var heatSvg = cut.Find("svg.heat-map");
+        Assert.NotNull(heatSvg);
 
-        var rects = cut.FindAll("svg.bar-chart rect");
-        Assert.True(rects.Count > 0, "CreationEvaluationPage BarChart should render rect elements");
+        var rects = cut.FindAll("svg.heat-map rect");
+        Assert.True(rects.Count > 0, "CreationEvaluationPage HeatMap should render rect elements");
     }
 
     [Fact]
     public void CreationEvaluationPage_Renders_ContainsResourceComposite()
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = Render<CreationEvaluationPage>();
 
-        // The resource allocation composite adds a LineChart with 2 series
+        // The constrained allocation chart has LineChart with 3 series + RadarChart
         var chartCards = cut.FindAll(".chart-card");
-        Assert.True(chartCards.Count >= 3, "CreationEvaluationPage should have at least 3 chart cards including the resource composite");
+        Assert.True(chartCards.Count >= 3, "CreationEvaluationPage should have at least 3 chart cards including the constrained allocation");
 
         var markup = cut.Markup;
-        Assert.Contains("Resource Allocation", markup);
+        Assert.Contains("Three-Way Squeeze", markup);
     }
 
     [Fact]
