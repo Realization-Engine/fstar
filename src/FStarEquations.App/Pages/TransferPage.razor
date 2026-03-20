@@ -312,9 +312,9 @@
 @* Chart 7: Tipping Point Shift — Eq (30) + (14)                         *@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
-<div id="transfer-chart-7">
+<div id="transfer-chart-7" style="min-height: 60vh;">
 <ChartCard Title="Tipping Point Shift — Eq (30) + (14)"
-           Description="F* before and after model transfer. Threshold at F*_pre; indicator shows whether F*_post > F*_pre (Eq 30).">
+           Description="F* before and after model transfer. M_absorbed derived from Eq (27) absorption ceiling; transfer amount from Eq (26) transfer rate.">
     <ChildContent>
         <NumberLine Width="600" Height="100"
                     Min="0" Max="@_tpNumberLineMax"
@@ -325,12 +325,15 @@
             F*_pre = <strong>@_fStarPre.ToString("F2")</strong>
             &ensp;|&ensp;F*_post = <strong>@_fStarPost.ToString("F2")</strong>
             &ensp;|&ensp;Shift = @((_fStarPost - _fStarPre).ToString("F2"))
-            &ensp;|&ensp;Transfer = @_transferAmount.ToString("F1")
+        </p>
+        <p class="chart-readout">
+            M_abs = <strong>@ComputeCurrentCeiling().ToString("F2")</strong> (from Eq 27)
+            &ensp;|&ensp;Transfer rate = <strong>@ComputeCurrentTransferRate().ToString("F2")</strong> (from Eq 26)
         </p>
         <p class="chart-readout" style="font-size: 0.85em; opacity: 0.7;">
             Blue dot: F*_pre (before transfer). Red dot: F*_post (after transfer).
-            The vertical line marks the pre-transfer threshold.
-            When the red dot is right of the blue, the tipping point has risen.
+            M_absorbed is the absorption ceiling (Eq 27); the transfer increment is the current transfer rate (Eq 26).
+            Change &eta;, F, &tau;, or M&#8320; sliders to see how transfer dynamics shift the tipping point.
         </p>
     </ChildContent>
     <TheoryContent>
@@ -339,12 +342,13 @@
         <h4>In Plain Language</h4>
         <p>Here is perhaps the deepest consequence of the F-to-M coupling. A successful knowledge transfer to the model raises the threshold below which force atrophy becomes self-reinforcing. More engineers fall below F* not because they got weaker, but because the threshold moved upward. They were above F* when the model was a simple amplifier. They fall below it when the model becomes a competent-seeming colleague. The better the transfer works, the more it undermines conditions for maintaining human force. A partially successful transfer might be safer than a very successful one.</p>
         <h4>Reading the Charts</h4>
-        <p>The number line places F*_pre and F*_post on the same scale. The threshold marker (vertical line) is at F*_pre. When the transfer amount increases, M_absorbed grows, pushing F*_post rightward. The indicator confirms whether the threshold has risen. Try increasing the transfer amount to see how successful transfer paradoxically raises the bar for everyone.</p>
+        <p>The number line places F*_pre and F*_post on the same scale. M_absorbed (used in F*) is wired to the absorption ceiling from Eq 27, so changing &eta; or F sliders shifts the pre-transfer tipping point. The transfer increment comes from the transfer rate (Eq 26), so the post-transfer threshold responds to the same parameters. This makes the connection concrete: the same sliders that control how much knowledge transfers also control how much the tipping point shifts.</p>
         <h4>Connections</h4>
         <ul>
             <li>Tipping point: <strong>Eq (14)</strong></li>
+            <li>Absorption ceiling drives M_abs: <strong>Eq (27)</strong></li>
+            <li>Transfer rate drives shift: <strong>Eq (26)</strong></li>
             <li>Force dynamics: <strong>Eq (11)</strong></li>
-            <li>Transfer rate: <strong>Eq (26)</strong></li>
         </ul>
     </TheoryContent>
 </ChartCard>
@@ -486,10 +490,6 @@
         <ParameterSlider Label="σ (absorption)" Min="0" Max="2" Step="0.05"
                          Value="@_tpSigma" ValueChanged="v => { _tpSigma = v; Recalculate(); }" />
     </div>
-    <div class="slider-slot @SlotClass("tp_mabs")">
-        <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1"
-                         Value="@_tpMAbsorbed" ValueChanged="v => { _tpMAbsorbed = v; Recalculate(); }" />
-    </div>
     <div class="slider-slot @SlotClass("tp_gamma")">
         <ParameterSlider Label="γ (engagement rate)" Min="0" Max="1" Step="0.01"
                          Value="@_tpGamma" ValueChanged="v => { _tpGamma = v; Recalculate(); }" />
@@ -497,10 +497,6 @@
     <div class="slider-slot @SlotClass("tp_e")">
         <ParameterSlider Label="E (engagement)" Min="0" Max="5" Step="0.1"
                          Value="@_tpEngagement" ValueChanged="v => { _tpEngagement = v; Recalculate(); }" />
-    </div>
-    <div class="slider-slot @SlotClass("transfer")">
-        <ParameterSlider Label="Transfer amount" Min="0" Max="3" Step="0.1"
-                         Value="@_transferAmount" ValueChanged="v => { _transferAmount = v; Recalculate(); }" />
     </div>
 </FloatingSliderPanel>
 
@@ -534,7 +530,7 @@
         new() { "eta_s", "eta_m", "eta_d", "f_s", "f_m", "f_d", "m0_abs" },                       // Chart 4: Absorption Ceiling
         new() { "tau_create", "tau_eval", "tau", "f_high" },                                        // Chart 5: Time Allocation
         new() { "q0", "f_avg", "m0_growth", "mu" },                                                // Chart 6: Data Quality Spiral
-        new() { "tp_beta", "tp_r", "tp_sigma", "tp_mabs", "tp_gamma", "tp_e", "transfer" },       // Chart 7: Tipping Point Shift
+        new() { "eta_s", "eta_m", "eta_d", "f_s", "f_m", "f_d", "tau", "m0_abs", "tp_beta", "tp_r", "tp_sigma", "tp_gamma", "tp_e" }, // Chart 7: Tipping Point Shift (wired to Eq 26/27)
     };
 
     private static readonly string[][] GroupKeys =
@@ -544,7 +540,7 @@
         new[] { "m0_abs" },
         new[] { "tau_create", "tau_eval", "f_high" },
         new[] { "q0", "f_avg", "m0_growth", "mu" },
-        new[] { "tp_beta", "tp_r", "tp_sigma", "tp_mabs", "tp_gamma", "tp_e", "transfer" },
+        new[] { "tp_beta", "tp_r", "tp_sigma", "tp_gamma", "tp_e" },
     };
 
     private bool IsSliderVisible(string key) =>
@@ -608,13 +604,12 @@
     private double _muGrowth = 0.1;
 
     // Eq (30) Tipping Point Shift
+    // M_absorbed and transfer amount are derived from Eq 27 and Eq 26 respectively
     private double _tpBeta = 0.3;
     private double _tpReplacement = 2.0;
     private double _tpSigma = 0.5;
-    private double _tpMAbsorbed = 1.0;
     private double _tpGamma = 0.2;
     private double _tpEngagement = 1.0;
-    private double _transferAmount = 1.0;
 
     // ═══════════════════════════════════════════════════════════════════════
     // Chart data fields
@@ -1118,10 +1113,15 @@
 
     private void ComputeTippingPoint()
     {
-        _fStarPre = ForceDynamics.TippingPoint(_tpBeta, _tpReplacement, _tpSigma, _tpMAbsorbed, _tpGamma, _tpEngagement);
-        _fStarPost = ForceDynamics.TippingPoint(_tpBeta, _tpReplacement, _tpSigma, _tpMAbsorbed + _transferAmount, _tpGamma, _tpEngagement);
+        // M_absorbed comes from the absorption ceiling (Eq 27)
+        var mAbsorbed = ComputeCurrentCeiling();
+        // Transfer increment comes from the transfer rate (Eq 26)
+        var transferIncrement = ComputeCurrentTransferRate();
+
+        _fStarPre = ForceDynamics.TippingPoint(_tpBeta, _tpReplacement, _tpSigma, mAbsorbed, _tpGamma, _tpEngagement);
+        _fStarPost = ForceDynamics.TippingPoint(_tpBeta, _tpReplacement, _tpSigma, mAbsorbed + transferIncrement, _tpGamma, _tpEngagement);
         _hasTippingPointRisen = ForceToModelTransfer.HasTippingPointRisen(_fStarPost, _fStarPre);
-        _tpNumberLineMax = Math.Max(Math.Max(_fStarPre, _fStarPost) * 1.5, 10);
+        _tpNumberLineMax = Math.Round(Math.Max(Math.Max(_fStarPre, _fStarPost) * 1.5, 10), 1);
 
         _tippingShiftLabel = _hasTippingPointRisen
             ? $"F*_post ({_fStarPost:F2}) > F*_pre ({_fStarPre:F2}) \u2014 tipping point risen"
