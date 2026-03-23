@@ -8,12 +8,6 @@
     The tipping point is the fulcrum of the entire framework. Below F*, force decays faster than it recovers; above it, a virtuous cycle of engagement and growth takes hold. Every parameter in the model either raises or lowers this threshold.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.LowThreshold)">Low Threshold</button>
-    <button @onclick="() => ApplyPreset(Preset.RisingThreshold)">Rising Threshold</button>
-    <button @onclick="() => ApplyPreset(Preset.HysteresisDemo)">Hysteresis Demo</button>
-</div>
-
 @* 1. Moving Threshold — NumberLine *@
 <ChartCard Title="Moving Threshold — F* on the Number Line">
     <ChildContent>
@@ -124,16 +118,23 @@
 </nav>
 
 <FloatingSliderPanel Visible="true" Title="Tipping Point Parameters" DefaultY="100">
-    <div class="slider-group-header">Eq (14): Tipping Point F*</div>
-    <ParameterSlider Label="β (decay)" Min="0.01" Max="1" Step="0.01" Value="@_beta" ValueChanged="OnBetaChanged" />
-    <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1" Value="@_replacement" ValueChanged="OnReplacementChanged" />
-    <ParameterSlider Label="σ (absorption rate)" Min="0" Max="2" Step="0.1" Value="@_sigma" ValueChanged="OnSigmaChanged" />
-    <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1" Value="@_mAbsorbed" ValueChanged="OnMAbsorbedChanged" />
-    <ParameterSlider Label="γ (engagement rate)" Min="0.01" Max="1" Step="0.01" Value="@_gamma" ValueChanged="OnGammaChanged" />
-    <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1" Value="@_engagement" ValueChanged="OnEngagementChanged" />
-    <div class="slider-group-header">Eq (11): Force Dynamics</div>
-    <ParameterSlider Label="α (struggle coeff)" Min="0" Max="1" Step="0.01" Value="@Alpha" ValueChanged="OnAlphaChanged" />
-    <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1" Value="@Struggle" ValueChanged="OnStruggleChanged" />
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.LowThreshold)">Low Threshold</button>
+        <button @onclick="() => ApplyPreset(Preset.RisingThreshold)">Rising Threshold</button>
+        <button @onclick="() => ApplyPreset(Preset.HysteresisDemo)">Hysteresis Demo</button>
+    </PresetContent>
+    <ChildContent>
+        <div class="slider-group-header">Eq (14): Tipping Point F*</div>
+        <ParameterSlider Label="β (decay)" Min="0.01" Max="1" Step="0.01" Value="@_beta" ValueChanged="OnBetaChanged" />
+        <ParameterSlider Label="R (replacement)" Min="0" Max="5" Step="0.1" Value="@_replacement" ValueChanged="OnReplacementChanged" />
+        <ParameterSlider Label="σ (absorption rate)" Min="0" Max="2" Step="0.1" Value="@_sigma" ValueChanged="OnSigmaChanged" />
+        <ParameterSlider Label="M_abs (absorbed)" Min="0" Max="5" Step="0.1" Value="@_mAbsorbed" ValueChanged="OnMAbsorbedChanged" />
+        <ParameterSlider Label="γ (engagement rate)" Min="0.01" Max="1" Step="0.01" Value="@_gamma" ValueChanged="OnGammaChanged" />
+        <ParameterSlider Label="E (engagement)" Min="0.1" Max="5" Step="0.1" Value="@_engagement" ValueChanged="OnEngagementChanged" />
+        <div class="slider-group-header">Eq (11): Force Dynamics</div>
+        <ParameterSlider Label="α (struggle coeff)" Min="0" Max="1" Step="0.01" Value="@Alpha" ValueChanged="OnAlphaChanged" />
+        <ParameterSlider Label="S (struggle)" Min="0" Max="5" Step="0.1" Value="@Struggle" ValueChanged="OnStruggleChanged" />
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

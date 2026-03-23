@@ -294,10 +294,6 @@ blockquote {
 }
 
 /* ===== Inline-style Replacements ===== */
-.preset-buttons {
-    margin-bottom: 1rem;
-}
-
 .cascade-svg {
     max-width: 1000px;
     margin: 1.5rem auto;

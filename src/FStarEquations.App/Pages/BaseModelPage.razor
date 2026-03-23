@@ -10,11 +10,6 @@
     Output is not the sum of its parts; it is a product. The Cobb-Douglas structure means that zeroing any single force dimension collapses the entire output, no matter how strong the others. The multiplier M acts as a scaling lens on this product.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.BalancedSenior)">Balanced Senior</button>
-    <button @onclick="() => ApplyPreset(Preset.MissingCriticalSkill)">Missing Critical Skill</button>
-    <button @onclick="() => ApplyPreset(Preset.JuniorEngineer)">Junior Engineer</button>
-</div>
 
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Eq (1): Cobb-Douglas Output — HeatMap                                  *@
@@ -202,6 +197,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Base Model Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.BalancedSenior)">Balanced Senior</button>
+        <button @onclick="() => ApplyPreset(Preset.MissingCriticalSkill)">Missing Critical Skill</button>
+        <button @onclick="() => ApplyPreset(Preset.JuniorEngineer)">Junior Engineer</button>
+    </PresetContent>
+    <ChildContent>
 
     <div class="slider-context-label">
         @if (_showAllSliders)
@@ -374,6 +375,7 @@
         <ParameterSlider Label="F_bar: Debugging" Min="0.5" Max="10" Step="0.1" Value="@_fBarDebugging" ValueChanged="v => { _fBarDebugging = v; Recalculate(); }" />
     </div>
 
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

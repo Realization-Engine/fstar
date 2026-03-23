@@ -10,12 +10,6 @@
     The multiplier grows exponentially. This single fact drives every dynamic in the framework: rising variance, accelerating divergence, collapsing SNR, and the relentless upward pressure on the tipping point. Understanding M(t) is understanding the clock speed of disruption.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.UnboundedGrowth)">Unbounded Growth</button>
-    <button @onclick="() => ApplyPreset(Preset.DeceleratingGrowth)">Decelerating Growth</button>
-    <button @onclick="() => ApplyPreset(Preset.Stalled)">Stalled</button>
-</div>
-
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Exponential M(t) Growth — Eq (25)                             *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -158,6 +152,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Model Growth Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.UnboundedGrowth)">Unbounded Growth</button>
+        <button @onclick="() => ApplyPreset(Preset.DeceleratingGrowth)">Decelerating Growth</button>
+        <button @onclick="() => ApplyPreset(Preset.Stalled)">Stalled</button>
+    </PresetContent>
+    <ChildContent>
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
         <span style="font-size: 0.8em; opacity: 0.7;">Sliders for: @ChartNames[Math.Clamp(_activeChartIndex, 0, ChartNames.Length - 1)]</span>
         <button class="slider-toggle-btn" @onclick="ToggleShowAll">@(_showAllSliders ? "Auto-filter" : "Show all")</button>
@@ -217,6 +217,7 @@
         <ParameterSlider Label="Δt" Min="0.1" Max="5" Step="0.1" Value="@_cascadeDeltaTime" ValueChanged="v => { _cascadeDeltaTime = v; RecalcAll(); }" />
     </div>
 
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

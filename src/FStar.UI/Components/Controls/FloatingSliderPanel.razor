@@ -11,6 +11,12 @@
             </div>
         </div>
         <div class="floating-slider-body">
+            @if (PresetContent is not null)
+            {
+                <div class="floating-preset-section">
+                    @PresetContent
+                </div>
+            }
             @ChildContent
         </div>
     </div>
@@ -35,6 +41,7 @@ else if (Visible && _minimized)
     [Parameter] public string Title { get; set; } = "Parameters";
     [Parameter] public int DefaultX { get; set; } = -1;
     [Parameter] public int DefaultY { get; set; } = 80;
+    [Parameter] public RenderFragment? PresetContent { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     protected override void OnInitialized() => _minimized = StartMinimized;

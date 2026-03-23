@@ -10,12 +10,6 @@
     Force is not static. It decays through replacement, atrophies without struggle, and stratifies into surface, middle, and deep layers. The surface layer is the first to erode and the easiest to replace; the deep layer is the most durable and the hardest to rebuild.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.DeliberatePractitioner)">Deliberate Practitioner</button>
-    <button @onclick="() => ApplyPreset(Preset.PassiveUser)">Passive User</button>
-    <button @onclick="() => ApplyPreset(Preset.OrgDeInvestment)">Org De-Investment</button>
-</div>
-
 @* ─── Chart 0: Surface Layer — Eq (11a) ─── *@
 <div id="force-dynamics-chart-0">
 <ChartCard Title="Surface Layer dF/dt — Eq (11a)"
@@ -230,6 +224,12 @@
 </div>
 
 <FloatingSliderPanel Visible="true" Title="Force Dynamics Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.DeliberatePractitioner)">Deliberate Practitioner</button>
+        <button @onclick="() => ApplyPreset(Preset.PassiveUser)">Passive User</button>
+        <button @onclick="() => ApplyPreset(Preset.OrgDeInvestment)">Org De-Investment</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -354,6 +354,7 @@
                          Value="@_odeDt"
                          ValueChanged="@OnOdeDtChanged" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

@@ -12,12 +12,6 @@
     Once broken, the pipeline cannot be restarted by hiring alone.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.PipelineIntact)">Pipeline Intact</button>
-    <button @onclick="() => ApplyPreset(Preset.PipelineStressed)">Pipeline Stressed</button>
-    <button @onclick="() => ApplyPreset(Preset.PipelineBroken)">Pipeline Broken</button>
-</div>
-
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Shared Work Decay — Eq (12b)                                  *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -205,6 +199,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Tacit Knowledge Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.PipelineIntact)">Pipeline Intact</button>
+        <button @onclick="() => ApplyPreset(Preset.PipelineStressed)">Pipeline Stressed</button>
+        <button @onclick="() => ApplyPreset(Preset.PipelineBroken)">Pipeline Broken</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -257,6 +257,7 @@
         <ParameterSlider Label="K₀ (initial knowledge)" Min="0.5" Max="20" Step="0.5"
                          Value="@_pipeK0" ValueChanged="@(v => { _pipeK0 = v; Recalculate(); })" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

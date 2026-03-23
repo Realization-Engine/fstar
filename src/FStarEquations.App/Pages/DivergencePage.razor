@@ -12,12 +12,6 @@
     than the last. This is the mechanism behind the Great Divergence.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.EarlyDivergence)">Early Divergence</button>
-    <button @onclick="() => ApplyPreset(Preset.MatureAdoption)">Mature Adoption</button>
-    <button @onclick="() => ApplyPreset(Preset.GenerationalTransition)">Generational Transition</button>
-</div>
-
 @* ─── Chart 0: Cohort Force Ceiling HeatMap — Eq (32) ─── *@
 <div id="divergence-chart-0">
 <ChartCard Title="Cohort Force Ceiling — Eq (32)"
@@ -249,6 +243,12 @@
 
 @* ─── Slider Panel ─── *@
 <FloatingSliderPanel Visible="true" Title="Divergence Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.EarlyDivergence)">Early Divergence</button>
+        <button @onclick="() => ApplyPreset(Preset.MatureAdoption)">Mature Adoption</button>
+        <button @onclick="() => ApplyPreset(Preset.GenerationalTransition)">Generational Transition</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -342,6 +342,7 @@
         <ParameterSlider Label="ρ (gen exponent)" Min="0.1" Max="2" Step="0.1"
                          Value="@_genRho" ValueChanged="@OnGenRhoChanged" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

@@ -10,12 +10,6 @@
     Organizations face a paradox: the multiplier raises the return on every unit of force, but it simultaneously degrades the ability to measure force accurately. As M grows, signal-to-noise collapses, Goodhart effects amplify, and decision bottlenecks compound.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.PreLLMOrg)">Pre-LLM Organization</button>
-    <button @onclick="() => ApplyPreset(Preset.PostLLMOrg)">Post-LLM Organization</button>
-    <button @onclick="() => ApplyPreset(Preset.ForceAdvantage)">Force Advantage</button>
-</div>
-
 @* ─── Chart 1: ROI HeatMap — Eq (17) ─── *@
 <div id="org-chart-0">
 <ChartCard Title="Marginal Return Surface — Eq (17)"
@@ -282,6 +276,12 @@
 
 @* ─── Slider Panel ─── *@
 <FloatingSliderPanel Visible="true" Title="Organizational Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.PreLLMOrg)">Pre-LLM Organization</button>
+        <button @onclick="() => ApplyPreset(Preset.PostLLMOrg)">Post-LLM Organization</button>
+        <button @onclick="() => ApplyPreset(Preset.ForceAdvantage)">Force Advantage</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -383,6 +383,7 @@
     <div class="slider-slot @GroupSlotClass(5)">
         <ParameterSlider Label="F_comp" Min="1" Max="10" Step="0.5" Value="@_advantageForceComp" ValueChanged="v => { _advantageForceComp = v; Recalculate(); }" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

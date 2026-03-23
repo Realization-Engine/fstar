@@ -81,6 +81,38 @@
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
 }
 
+/* Preset buttons section at top of panel */
+.floating-preset-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.375rem;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+::deep .floating-preset-section button {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border: 1px solid var(--accent, #2563eb);
+    border-radius: 0.25rem;
+    background: var(--bg-card, #fff);
+    color: var(--accent, #2563eb);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+::deep .floating-preset-section button:hover {
+    background: var(--accent, #2563eb);
+    color: white;
+}
+
 /* Equation group sub-headers */
 ::deep .slider-group-header {
     font-size: 0.75rem;

@@ -12,12 +12,6 @@
     recovery requires external intervention at a scale proportional to the loss already sustained.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.Resilient)">Resilient</button>
-    <button @onclick="() => ApplyPreset(Preset.SeniorBurnout)">Senior Burnout</button>
-    <button @onclick="() => ApplyPreset(Preset.GradualErosion)">Gradual Erosion</button>
-</div>
-
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Motivation Decay Surface — HeatMap                            *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -203,6 +197,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Motivation Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.Resilient)">Resilient</button>
+        <button @onclick="() => ApplyPreset(Preset.SeniorBurnout)">Senior Burnout</button>
+        <button @onclick="() => ApplyPreset(Preset.GradualErosion)">Gradual Erosion</button>
+    </PresetContent>
+    <ChildContent>
 
     <div class="slider-context-label">
         @if (_showAllSliders)
@@ -315,6 +315,7 @@
                          Value="@_w7" ValueChanged="v => { _w7 = v; NormalizeWeights(6); }" />
     </div>
 
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

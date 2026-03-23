@@ -12,11 +12,6 @@
     This is the mechanism behind the barbell distribution of market value.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.PreLLM)">Pre-LLM Baseline</button>
-    <button @onclick="() => ApplyPreset(Preset.CurrentState)">Current State</button>
-    <button @onclick="() => ApplyPreset(Preset.HighMDivergence)">High-M Divergence</button>
-</div>
 
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 1: Variance Amplification — HeatMap (Eq 4) + Radar               *@
@@ -317,6 +312,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Variance Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.PreLLM)">Pre-LLM Baseline</button>
+        <button @onclick="() => ApplyPreset(Preset.CurrentState)">Current State</button>
+        <button @onclick="() => ApplyPreset(Preset.HighMDivergence)">High-M Divergence</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -401,6 +402,7 @@
                          Value="@_floorLow"
                          ValueChanged="@OnFloorLowChanged" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

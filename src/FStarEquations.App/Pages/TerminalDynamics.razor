@@ -9,12 +9,6 @@
     Select a preset or adjust parameters to explore how force and the multiplier co-evolve.
 </p>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.Virtuous)">Virtuous Cycle</button>
-    <button @onclick="() => ApplyPreset(Preset.Decline)">Managed Decline</button>
-    <button @onclick="() => ApplyPreset(Preset.Collapse)">Collapse</button>
-</div>
-
 @* ─── Phase Portrait ─── *@
 <ChartCard Title="Phase Portrait: F(t) vs M(t)"
            Description="Trajectory in phase space — each point is (F(t), M(t)) at a given time step.">
@@ -85,6 +79,12 @@
 </ChartCard>
 
 <FloatingSliderPanel Visible="true" Title="Terminal Dynamics Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.Virtuous)">Virtuous Cycle</button>
+        <button @onclick="() => ApplyPreset(Preset.Decline)">Managed Decline</button>
+        <button @onclick="() => ApplyPreset(Preset.Collapse)">Collapse</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-group-header">Eq (11): Force Dynamics</div>
     <ParameterSlider Label="alpha (struggle coeff)" Min="0.01" Max="1" Step="0.01"
                      Value="@_alpha" ValueChanged="@OnAlphaChanged" />
@@ -108,6 +108,7 @@
                      Value="@_dt" ValueChanged="@OnDtChanged" />
     <ParameterSlider Label="tEnd (years)" Min="5" Max="50" Step="1"
                      Value="@_tEnd" ValueChanged="@OnTEndChanged" />
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

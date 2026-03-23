@@ -12,12 +12,6 @@
     The epistemic gap measures how well the organization can tell the difference.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.RateLimited)">Rate-Limited (Pre-LLM)</button>
-    <button @onclick="() => ApplyPreset(Preset.AmplifiedDamage)">Amplified Damage</button>
-    <button @onclick="() => ApplyPreset(Preset.MaxEpistemicDanger)">Max Epistemic Danger</button>
-</div>
-
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Eq (8): Directed Force Waterfall + Radar                               *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -198,7 +192,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Negative Force Parameters" DefaultY="100">
-
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.RateLimited)">Rate-Limited (Pre-LLM)</button>
+        <button @onclick="() => ApplyPreset(Preset.AmplifiedDamage)">Amplified Damage</button>
+        <button @onclick="() => ApplyPreset(Preset.MaxEpistemicDanger)">Max Epistemic Danger</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -267,7 +266,7 @@
     <div class="slider-slot @GroupSlotClass(2)">
         <ParameterSlider Label="Fi (Force Individual)" Min="0.1" Max="10" Step="0.1" Value="@_forceIndividual" ValueChanged="OnForceIndividualChanged" />
     </div>
-
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

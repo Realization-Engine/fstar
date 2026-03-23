@@ -11,11 +11,6 @@
     Every hour a high-force individual spends evaluating others is an hour not spent creating. The evaluation bottleneck arises because the same people who are best at doing the work are also the only ones who can reliably judge it.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.PreLLMBalance)">Pre-LLM Balance</button>
-    <button @onclick="() => ApplyPreset(Preset.PostLLMSqueeze)">Post-LLM Squeeze</button>
-    <button @onclick="() => ApplyPreset(Preset.ThreeWayBind)">Three-Way Bind</button>
-</div>
 
 <!-- Chart 1: Evaluation Bottleneck — HeatMap -->
 <div id="creation-eval-chart-0">
@@ -144,6 +139,12 @@
 </div>
 
 <FloatingSliderPanel Visible="true" Title="Creation vs Evaluation Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.PreLLMBalance)">Pre-LLM Balance</button>
+        <button @onclick="() => ApplyPreset(Preset.PostLLMSqueeze)">Post-LLM Squeeze</button>
+        <button @onclick="() => ApplyPreset(Preset.ThreeWayBind)">Three-Way Bind</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -219,6 +220,7 @@
                          Value="@_etaEff"
                          ValueChanged="@OnEtaEffChanged" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

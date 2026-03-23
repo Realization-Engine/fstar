@@ -12,12 +12,6 @@
     the threshold, no amount of imported multiplier can compensate.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.Sovereign)">Sovereign</button>
-    <button @onclick="() => ApplyPreset(Preset.Dependent)">Dependent</button>
-    <button @onclick="() => ApplyPreset(Preset.AccessCut)">Access Cut</button>
-</div>
-
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 1: National Capability HeatMap — Eq (24)                          *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -169,6 +163,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Sovereignty Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.Sovereign)">Sovereign</button>
+        <button @onclick="() => ApplyPreset(Preset.Dependent)">Dependent</button>
+        <button @onclick="() => ApplyPreset(Preset.AccessCut)">Access Cut</button>
+    </PresetContent>
+    <ChildContent>
     <div class="slider-context-label">
         @if (_showAllSliders)
         {
@@ -225,6 +225,7 @@
     <div class="slider-slot @GroupSlotClass(2)">
         <ParameterSlider Label="Min Viable Capability" Min="0" Max="50" Step="0.5" Value="@_resMinViable" ValueChanged="v => { _resMinViable = v; Recalculate(); }" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {

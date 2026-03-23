@@ -10,12 +10,6 @@
     The transfer from human force to model capability is not lossless. Surface knowledge transfers almost perfectly; deep expertise barely transfers at all. The absorption ceiling, the data quality spiral, and the rising tipping point are all consequences of this asymmetric extraction.
 </blockquote>
 
-<div class="preset-buttons">
-    <button @onclick="() => ApplyPreset(Preset.EarlyTransfer)">Early Transfer</button>
-    <button @onclick="() => ApplyPreset(Preset.SuccessfulTransfer)">Successful Transfer</button>
-    <button @onclick="() => ApplyPreset(Preset.QualitySpiral)">Quality Spiral</button>
-</div>
-
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Transfer Rate HeatMap + Radar — Eq (26)                       *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -365,6 +359,12 @@
 @* ──────────────────────────────────────────────────────────────────────── *@
 
 <FloatingSliderPanel Visible="true" Title="Transfer Parameters" DefaultY="100">
+    <PresetContent>
+        <button @onclick="() => ApplyPreset(Preset.EarlyTransfer)">Early Transfer</button>
+        <button @onclick="() => ApplyPreset(Preset.SuccessfulTransfer)">Successful Transfer</button>
+        <button @onclick="() => ApplyPreset(Preset.QualitySpiral)">Quality Spiral</button>
+    </PresetContent>
+    <ChildContent>
 
     <div class="slider-context-label">
         @if (_showAllSliders)
@@ -504,6 +504,7 @@
         <ParameterSlider Label="E (engagement)" Min="0" Max="5" Step="0.1"
                          Value="@_tpEngagement" ValueChanged="v => { _tpEngagement = v; Recalculate(); }" />
     </div>
+    </ChildContent>
 </FloatingSliderPanel>
 
 @code {
