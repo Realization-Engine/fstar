@@ -10,6 +10,12 @@
     The transfer from human force to model capability is not lossless. Surface knowledge transfers almost perfectly; deep expertise barely transfers at all. The absorption ceiling, the data quality spiral, and the rising tipping point are all consequences of this asymmetric extraction.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.EarlyTransfer)">Early Transfer</button>
+    <button @onclick="() => ApplyPreset(Preset.SuccessfulTransfer)">Successful Transfer</button>
+    <button @onclick="() => ApplyPreset(Preset.QualitySpiral)">Quality Spiral</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Transfer Rate HeatMap + Radar — Eq (26)                       *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -501,6 +507,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { EarlyTransfer, SuccessfulTransfer, QualitySpiral }
+
     // ═══════════════════════════════════════════════════════════════════════
     // Scroll-aware slider state
     // ═══════════════════════════════════════════════════════════════════════
@@ -668,7 +676,7 @@
     // Lifecycle
     // ═══════════════════════════════════════════════════════════════════════
 
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.EarlyTransfer);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -721,6 +729,45 @@
 
     private double ComputeTotalTime() =>
         ForceToModelTransfer.TotalTimeAllocation(_tauCreate, _tauEval, _tauExtract);
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Presets
+    // ═══════════════════════════════════════════════════════════════════════
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.EarlyTransfer:
+                _etaSurface = 0.95; _etaMiddle = 0.45; _etaDeep = 0.05;
+                _forceSurface = 3.0; _forceMiddle = 5.0; _forceDeep = 7.0;
+                _tauExtract = 0.5;
+                _kTacit = 10.0; _kModel = 3.0; _m0Absorption = 1.5;
+                _tauCreate = 5.0; _tauEval = 2.0; _forceHigh = 8.0;
+                _qualityCurrent = 5.0; _avgForceAnnotators = 6.0; _m0Growth = 1.0; _muGrowth = 0.08;
+                _tpBeta = 0.2; _tpReplacement = 1.5; _tpSigma = 0.3; _tpGamma = 0.25; _tpEngagement = 1.5;
+                break;
+            case Preset.SuccessfulTransfer:
+                _etaSurface = 0.95; _etaMiddle = 0.45; _etaDeep = 0.05;
+                _forceSurface = 3.0; _forceMiddle = 5.0; _forceDeep = 7.0;
+                _tauExtract = 3.0;
+                _kTacit = 10.0; _kModel = 8.0; _m0Absorption = 3.0;
+                _tauCreate = 2.5; _tauEval = 2.5; _forceHigh = 7.0;
+                _qualityCurrent = 5.0; _avgForceAnnotators = 5.0; _m0Growth = 1.0; _muGrowth = 0.05;
+                _tpBeta = 0.3; _tpReplacement = 2.0; _tpSigma = 0.5; _tpGamma = 0.2; _tpEngagement = 1.0;
+                break;
+            case Preset.QualitySpiral:
+                _etaSurface = 0.95; _etaMiddle = 0.45; _etaDeep = 0.05;
+                _forceSurface = 2.0; _forceMiddle = 3.0; _forceDeep = 5.0;
+                _tauExtract = 2.0;
+                _kTacit = 10.0; _kModel = 6.0; _m0Absorption = 2.5;
+                _tauCreate = 3.0; _tauEval = 3.0; _forceHigh = 5.0;
+                _qualityCurrent = 3.0; _avgForceAnnotators = 3.0; _m0Growth = 1.0; _muGrowth = 0.02;
+                _tpBeta = 0.4; _tpReplacement = 2.5; _tpSigma = 0.6; _tpGamma = 0.15; _tpEngagement = 0.8;
+                break;
+        }
+        Recalculate();
+    }
 
     // ═══════════════════════════════════════════════════════════════════════
     // Master recalculation

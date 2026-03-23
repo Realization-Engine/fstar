@@ -8,6 +8,12 @@
     The tipping point is the fulcrum of the entire framework. Below F*, force decays faster than it recovers; above it, a virtuous cycle of engagement and growth takes hold. Every parameter in the model either raises or lowers this threshold.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.LowThreshold)">Low Threshold</button>
+    <button @onclick="() => ApplyPreset(Preset.RisingThreshold)">Rising Threshold</button>
+    <button @onclick="() => ApplyPreset(Preset.HysteresisDemo)">Hysteresis Demo</button>
+</div>
+
 @* 1. Moving Threshold — NumberLine *@
 <ChartCard Title="Moving Threshold — F* on the Number Line">
     <ChildContent>
@@ -131,6 +137,29 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { LowThreshold, RisingThreshold, HysteresisDemo }
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.LowThreshold:
+                _beta = 0.15; _replacement = 1.0; _sigma = 0.2; _mAbsorbed = 0.5;
+                _gamma = 0.3; _engagement = 2.0; _alpha = 0.5; _struggle = 3.0;
+                break;
+            case Preset.RisingThreshold:
+                _beta = 0.3; _replacement = 2.0; _sigma = 0.5; _mAbsorbed = 3.0;
+                _gamma = 0.2; _engagement = 1.0; _alpha = 0.3; _struggle = 2.0;
+                break;
+            case Preset.HysteresisDemo:
+                _beta = 0.4; _replacement = 2.5; _sigma = 0.5; _mAbsorbed = 2.0;
+                _gamma = 0.15; _engagement = 1.5; _alpha = 0.2; _struggle = 1.5;
+                break;
+        }
+    }
+
+    protected override void OnInitialized() => ApplyPreset(Preset.LowThreshold);
+
     // Shared slider parameters
     private double _beta = 0.3;
     private double _replacement = 2.0;

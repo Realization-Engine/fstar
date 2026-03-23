@@ -10,6 +10,12 @@
     Force is not static. It decays through replacement, atrophies without struggle, and stratifies into surface, middle, and deep layers. The surface layer is the first to erode and the easiest to replace; the deep layer is the most durable and the hardest to rebuild.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.DeliberatePractitioner)">Deliberate Practitioner</button>
+    <button @onclick="() => ApplyPreset(Preset.PassiveUser)">Passive User</button>
+    <button @onclick="() => ApplyPreset(Preset.OrgDeInvestment)">Org De-Investment</button>
+</div>
+
 @* ─── Chart 0: Surface Layer — Eq (11a) ─── *@
 <div id="force-dynamics-chart-0">
 <ChartCard Title="Surface Layer dF/dt — Eq (11a)"
@@ -351,6 +357,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { DeliberatePractitioner, PassiveUser, OrgDeInvestment }
+
     // ─── Surface layer params ───
     private double _betaSurface = 0.5;
 
@@ -450,6 +458,32 @@
 
     protected override void OnInitialized()
     {
+        ApplyPreset(Preset.DeliberatePractitioner);
+    }
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.DeliberatePractitioner:
+                _betaSurface = 0.3; _alphaM = 0.5; _struggle = 3.0; _gammaM = 0.3;
+                _engagement = 2.0; _forceMid = 5.0; _betaM = 0.2; _alphaD = 0.5; _betaD = 0.1;
+                _odeAlpha = 0.5; _odeBeta = 0.15; _odeGamma = 0.3; _odeSigma = 0.2;
+                _odeEngagement = 2.0; _odeStruggle = 3.0; _odeReplacement = 1.0; _odeMAbsorbed = 1.0; _odeDt = 0.1;
+                break;
+            case Preset.PassiveUser:
+                _betaSurface = 0.8; _alphaM = 0.1; _struggle = 0.5; _gammaM = 0.1;
+                _engagement = 0.5; _forceMid = 5.0; _betaM = 0.7; _alphaD = 0.2; _betaD = 0.5;
+                _odeAlpha = 0.1; _odeBeta = 0.5; _odeGamma = 0.1; _odeSigma = 0.3;
+                _odeEngagement = 0.5; _odeStruggle = 0.5; _odeReplacement = 3.0; _odeMAbsorbed = 1.5; _odeDt = 0.1;
+                break;
+            case Preset.OrgDeInvestment:
+                _betaSurface = 0.5; _alphaM = 0.2; _struggle = 1.0; _gammaM = 0.2;
+                _engagement = 1.0; _forceMid = 5.0; _betaM = 0.4; _alphaD = 0.3; _betaD = 0.2;
+                _odeAlpha = 0.2; _odeBeta = 0.3; _odeGamma = 0.2; _odeSigma = 0.8;
+                _odeEngagement = 1.0; _odeStruggle = 1.0; _odeReplacement = 2.0; _odeMAbsorbed = 3.0; _odeDt = 0.1;
+                break;
+        }
         RecalcAll();
     }
 

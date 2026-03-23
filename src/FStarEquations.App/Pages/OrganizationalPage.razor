@@ -10,6 +10,12 @@
     Organizations face a paradox: the multiplier raises the return on every unit of force, but it simultaneously degrades the ability to measure force accurately. As M grows, signal-to-noise collapses, Goodhart effects amplify, and decision bottlenecks compound.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.PreLLMOrg)">Pre-LLM Organization</button>
+    <button @onclick="() => ApplyPreset(Preset.PostLLMOrg)">Post-LLM Organization</button>
+    <button @onclick="() => ApplyPreset(Preset.ForceAdvantage)">Force Advantage</button>
+</div>
+
 @* ─── Chart 1: ROI HeatMap — Eq (17) ─── *@
 <div id="org-chart-0">
 <ChartCard Title="Marginal Return Surface — Eq (17)"
@@ -380,6 +386,40 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { PreLLMOrg, PostLLMOrg, ForceAdvantage }
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.PreLLMOrg:
+                _roiM = 1.5; _roiForceJ = 5.0;
+                _snrMp = 1.5; _snrVarForceTrue = 4.0; _snrVarEpsilon = 1.0; _snrVarEta = 0.5;
+                _goodhartForceTrue = 5.0; _goodhartDelta = 1.0;
+                _throughputM = 1.5; _throughputRateDec = 4.0; _throughputRateExec = 5.0;
+                _indecisionM = 1.5; _indecisionRateExec = 5.0; _indecisionDeltaTime = 1.0;
+                _advantageM = 1.5; _advantageForceFirm = 7.0; _advantageForceComp = 5.0;
+                break;
+            case Preset.PostLLMOrg:
+                _roiM = 4.0; _roiForceJ = 5.0;
+                _snrMp = 4.0; _snrVarForceTrue = 4.0; _snrVarEpsilon = 1.0; _snrVarEta = 0.5;
+                _goodhartForceTrue = 5.0; _goodhartDelta = 5.0;
+                _throughputM = 4.0; _throughputRateDec = 4.0; _throughputRateExec = 5.0;
+                _indecisionM = 4.0; _indecisionRateExec = 5.0; _indecisionDeltaTime = 1.0;
+                _advantageM = 4.0; _advantageForceFirm = 7.0; _advantageForceComp = 5.0;
+                break;
+            case Preset.ForceAdvantage:
+                _roiM = 3.0; _roiForceJ = 8.0;
+                _snrMp = 3.0; _snrVarForceTrue = 4.0; _snrVarEpsilon = 1.0; _snrVarEta = 0.5;
+                _goodhartForceTrue = 8.0; _goodhartDelta = 3.0;
+                _throughputM = 3.0; _throughputRateDec = 6.0; _throughputRateExec = 5.0;
+                _indecisionM = 3.0; _indecisionRateExec = 5.0; _indecisionDeltaTime = 0.5;
+                _advantageM = 3.0; _advantageForceFirm = 9.0; _advantageForceComp = 4.0;
+                break;
+        }
+        Recalculate();
+    }
+
     // ── Scroll-aware slider state ──
     private int _activeChartIndex = 0;
     private bool _showAllSliders;
@@ -518,7 +558,7 @@
     private IReadOnlyList<RadarAxis> _orgHealthRadarAxes = Array.Empty<RadarAxis>();
 
     // ── Lifecycle ──
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.PreLLMOrg);
 
     // ── Readout helpers ──
     private double ComputeRoiReturn() => OrganizationalDynamics.MarginalReturn(_roiM, _roiForceJ);

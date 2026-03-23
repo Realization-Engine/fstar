@@ -10,6 +10,12 @@
     The multiplier grows exponentially. This single fact drives every dynamic in the framework: rising variance, accelerating divergence, collapsing SNR, and the relentless upward pressure on the tipping point. Understanding M(t) is understanding the clock speed of disruption.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.UnboundedGrowth)">Unbounded Growth</button>
+    <button @onclick="() => ApplyPreset(Preset.DeceleratingGrowth)">Decelerating Growth</button>
+    <button @onclick="() => ApplyPreset(Preset.Stalled)">Stalled</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Exponential M(t) Growth — Eq (25)                             *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -214,6 +220,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { UnboundedGrowth, DeceleratingGrowth, Stalled }
+
     // ── Scroll-aware slider state ──
     private int _activeChartIndex = 0;
     private bool _showAllSliders;
@@ -326,6 +334,23 @@
 
     protected override void OnInitialized()
     {
+        ApplyPreset(Preset.UnboundedGrowth);
+    }
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.UnboundedGrowth:
+                _m0 = 1.0; _mu = 0.15; _cascadeVarF = 2.0; _cascadeBeta = 0.2; _cascadeReplacement = 1.5; _cascadeSigma = 0.3; _cascadeGamma = 0.3; _cascadeEngagement = 2.0; _cascadeRateExec = 5.0; _cascadeDeltaTime = 1.0;
+                break;
+            case Preset.DeceleratingGrowth:
+                _m0 = 1.0; _mu = 0.05; _cascadeVarF = 3.0; _cascadeBeta = 0.3; _cascadeReplacement = 2.0; _cascadeSigma = 0.5; _cascadeGamma = 0.2; _cascadeEngagement = 1.0; _cascadeRateExec = 5.0; _cascadeDeltaTime = 1.0;
+                break;
+            case Preset.Stalled:
+                _m0 = 1.0; _mu = 0.01; _cascadeVarF = 4.0; _cascadeBeta = 0.4; _cascadeReplacement = 3.0; _cascadeSigma = 0.7; _cascadeGamma = 0.15; _cascadeEngagement = 0.5; _cascadeRateExec = 5.0; _cascadeDeltaTime = 1.0;
+                break;
+        }
         RecalcAll();
     }
 

@@ -12,6 +12,12 @@
     than the last. This is the mechanism behind the Great Divergence.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.EarlyDivergence)">Early Divergence</button>
+    <button @onclick="() => ApplyPreset(Preset.MatureAdoption)">Mature Adoption</button>
+    <button @onclick="() => ApplyPreset(Preset.GenerationalTransition)">Generational Transition</button>
+</div>
+
 @* ─── Chart 0: Cohort Force Ceiling HeatMap — Eq (32) ─── *@
 <div id="divergence-chart-0">
 <ChartCard Title="Cohort Force Ceiling — Eq (32)"
@@ -339,6 +345,34 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { EarlyDivergence, MatureAdoption, GenerationalTransition }
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.EarlyDivergence:
+                _forceMax = 8.0; _ceilingSAvailCrosshair = 5.0; _strugglePre = 5.0; _rho = 1.0;
+                _divFH0 = 7.0; _divFL0 = 5.0; _divAlpha = 0.3; _divStruggle0 = 2.0;
+                _divGamma = 0.15; _divM = 1.5; _divBeta = 0.2; _divKappa = 0.5; _divDt = 0.1;
+                _genForceMax = 8.0; _genStrugglePre = 5.0; _genRho = 1.0;
+                break;
+            case Preset.MatureAdoption:
+                _forceMax = 8.0; _ceilingSAvailCrosshair = 3.0; _strugglePre = 5.0; _rho = 1.0;
+                _divFH0 = 8.0; _divFL0 = 3.0; _divAlpha = 0.3; _divStruggle0 = 2.0;
+                _divGamma = 0.2; _divM = 3.0; _divBeta = 0.3; _divKappa = 0.5; _divDt = 0.1;
+                _genForceMax = 8.0; _genStrugglePre = 5.0; _genRho = 1.0;
+                break;
+            case Preset.GenerationalTransition:
+                _forceMax = 8.0; _ceilingSAvailCrosshair = 2.0; _strugglePre = 5.0; _rho = 1.0;
+                _divFH0 = 8.0; _divFL0 = 2.0; _divAlpha = 0.2; _divStruggle0 = 1.0;
+                _divGamma = 0.2; _divM = 4.0; _divBeta = 0.4; _divKappa = 0.5; _divDt = 0.1;
+                _genForceMax = 8.0; _genStrugglePre = 5.0; _genRho = 1.0;
+                break;
+        }
+        Recalculate();
+    }
+
     // ─── Cohort Force Ceiling (Eq 32) ───
     private double _forceMax = 8.0;
     private double _strugglePre = 5.0;
@@ -446,7 +480,7 @@
     }
 
     // ─── Lifecycle ───
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.EarlyDivergence);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

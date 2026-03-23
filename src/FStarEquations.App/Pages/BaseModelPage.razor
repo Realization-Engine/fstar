@@ -10,6 +10,12 @@
     Output is not the sum of its parts; it is a product. The Cobb-Douglas structure means that zeroing any single force dimension collapses the entire output, no matter how strong the others. The multiplier M acts as a scaling lens on this product.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.BalancedSenior)">Balanced Senior</button>
+    <button @onclick="() => ApplyPreset(Preset.MissingCriticalSkill)">Missing Critical Skill</button>
+    <button @onclick="() => ApplyPreset(Preset.JuniorEngineer)">Junior Engineer</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Eq (1): Cobb-Douglas Output — HeatMap                                  *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -371,6 +377,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { BalancedSenior, MissingCriticalSkill, JuniorEngineer }
+
     // ── Scroll-aware slider state ──
     private int _activeChartIndex = 0;
     private bool _showAllSliders;
@@ -527,7 +535,45 @@
     private List<ChartSeries> _skillValueSeries = new();
     private Dictionary<string, double> _skillReadouts = new();
 
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.BalancedSenior);
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.BalancedSenior:
+                _m = 2.0; _f1 = 7.0; _f2 = 6.0; _f3 = 5.0; _f4 = 6.0; _f5 = 7.0; _f6 = 5.0; _f7 = 6.0;
+                _w1 = 0.20; _w2 = 0.18; _w3 = 0.10; _w4 = 0.15; _w5 = 0.15; _w6 = 0.12; _w7 = 0.10;
+                _mEffSurface = 20.0; _mEffMiddle = 3.0; _mEffDeep = 1.2;
+                _forceSurface = 4.0; _forceMiddle = 6.0; _forceDeep = 8.0;
+                _msBoilerplate = 30.0; _msIntegration = 5.0; _msArchitecture = 1.3; _msDebugging = 0.8;
+                _fdBoilerplate = 3.0; _fdIntegration = 5.0; _fdArchitecture = 7.0; _fdDebugging = 8.0;
+                _currentIp = 3.0; _dMsBoilerplate = 8.0; _dMsIntegration = 4.0; _dMsArchitecture = 1.5; _dMsDebugging = 0.5;
+                _fBarBoilerplate = 3.0; _fBarIntegration = 5.0; _fBarArchitecture = 7.0; _fBarDebugging = 8.0;
+                break;
+            case Preset.MissingCriticalSkill:
+                _m = 3.0; _f1 = 0.5; _f2 = 9.0; _f3 = 7.0; _f4 = 8.0; _f5 = 2.0; _f6 = 3.0; _f7 = 7.0;
+                _w1 = 0.20; _w2 = 0.18; _w3 = 0.10; _w4 = 0.15; _w5 = 0.15; _w6 = 0.12; _w7 = 0.10;
+                _mEffSurface = 20.0; _mEffMiddle = 3.0; _mEffDeep = 1.2;
+                _forceSurface = 4.0; _forceMiddle = 6.0; _forceDeep = 8.0;
+                _msBoilerplate = 30.0; _msIntegration = 5.0; _msArchitecture = 1.3; _msDebugging = 0.8;
+                _fdBoilerplate = 3.0; _fdIntegration = 5.0; _fdArchitecture = 7.0; _fdDebugging = 8.0;
+                _currentIp = 3.0; _dMsBoilerplate = 8.0; _dMsIntegration = 4.0; _dMsArchitecture = 1.5; _dMsDebugging = 0.5;
+                _fBarBoilerplate = 3.0; _fBarIntegration = 5.0; _fBarArchitecture = 7.0; _fBarDebugging = 8.0;
+                break;
+            case Preset.JuniorEngineer:
+                _m = 3.0; _f1 = 2.0; _f2 = 2.0; _f3 = 2.0; _f4 = 3.0; _f5 = 1.5; _f6 = 1.5; _f7 = 5.0;
+                _w1 = 0.20; _w2 = 0.18; _w3 = 0.10; _w4 = 0.15; _w5 = 0.15; _w6 = 0.12; _w7 = 0.10;
+                _mEffSurface = 20.0; _mEffMiddle = 3.0; _mEffDeep = 1.2;
+                _forceSurface = 4.0; _forceMiddle = 6.0; _forceDeep = 8.0;
+                _msBoilerplate = 30.0; _msIntegration = 5.0; _msArchitecture = 1.3; _msDebugging = 0.8;
+                _fdBoilerplate = 3.0; _fdIntegration = 5.0; _fdArchitecture = 7.0; _fdDebugging = 8.0;
+                _currentIp = 3.0; _dMsBoilerplate = 8.0; _dMsIntegration = 4.0; _dMsArchitecture = 1.5; _dMsDebugging = 0.5;
+                _fBarBoilerplate = 3.0; _fBarIntegration = 5.0; _fBarArchitecture = 7.0; _fBarDebugging = 8.0;
+                break;
+        }
+        Recalculate();
+    }
 
     private void OnMChanged(double v) { _m = v; Recalculate(); }
 

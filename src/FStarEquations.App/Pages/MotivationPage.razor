@@ -12,6 +12,12 @@
     recovery requires external intervention at a scale proportional to the loss already sustained.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.Resilient)">Resilient</button>
+    <button @onclick="() => ApplyPreset(Preset.SeniorBurnout)">Senior Burnout</button>
+    <button @onclick="() => ApplyPreset(Preset.GradualErosion)">Gradual Erosion</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Motivation Decay Surface — HeatMap                            *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -312,6 +318,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { Resilient, SeniorBurnout, GradualErosion }
+
     // ── JS interop for scroll-aware slider panel ──
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<MotivationPage>? _dotNetRef;
@@ -446,7 +454,30 @@
     private List<ChartMarker> _sensitivityMarkers = new();
     private HashSet<int> _sensitivityHighlight = new();
 
-    protected override void OnInitialized() => RecalcAll();
+    protected override void OnInitialized() => ApplyPreset(Preset.Resilient);
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.Resilient:
+                _fMot0 = 8.0; _lambda = 0.05; _currentLoss = 2.0; _m = 2.0;
+                _f1 = 7.0; _f2 = 6.0; _f3 = 5.0; _f4 = 6.0; _f5 = 7.0; _f6 = 5.0;
+                _w1 = 0.18; _w2 = 0.16; _w3 = 0.10; _w4 = 0.13; _w5 = 0.13; _w6 = 0.10; _w7 = 0.20;
+                break;
+            case Preset.SeniorBurnout:
+                _fMot0 = 9.0; _lambda = 0.25; _currentLoss = 8.0; _m = 3.0;
+                _f1 = 8.0; _f2 = 8.0; _f3 = 7.0; _f4 = 7.0; _f5 = 8.0; _f6 = 6.0;
+                _w1 = 0.18; _w2 = 0.16; _w3 = 0.10; _w4 = 0.13; _w5 = 0.13; _w6 = 0.10; _w7 = 0.20;
+                break;
+            case Preset.GradualErosion:
+                _fMot0 = 7.0; _lambda = 0.12; _currentLoss = 5.0; _m = 2.5;
+                _f1 = 6.0; _f2 = 5.0; _f3 = 5.0; _f4 = 5.0; _f5 = 6.0; _f6 = 4.0;
+                _w1 = 0.18; _w2 = 0.16; _w3 = 0.10; _w4 = 0.13; _w5 = 0.13; _w6 = 0.10; _w7 = 0.20;
+                break;
+        }
+        RecalcAll();
+    }
 
     // ── Helpers ──
 

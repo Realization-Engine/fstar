@@ -11,6 +11,12 @@
     Every hour a high-force individual spends evaluating others is an hour not spent creating. The evaluation bottleneck arises because the same people who are best at doing the work are also the only ones who can reliably judge it.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.PreLLMBalance)">Pre-LLM Balance</button>
+    <button @onclick="() => ApplyPreset(Preset.PostLLMSqueeze)">Post-LLM Squeeze</button>
+    <button @onclick="() => ApplyPreset(Preset.ThreeWayBind)">Three-Way Bind</button>
+</div>
+
 <!-- Chart 1: Evaluation Bottleneck — HeatMap -->
 <div id="creation-eval-chart-0">
 <ChartCard Title="Evaluation Bottleneck" Description="Eq (7) Throughput = Budget / Cost as a function of both budget and cost.">
@@ -216,6 +222,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { PreLLMBalance, PostLLMSqueeze, ThreeWayBind }
+
     // ── Scroll-aware slider state ──
     private int _activeChartIndex = 0;
     private bool _showAllSliders;
@@ -325,8 +333,28 @@
 
     private const int HeatResolution = 25;
 
-    protected override void OnInitialized()
+    protected override void OnInitialized() => ApplyPreset(Preset.PreLLMBalance);
+
+    private void ApplyPreset(Preset preset)
     {
+        switch (preset)
+        {
+            case Preset.PreLLMBalance:
+                _budget = 100.0; _costEval = 5.0; _forceHigh = 8.0; _fractionToEval = 0.3;
+                _tauAvailable = 8.0; _resTauCreate = 5.0; _resTauExtract = 0.5;
+                _resForceHigh = 8.0; _resCostEval = 5.0; _etaEff = 0.3;
+                break;
+            case Preset.PostLLMSqueeze:
+                _budget = 100.0; _costEval = 8.0; _forceHigh = 8.0; _fractionToEval = 0.7;
+                _tauAvailable = 8.0; _resTauCreate = 2.0; _resTauExtract = 1.0;
+                _resForceHigh = 8.0; _resCostEval = 8.0; _etaEff = 0.5;
+                break;
+            case Preset.ThreeWayBind:
+                _budget = 80.0; _costEval = 10.0; _forceHigh = 7.0; _fractionToEval = 0.5;
+                _tauAvailable = 8.0; _resTauCreate = 2.5; _resTauExtract = 2.5;
+                _resForceHigh = 7.0; _resCostEval = 10.0; _etaEff = 0.7;
+                break;
+        }
         RecalcThroughput();
         RecalcReallocation();
         RecalcResource();

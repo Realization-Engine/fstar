@@ -12,6 +12,12 @@
     Once broken, the pipeline cannot be restarted by hiring alone.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.PipelineIntact)">Pipeline Intact</button>
+    <button @onclick="() => ApplyPreset(Preset.PipelineStressed)">Pipeline Stressed</button>
+    <button @onclick="() => ApplyPreset(Preset.PipelineBroken)">Pipeline Broken</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 0: Shared Work Decay — Eq (12b)                                  *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -254,6 +260,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { PipelineIntact, PipelineStressed, PipelineBroken }
+
     // ── Shared parameters (unified across charts) ──
     private double _w0 = 5.0;
     private double _psi = 0.2;
@@ -382,7 +390,27 @@
     private double ComputeKFinal() => _cachedKFinal;
 
     // ── Lifecycle ──
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.PipelineIntact);
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.PipelineIntact:
+                _w0 = 5.0; _psi = 0.2; _m = 1.0; _pipePhi = 0.5;
+                _forceSenior = 7.0; _pipeDelta = 0.1; _pipeK0 = 10.0;
+                break;
+            case Preset.PipelineStressed:
+                _w0 = 5.0; _psi = 0.2; _m = 2.5; _pipePhi = 0.5;
+                _forceSenior = 5.0; _pipeDelta = 0.1; _pipeK0 = 10.0;
+                break;
+            case Preset.PipelineBroken:
+                _w0 = 5.0; _psi = 0.3; _m = 4.0; _pipePhi = 0.4;
+                _forceSenior = 3.0; _pipeDelta = 0.15; _pipeK0 = 10.0;
+                break;
+        }
+        Recalculate();
+    }
 
     private void Recalculate()
     {

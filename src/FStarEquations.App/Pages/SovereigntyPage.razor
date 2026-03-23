@@ -12,6 +12,12 @@
     the threshold, no amount of imported multiplier can compensate.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.Sovereign)">Sovereign</button>
+    <button @onclick="() => ApplyPreset(Preset.Dependent)">Dependent</button>
+    <button @onclick="() => ApplyPreset(Preset.AccessCut)">Access Cut</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 1: National Capability HeatMap — Eq (24)                          *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -222,6 +228,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { Sovereign, Dependent, AccessCut }
+
     // ── Scroll-aware slider state ──
     private int _activeChartIndex = 0;
     private bool _showAllSliders;
@@ -333,7 +341,24 @@
         Sovereignty.NationalCapability(Forces, _capM, _capPAccess);
 
     // ── Lifecycle ──
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.Sovereign);
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.Sovereign:
+                _capM = 2.0; _capPAccess = 1.0; _capF1 = 5.0; _capF2 = 6.0; _capF3 = 7.0; _capF4 = 5.0; _capF5 = 6.0; _resMinViable = 10.0;
+                break;
+            case Preset.Dependent:
+                _capM = 3.0; _capPAccess = 0.5; _capF1 = 3.0; _capF2 = 4.0; _capF3 = 5.0; _capF4 = 3.0; _capF5 = 4.0; _resMinViable = 15.0;
+                break;
+            case Preset.AccessCut:
+                _capM = 4.0; _capPAccess = 0.0; _capF1 = 2.0; _capF2 = 3.0; _capF3 = 4.0; _capF4 = 2.0; _capF5 = 3.0; _resMinViable = 15.0;
+                break;
+        }
+        Recalculate();
+    }
 
     private void Recalculate()
     {

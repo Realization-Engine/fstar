@@ -12,6 +12,12 @@
     This is the mechanism behind the barbell distribution of market value.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.PreLLM)">Pre-LLM Baseline</button>
+    <button @onclick="() => ApplyPreset(Preset.CurrentState)">Current State</button>
+    <button @onclick="() => ApplyPreset(Preset.HighMDivergence)">High-M Divergence</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Chart 1: Variance Amplification — HeatMap (Eq 4) + Radar               *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -398,6 +404,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { PreLLM, CurrentState, HighMDivergence }
+
     // ── Shared parameters ──
     private double _m = 3.0;
     private double _varianceF = 2.0;
@@ -500,7 +508,30 @@
     private static readonly IReadOnlySet<int> BarbellHighlight = new HashSet<int> { 0 };
 
     // ── Lifecycle ──
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.PreLLM);
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.PreLLM:
+                _m = 1.0; _varianceF = 2.0; _rho = 0.0; _forceHigh = 7.0; _forceLow = 4.0;
+                _currentF = 5.0; _thresholdLow = 2.0; _thresholdHigh = 7.0;
+                _premiumHigh = 30.0; _wageMid = 25.0; _floorLow = 15.0;
+                break;
+            case Preset.CurrentState:
+                _m = 3.0; _varianceF = 2.0; _rho = 0.3; _forceHigh = 8.0; _forceLow = 3.0;
+                _currentF = 5.0; _thresholdLow = 2.0; _thresholdHigh = 7.0;
+                _premiumHigh = 50.0; _wageMid = 25.0; _floorLow = 10.0;
+                break;
+            case Preset.HighMDivergence:
+                _m = 5.0; _varianceF = 3.0; _rho = 0.6; _forceHigh = 9.0; _forceLow = 2.0;
+                _currentF = 5.0; _thresholdLow = 2.0; _thresholdHigh = 7.0;
+                _premiumHigh = 80.0; _wageMid = 10.0; _floorLow = 5.0;
+                break;
+        }
+        Recalculate();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

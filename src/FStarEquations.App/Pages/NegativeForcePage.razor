@@ -12,6 +12,12 @@
     The epistemic gap measures how well the organization can tell the difference.
 </blockquote>
 
+<div class="preset-buttons">
+    <button @onclick="() => ApplyPreset(Preset.RateLimited)">Rate-Limited (Pre-LLM)</button>
+    <button @onclick="() => ApplyPreset(Preset.AmplifiedDamage)">Amplified Damage</button>
+    <button @onclick="() => ApplyPreset(Preset.MaxEpistemicDanger)">Max Epistemic Danger</button>
+</div>
+
 @* ──────────────────────────────────────────────────────────────────────── *@
 @* Eq (8): Directed Force Waterfall + Radar                               *@
 @* ──────────────────────────────────────────────────────────────────────── *@
@@ -265,6 +271,8 @@
 </FloatingSliderPanel>
 
 @code {
+    private enum Preset { RateLimited, AmplifiedDamage, MaxEpistemicDanger }
+
     // ── Scroll-aware slider state ──
     private int _activeChartIndex = 0;
     private bool _showAllSliders;
@@ -382,7 +390,30 @@
     private List<string> _epistemicTooltipLines = new();
     private double _currentEpistemicGap;
 
-    protected override void OnInitialized() => Recalculate();
+    protected override void OnInitialized() => ApplyPreset(Preset.RateLimited);
+
+    private void ApplyPreset(Preset preset)
+    {
+        switch (preset)
+        {
+            case Preset.RateLimited:
+                _w1 = 0.3; _w2 = 0.5; _w3 = 0.2; _f1 = 5.0; _f2 = -3.0; _f3 = 7.0;
+                _m = 1.0; _forceNeg = 3.0; _tau = 1.0;
+                _mPresentation = 1.5; _mSubstance = 1.0; _forceIndividual = 5.0;
+                break;
+            case Preset.AmplifiedDamage:
+                _w1 = 0.3; _w2 = 0.5; _w3 = 0.2; _f1 = 5.0; _f2 = -3.0; _f3 = 7.0;
+                _m = 4.0; _forceNeg = 5.0; _tau = 3.0;
+                _mPresentation = 3.0; _mSubstance = 1.0; _forceIndividual = 3.0;
+                break;
+            case Preset.MaxEpistemicDanger:
+                _w1 = 0.3; _w2 = 0.5; _w3 = 0.2; _f1 = 3.0; _f2 = -5.0; _f3 = 4.0;
+                _m = 3.0; _forceNeg = 5.0; _tau = 2.0;
+                _mPresentation = 5.0; _mSubstance = 0.5; _forceIndividual = 2.0;
+                break;
+        }
+        Recalculate();
+    }
 
     private void OnW1Changed(double v) { _w1 = v; Recalculate(); }
     private void OnW2Changed(double v) { _w2 = v; Recalculate(); }
