@@ -14,7 +14,7 @@ namespace FStarEquations
             {
                 product *= Math.Pow(forces[i], weights[i]);
             }
-            return m * product - 1; // '- 1' bug!!!
+            return m * product; // '- 1' bug!!!
         }
 
         /// <summary>
