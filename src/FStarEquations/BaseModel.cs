@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace FStarEquations
 {
@@ -14,7 +14,7 @@ namespace FStarEquations
             {
                 product *= Math.Pow(forces[i], weights[i]);
             }
-            return m * product;
+            return m * product - 1; // '- 1' bug!!!
         }
 
         /// <summary>
