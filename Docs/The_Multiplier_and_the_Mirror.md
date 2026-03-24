@@ -405,30 +405,30 @@ graph TD
     linkStyle 2 stroke:#e67e22,stroke-width:2px
     linkStyle 3,4,5 stroke:#27ae60,stroke-width:2px
     linkStyle 6,7 stroke:#8e44ad,stroke-width:2px
-    linkStyle 8,9 stroke:#16a085,stroke-width:2px
+    linkStyle 8,9 stroke:#f1c40f,stroke-width:2px
     linkStyle 10,11,12,13,14 stroke:#2980b9,stroke-width:2px
     linkStyle 15,16 stroke:#d35400,stroke-width:2px
 ```
 
-**Loop 1: Atrophy → Epistemic corruption → Undetected damage.**
+🔴 **Loop 1: Atrophy → Epistemic corruption → Undetected damage.**
 As $F$ decays via Eq. 11, the epistemic gap from Eq. 10 widens, proportional to $M_p / (M_s \cdot F_i)$. The middle-layer decay (Eq. 11b) means self-assessment erodes. The mirror's presentation channel keeps confidence high. Damage compounds silently.
 
-**Loop 2: Epistemic corruption → Evaluation bottleneck → Organizational risk.**
+🟠 **Loop 2: Epistemic corruption → Evaluation bottleneck → Organizational risk.**
 As the epistemic gap widens, the evaluation bottleneck (Eq. 7) tightens. More output needs review; the defects are subtler because $M_p$ polishes them.
 
-**Loop 3: Organizational efficiency → Tacit knowledge decay →** ***<small>FORCE</small>*** **supply collapse.**
+🟢 **Loop 3: Organizational efficiency → Tacit knowledge decay →** ***<small>FORCE</small>*** **supply collapse.**
 Organizations consolidate work onto fewer, higher-force individuals. Shared work $W(t)$ declines (Eq. 12b). Tacit knowledge transmission drops. The cohort discontinuity accelerates this: post-LLM juniors lack capacity to absorb tacit knowledge even when exposed.
 
-**Loop 4:** ***<small>FORCE</small>*** **decay → Motivation decay →** ***<small>FORCE</small>*** **decay.**
+🟣 **Loop 4:** ***<small>FORCE</small>*** **decay → Motivation decay →** ***<small>FORCE</small>*** **decay.**
 The craft experience is diluted. Motivation $f_{\text{mot}}$ is a component of ***<small>FORCE</small>*** in Eq. 1; it enters *multiplicatively*, so its decay doesn't just reduce output linearly. Via the Cobb-Douglas form, declining motivation degrades the effectiveness of *all* other ***<small>FORCE</small>*** components. If $f_{\text{mot}}$ halves, total $F$ drops by more than half because $f_{\text{mot}}^{w_{\text{mot}}}$ pulls down the entire product. This loop hits highest-force individuals hardest.
 
-**Loop 5: Variance amplification → Barbell → Talent concentration → Evaluation bottleneck.**
+🟡 **Loop 5: Variance amplification → Barbell → Talent concentration → Evaluation bottleneck.**
 Variance widens (Eq. 4). Markets bifurcate (Eq. 6). High-$F$ individuals concentrate in fewer firms. Most organizations lose evaluation capacity.
 
-**Loop 6: F→M transfer → De-investment in F → Training signal degradation → M stagnation.**
+🔵 **Loop 6: F→M transfer → De-investment in F → Training signal degradation → M stagnation.**
 ***<small>FORCE</small>*** flows into the model. Organizations invest less in human capability. The model absorbed only the explicit layer (Eq. 27). The atrophied workforce produces worse training signal (Eq. 31). The mirror's quality degrades. This loop closes the $F \to M \to F$ circuit.
 
-**Loop 7: Cohort discontinuity → Reduced absorption → Accelerated pipeline collapse.**
+🟤 **Loop 7: Cohort discontinuity → Reduced absorption → Accelerated pipeline collapse.**
 Post-LLM cohorts enter with lower $F_{\text{initial}}$ (Eq. 32). Even when exposed to tacit knowledge, they absorb less. This compounds Loop 3: the pipeline collapses faster than senior attrition alone would predict.
 
 These seven loops interact. Multiple positive feedback mechanisms, few natural brakes.
