@@ -558,6 +558,8 @@ The atrophy dynamic, the cohort discontinuity, and the F→M transfer each threa
 
 ## The Counter-Argument: LLMs as Floor-Raisers
 
+### ('The Rising Tide Lifts All Boats' Fallacy) 
+
 The objection: LLMs raise the floor. A junior produces 3 instead of 1. A senior produces 30 instead of 10. The ratio is unchanged.
 
 The problem is that Eqs. 15a and 15b describe *trajectories*. The floor-raising is correct at $t = 0$. But the tipping point (Eq. 14), hysteresis (Eq. 14a), and cohort discontinuity (Eq. 32) mean the derivatives diverge. The floor was raised at introduction. It may erode underneath the people standing on it.
