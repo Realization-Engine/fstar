@@ -566,6 +566,8 @@ The problem is that Eqs. 15a and 15b describe *trajectories*. The floor-raising 
 
 The counter-argument isn't wrong. It's incomplete. The floor-raising is immediate and visible. The divergence is delayed and invisible until it's structural.
 
+The 'boat' (***<small>FORCE</small>***) at $t$<sub>0</sub> has a tiny hole in its hull that will increase under pressure over time.
+
 ---
 
 ## The Inequality Accelerant
