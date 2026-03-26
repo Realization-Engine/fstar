@@ -578,7 +578,7 @@ The empirical evidence for floor-raising is real and should not be dismissed. St
 
 The counter-argument isn't wrong. It's incomplete. The floor-raising is immediate and visible. The divergence is delayed and invisible until it's structural.
 
-The tide did lift every boat. But the boat (***<small>FORCE</small>***) at $t$<sub>0</sub> has a small hole in its hull, and the hole widens with time.
+The tide did lift every boat. But the boat (***<small>FORCE</small>***) at $t$<sub>0</sub> *may have* a small hole in its hull, and the hole widens with time.
 
 ---
 
