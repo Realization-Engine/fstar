@@ -4,7 +4,7 @@
 
 **Author:** Dennis A. Landi
 **Date:** 2026-03-14
-**Version:** 0.03
+**Version:** 0.04
 **Copyright** &copy; 2026 Dennis A. Landi. All rights reserved.
 
 ---
@@ -101,7 +101,7 @@ The components $f_i$ include domain expertise, architectural judgment, taste, cl
 
 The mirror makes this vivid. You cannot place a question before the mirror that exhibits precision you don't possess. The reflection is faithful along the substance channel; it gives back what you brought, no more and no less. The senior engineer's precise question produced a precise reflection. The junior engineer's vague question produced a vague one. The mirror didn't generate the difference. The ***<small>FORCE</small>*** did. But the presentation channel rendered both with equal fluency and confidence, which is why the junior may not notice the substance gap.
 
-### Mirror as a Formal Object ###
+### So, what is the MIRROR? ###
 
 The presentation channel $M_p$ drives the epistemic gap (Eq. 10), collapses assessment signal (Eq. 18), and enables Goodhart-style gaming (Eq. 19). The substance channel $M_s(d)$ governs domain-specific amplification (Eq. 2). **Mirror** is not only a mechanism; it is a formal object with internal structure.
 
