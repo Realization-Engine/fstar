@@ -3,8 +3,8 @@
 *A mathematical framework for human capability under AI amplification and the future of software engineering*
 
 **Author:** Dennis A. Landi
-**Date:** 2026-03-14
-**Version:** 0.04
+**Date:** 2026-04-18
+**Version:** 0.05
 **Copyright** &copy; 2026 Dennis A. Landi. All rights reserved.
 
 ---
@@ -674,7 +674,259 @@ graph TD
 
 Which trajectory obtains depends on whether interventions preserving the $\alpha S$ and $\gamma E F$ terms in Eq. 11 are implemented before the data quality spiral (Eq. 31) begins to bind. The time to intervene is before the spiral starts, not after.
 
+The Phase Portrait section formalizes these regimes as basins of attraction in the $(F, M)$ plane and states the conditions under which each is mathematically realized.
+
 The uncomfortable conclusion: a technology widely perceived as democratizing may be the most powerful inequality amplifier in the history of knowledge work. Access is equal. ***<small>FORCE</small>*** is not. And Eqs. 1 through 32 show, with some rigor, that it's ***<small>FORCE</small>***, not access, that determines outcomes.
+
+---
+
+## The Phase Portrait
+
+The tipping point has been a number. Eq. 14 defined $F^*$ as the threshold of ***<small>FORCE</small>*** where growth and decay balance, derived by setting $dF/dt = 0$ and holding the multiplier fixed. Nothing in the system actually holds the multiplier fixed. Eq. 25 says $M$ grows over time. Eq. 31 says the quality of that growth depends on the ***<small>FORCE</small>*** of the workforce feeding it. $F$ depends on $M$ and $M$ depends on $\bar{F}$. The threshold and the multiplier are coupled, and when the full system is written together, the tipping point is no longer a scalar. It becomes a curve in a two-dimensional plane, and the long-run trajectory of an engineer, a team, a firm, or a nation traces a path across that plane toward one of several possible destinations. This section derives the plane, draws the curve, and reads what the geometry says about which destinations are reachable and which are not.
+
+### The Coupled System
+
+Eq. 11 describes how ***<small>FORCE</small>*** evolves. Eq. 25 describes how the multiplier grows. Eq. 31 describes how the multiplier's growth depends on ***<small>FORCE</small>***. Writing all three together, with $M_{\text{absorbed}}$ expressed as a function of $M$ and the multiplier's growth rate expressed as a function of $\bar{F}$, produces the coupled system:
+
+$$\frac{dF}{dt} = \alpha \cdot S + \gamma \cdot E \cdot F - \beta \cdot R - \sigma \cdot M_{\text{absorbed}}(M) \qquad (33a)$$
+
+$$\frac{dM}{dt} = \mu(\bar{F}) \cdot M \qquad (33b)$$
+
+Eq. 33a extends Eq. 11 by making the model-absorption term depend on $M$: the more capable the model, the more it has absorbed, and the more ***<small>FORCE</small>*** is lost to organizational de-investment scaled by $\sigma$. Eq. 33b generalizes Eq. 25 by making the growth rate a function of the signal quality supplied by the workforce, per the Eq. 31 constraint. $\mu(\bar{F}) \to \mu_0$ when $\bar{F}$ is high; $\mu(\bar{F}) \to 0$ or negative when $\bar{F}$ is low. Together, Eq. 33a and Eq. 33b constitute a two-dimensional autonomous system: $F$ dynamics depend on $M$, and $M$ dynamics depend on $\bar{F}$.
+
+Reliance $R$, engagement $E$, and struggle $S$ are themselves functions of $M$ and $F$ in practice. The framework commits to monotonicity only, without prescribing specific functional forms:
+
+$$\frac{\partial R}{\partial M} > 0, \qquad \frac{\partial S}{\partial M} < 0, \qquad \frac{\partial E}{\partial F} \geq 0$$
+
+A more capable mirror raises the temptation to rely. A more capable mirror smooths the friction to struggle against. Deliberate engagement depends on existing capability. These sign conditions are sufficient for the derivations that follow. No further commitment about functional form is made or required.
+
+**In plain language.** The rate at which ***<small>FORCE</small>*** changes follows Eq. 11's four terms, now with the absorption term explicit as an $M$-dependent quantity. The rate at which the multiplier grows is governed by its current size times a signal-quality factor that climbs with the workforce's ***<small>FORCE</small>*** and falls with it. Neither variable evolves on its own. The system is two-dimensional and its dynamics live in the $(F, M)$ plane.
+
+### The Separatrix
+
+The scalar tipping point $F^*$ of Eq. 14 was derived by setting $dF/dt = 0$ and solving for $F$, with $M$ treated as a parameter. In the coupled system, $M$ is not a parameter. Setting $dF/dt = 0$ and solving at each value of $M$ produces a curve rather than a point:
+
+$$F^*(M) = \frac{\beta \cdot R(M) + \sigma \cdot M_{\text{absorbed}}(M)}{\gamma \cdot E} \qquad (34)$$
+
+The tipping point generalizes from a scalar threshold to a state-dependent curve, a **separatrix** between the virtuous basin (where ***<small>FORCE</small>*** compounds) and the decay basin (where ***<small>FORCE</small>*** atrophies). A separatrix is the geometric object that divides phase space into regions of qualitatively different long-run behavior. Trajectories on one side converge to one attractor. Trajectories on the other converge to a different attractor or diverge.
+
+As $M$ grows, $R(M)$ rises by monotonicity and $M_{\text{absorbed}}(M)$ rises by the transfer dynamics of Eqs. 26-27. Both terms in the numerator of Eq. 34 rise. The curve shifts upward. The threshold moves away from the trajectory.
+
+Eq. 30 (successful transfer raises the tipping point) is recovered as a corollary. The statement $F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}}$ is the evaluation of Eq. 34 at two successive values of $M$. The floor-raising observation from "The Counter-Argument" becomes geometric: a trajectory holds $F$ roughly constant while the separatrix sweeps past it. What was framed as a floor rising underneath the boat is the tipping point rising past the engineer who has not moved.
+
+A trajectory above $F^*(M)$ at the current value of $M$ compounds. A trajectory below $F^*(M)$ atrophies. Because the separatrix is a moving curve, a trajectory can cross it without any change in the underlying $F$, simply because the curve shifted. Hysteresis (Eq. 14a) acquires a visual meaning: the return crossing is not the mirror of the descent because the separatrix has kept moving.
+
+**In plain language.** The line between compounding and atrophy is rising as the multiplier grows. An engineer who was safely above the line yesterday may be below it today, not because her ***<small>FORCE</small>*** declined, but because the threshold rose past her. The same sentence applies at every scale: team, firm, profession, nation.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" style="max-width:640px;display:block;margin:1.5em auto;" role="img" aria-labelledby="pp1-t pp1-d">
+  <title id="pp1-t">Canonical phase portrait of the coupled (F, M) system</title>
+  <desc id="pp1-d">A two-dimensional plane with F on the horizontal axis and M on the vertical axis. A rising blue separatrix curve divides the plane into the virtuous basin (upper right) and the decay basin (lower left). A filled black circle marks the virtuous equilibrium inside the virtuous basin. An open circle marks the managed-decline saddle sitting on the separatrix. Flow arrows in each basin show trajectories converging toward the virtuous fixed point or flowing away toward collapse.</desc>
+  <defs>
+    <marker id="pp1-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1a1a2e"/></marker>
+    <marker id="pp1-axa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <line x1="60" y1="360" x2="560" y2="360" stroke="#333" stroke-width="1.5" marker-end="url(#pp1-axa)"/>
+  <line x1="60" y1="360" x2="60" y2="30" stroke="#333" stroke-width="1.5" marker-end="url(#pp1-axa)"/>
+  <text x="574" y="364" font-family="serif" font-size="16" font-style="italic" fill="#1a1a2e">F</text>
+  <text x="53" y="22" font-family="serif" font-size="16" font-style="italic" fill="#1a1a2e">M</text>
+  <text x="52" y="375" font-family="sans-serif" font-size="11" fill="#555" text-anchor="end">0</text>
+  <path d="M 70 335 Q 200 318 280 235 T 540 70" stroke="#3a86ff" stroke-width="2.5" fill="none"/>
+  <text x="395" y="155" font-family="serif" font-size="15" font-style="italic" fill="#3a86ff">F*(M)</text>
+  <text x="400" y="290" font-family="sans-serif" font-size="13" fill="#1a1a2e" font-weight="600">Virtuous basin</text>
+  <text x="115" y="180" font-family="sans-serif" font-size="13" fill="#1a1a2e" font-weight="600">Decay basin</text>
+  <text x="78" y="350" font-family="sans-serif" font-size="10" fill="#888" font-style="italic">toward collapse</text>
+  <circle cx="470" cy="100" r="6" fill="#1a1a2e"/>
+  <text x="482" y="105" font-family="sans-serif" font-size="12" fill="#1a1a2e">virtuous equilibrium</text>
+  <circle cx="280" cy="235" r="6" fill="white" stroke="#1a1a2e" stroke-width="2"/>
+  <text x="293" y="240" font-family="sans-serif" font-size="12" fill="#1a1a2e">managed decline</text>
+  <line x1="440" y1="260" x2="462" y2="118" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp1-arr)"/>
+  <line x1="520" y1="220" x2="483" y2="114" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp1-arr)"/>
+  <line x1="360" y1="310" x2="455" y2="130" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp1-arr)"/>
+  <line x1="220" y1="280" x2="125" y2="345" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp1-arr)"/>
+  <line x1="170" y1="230" x2="95" y2="330" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp1-arr)"/>
+  <line x1="245" y1="160" x2="135" y2="285" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp1-arr)"/>
+</svg>
+
+*Figure PP-1. Canonical phase portrait of the coupled $(F, M)$ system under threshold-like or signed $\mu(\bar F)$. The separatrix $F^*(M)$ rises as $M$ grows. Above and to the right of the curve, trajectories compound toward the virtuous equilibrium. Below and to the left, trajectories atrophy toward collapse. The managed-decline fixed point sits on the separatrix as a saddle.*
+
+### Fixed Points and Their Classification
+
+A fixed point of the coupled system is a state where both $dF/dt = 0$ and $dM/dt = 0$ simultaneously. Such a state, once reached, is permanent in principle, absent external perturbation. Stability under perturbation is determined by the Jacobian of the system evaluated at the fixed point:
+
+$$J(F^*, M^*) = \begin{bmatrix} \dfrac{\partial \dot{F}}{\partial F} & \dfrac{\partial \dot{F}}{\partial M} \\[0.4em] \dfrac{\partial \dot{M}}{\partial F} & \dfrac{\partial \dot{M}}{\partial M} \end{bmatrix} \qquad (35)$$
+
+The signs and magnitudes of the Jacobian's eigenvalues classify the fixed point into one of four categories, each with distinct practical meaning.
+
+**Case 1. Stable node.** Both eigenvalues have negative real part. A trajectory perturbed away from the fixed point returns to it. The system rests at this equilibrium and is resilient to small disturbances.
+
+**Case 2. Stable spiral.** Complex eigenvalues with negative real part. Same long-run behavior as the stable node, with oscillatory approach. Trajectories circle the equilibrium before settling. Volatility around the equilibrium is not drift toward another basin.
+
+**Case 3. Saddle.** One eigenvalue positive, one negative. The fixed point is not a resting state. It is a crossing. Trajectories approach along one direction, the stable manifold, and depart along another, the unstable manifold. A system that appears to have stabilized at a saddle has not stabilized. It is in transit, and the direction of motion depends on which side of the stable manifold it occupies.
+
+**Case 4. Unstable node or spiral.** Eigenvalues have positive real part. Trajectories perturbed near the fixed point move away. No resting state; the fixed point is a repeller.
+
+Applied to the framework, the high-$(F, M)$ virtuous equilibrium falls into Case 1 or Case 2 under a wide range of monotone $\mu(\bar{F})$ and plausible coefficient values. The growth terms in Eq. 33a and Eq. 33b are self-reinforcing at high values of both variables, and small deviations decay back.
+
+The middle equilibrium, the one Terminal Dynamics has called *managed decline*, is where classification matters most. Depending on the slope of $\mu(\bar{F})$ near the signal-quality floor and the slope of $R(M)$ in that regime, the middle equilibrium is either a stable node or a saddle. The practical reading diverges sharply:
+
+If the middle is a **stable node**, managed decline is a genuine equilibrium. An organization, profession, or nation that slips below the virtuous separatrix settles at a lower level where $M$ compensates partially for reduced $F$. The equilibrium is functional but fragile. Recovery to the virtuous basin is possible, but only through a policy intervention large enough to carry the trajectory back across the separatrix.
+
+If the middle is a **saddle**, managed decline is not an equilibrium at all. It is a transit point. A trajectory that appears to stabilize there is on the saddle's stable manifold. Any perturbation off that manifold sends the trajectory either upward toward virtuous or downward toward collapse. The long-run outcomes are binary. The appearance of stability at the middle is structural illusion.
+
+The framework does not select between these readings. The Jacobian's sign conditions determine which obtains, and those conditions depend on monotone properties of $R$, $E$, $S$, and $\mu(\bar{F})$ that the paper does not calibrate. What the framework establishes is that the practical calculus of managed decline depends on an analytic fact that is in principle measurable, not on verbal description.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" width="100%" style="max-width:780px;display:block;margin:1.5em auto;" role="img" aria-labelledby="pp3-t pp3-d">
+  <title id="pp3-t">Fixed-point classification: stable node versus saddle</title>
+  <desc id="pp3-d">Two panels showing local trajectory behavior near a fixed point. Left panel shows a stable node: all nearby trajectories flow inward toward the fixed point. Right panel shows a saddle: trajectories approach along one direction, the stable manifold, and depart along the perpendicular direction, the unstable manifold.</desc>
+  <defs>
+    <marker id="pp3-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1a1a2e"/></marker>
+    <marker id="pp3-arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a86ff"/></marker>
+    <marker id="pp3-arr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d62828"/></marker>
+  </defs>
+  <g transform="translate(0, 0)">
+    <text x="170" y="22" font-family="sans-serif" font-size="13" font-weight="600" fill="#1a1a2e" text-anchor="middle">Stable node</text>
+    <text x="170" y="38" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle">both eigenvalues negative</text>
+    <circle cx="170" cy="160" r="5" fill="#1a1a2e"/>
+    <line x1="80" y1="80" x2="158" y2="148" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="170" y1="70" x2="170" y2="145" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="260" y1="80" x2="183" y2="148" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="280" y1="160" x2="185" y2="160" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="260" y1="240" x2="183" y2="172" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="170" y1="250" x2="170" y2="175" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="80" y1="240" x2="158" y2="172" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <line x1="60" y1="160" x2="155" y2="160" stroke="#1a1a2e" stroke-width="1.3" marker-end="url(#pp3-arr)"/>
+    <text x="170" y="285" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle" font-style="italic">trajectories converge</text>
+  </g>
+  <line x1="360" y1="30" x2="360" y2="275" stroke="#ddd" stroke-width="1" stroke-dasharray="3 3"/>
+  <g transform="translate(380, 0)">
+    <text x="170" y="22" font-family="sans-serif" font-size="13" font-weight="600" fill="#1a1a2e" text-anchor="middle">Saddle</text>
+    <text x="170" y="38" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle">one positive, one negative</text>
+    <circle cx="170" cy="160" r="5" fill="white" stroke="#1a1a2e" stroke-width="1.8"/>
+    <line x1="60" y1="160" x2="155" y2="160" stroke="#3a86ff" stroke-width="1.8" marker-end="url(#pp3-arb)"/>
+    <line x1="280" y1="160" x2="185" y2="160" stroke="#3a86ff" stroke-width="1.8" marker-end="url(#pp3-arb)"/>
+    <line x1="170" y1="150" x2="170" y2="80" stroke="#d62828" stroke-width="1.8" marker-end="url(#pp3-arr-r)"/>
+    <line x1="170" y1="170" x2="170" y2="240" stroke="#d62828" stroke-width="1.8" marker-end="url(#pp3-arr-r)"/>
+    <path d="M 85 90 Q 155 150 130 240" stroke="#1a1a2e" stroke-width="1" fill="none" marker-end="url(#pp3-arr)" opacity="0.65"/>
+    <path d="M 255 90 Q 185 150 210 240" stroke="#1a1a2e" stroke-width="1" fill="none" marker-end="url(#pp3-arr)" opacity="0.65"/>
+    <text x="80" y="152" font-family="sans-serif" font-size="10" fill="#3a86ff">stable manifold</text>
+    <text x="175" y="100" font-family="sans-serif" font-size="10" fill="#d62828">unstable manifold</text>
+    <text x="170" y="285" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle" font-style="italic">trajectories transit through</text>
+  </g>
+</svg>
+
+*Figure PP-3. Local trajectory behavior near a fixed point. In the stable-node case, all nearby trajectories return to the point; the fixed point is a destination. In the saddle case, trajectories approach along the stable manifold and depart along the unstable manifold; the fixed point is a crossing, not a destination. The classification of the middle equilibrium in the coupled system determines whether managed decline is an equilibrium the system rests at or a transit point the system passes through.*
+
+### What Shape of Signal Dependence Produces Three Regimes
+
+The coupled system's phase portrait depends on how $\mu(\bar{F})$ behaves near low signal quality. Five monotone families are worth distinguishing. Each produces a qualitatively different portrait.
+
+**Decoupled.** $\mu(\bar{F}) = \mu_0$, constant. The signal-quality constraint is held aside. Multiplier growth is independent of the workforce. The system has no interior fixed point in $(F, M)$; $M(t)$ runs off exponentially, and the separatrix $F^*(M)$ becomes a curve the trajectory crosses as $M$ moves along a prescribed path. Three regimes do not exist in this family.
+
+**Linear.** Growth scales proportionally with signal quality. Halving $\bar{F}$ halves the growth rate. The coupling is monotone and smooth. The portrait admits one stable fixed point at high $(F, M)$. Managed decline does not appear as a distinct attractor. Collapse occurs only in the limit $\bar{F} \to 0$, which halts $M$'s growth but does not reverse it.
+
+**Threshold-like.** Growth is near maximal when $\bar{F}$ exceeds a critical value and near zero below it, with a transition width that can be arbitrarily sharp. The portrait admits two regimes separated by the transition: a virtuous fixed point at high $(F, M)$, and a low-growth quasi-equilibrium below the threshold. Managed decline appears as a saddle on the transition. The separatrix has nonlinear curvature.
+
+**Saturating.** Growth approaches a ceiling at high signal quality, with diminishing returns. Smooth coupling, one stable fixed point, no distinct middle attractor. Qualitatively similar to linear with an upper bound.
+
+**Signed.** Growth is positive above a signal-quality floor and negative below it. The multiplier itself can decline. The portrait admits a true collapse basin in which both $F$ and $M$ decay. The separatrix is a closed curve enclosing the collapse basin, and managed decline appears either as a saddle or, under specific parameter settings, as an unstable fixed point. This is the only family in which the "collapse spiral" of Terminal Dynamics is literal rather than metaphorical.
+
+Three of the five families (decoupled, linear, saturating) produce portraits in which the framework's three regimes collapse to two or fewer. The three-regime description of Terminal Dynamics is mathematically realized only under threshold-like or signed behavior of $\mu(\bar{F})$. Whether actual workforce-to-model signal dynamics exhibit such behavior is an empirical question this paper does not resolve. What it resolves is that the qualitative claim of three regimes is a claim about the shape of $\mu(\bar{F})$ near low signal quality, not a claim the mathematics delivers on its own.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="100%" style="max-width:780px;display:block;margin:1.5em auto;" role="img" aria-labelledby="pp2-t pp2-d">
+  <title id="pp2-t">Comparative signal dependence: simple versus three-basin portraits</title>
+  <desc id="pp2-d">Two side-by-side phase portraits comparing the structural outcomes of different shapes of the multiplier's growth function. The left panel corresponds to decoupled, linear, or saturating signal dependence: one stable virtuous fixed point, no middle attractor. The right panel corresponds to threshold-like or signed signal dependence: three basins of attraction separated by a curved separatrix, with a saddle at the managed-decline point.</desc>
+  <defs>
+    <marker id="pp2-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1a1a2e"/></marker>
+    <marker id="pp2-axa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <g transform="translate(0, 0)">
+    <text x="175" y="22" font-family="sans-serif" font-size="13" font-weight="600" fill="#1a1a2e" text-anchor="middle">Forms A, B, D</text>
+    <text x="175" y="38" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle">decoupled / linear / saturating</text>
+    <line x1="40" y1="310" x2="320" y2="310" stroke="#333" stroke-width="1.3" marker-end="url(#pp2-axa)"/>
+    <line x1="40" y1="310" x2="40" y2="60" stroke="#333" stroke-width="1.3" marker-end="url(#pp2-axa)"/>
+    <text x="330" y="314" font-family="serif" font-size="14" font-style="italic" fill="#1a1a2e">F</text>
+    <text x="34" y="54" font-family="serif" font-size="14" font-style="italic" fill="#1a1a2e">M</text>
+    <circle cx="250" cy="105" r="5" fill="#1a1a2e"/>
+    <text x="199" y="95" font-family="sans-serif" font-size="11" fill="#1a1a2e">virtuous</text>
+    <line x1="100" y1="260" x2="230" y2="125" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="180" y1="280" x2="240" y2="125" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="270" y1="240" x2="255" y2="120" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="90" y1="180" x2="225" y2="115" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="60" y1="240" x2="215" y2="120" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <text x="175" y="350" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle" font-style="italic">one basin; no middle attractor</text>
+  </g>
+  <line x1="360" y1="30" x2="360" y2="340" stroke="#ddd" stroke-width="1" stroke-dasharray="3 3"/>
+  <g transform="translate(380, 0)">
+    <text x="160" y="22" font-family="sans-serif" font-size="13" font-weight="600" fill="#1a1a2e" text-anchor="middle">Forms C, E</text>
+    <text x="160" y="38" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle">threshold-like / signed</text>
+    <line x1="40" y1="310" x2="320" y2="310" stroke="#333" stroke-width="1.3" marker-end="url(#pp2-axa)"/>
+    <line x1="40" y1="310" x2="40" y2="60" stroke="#333" stroke-width="1.3" marker-end="url(#pp2-axa)"/>
+    <text x="330" y="314" font-family="serif" font-size="14" font-style="italic" fill="#1a1a2e">F</text>
+    <text x="34" y="54" font-family="serif" font-size="14" font-style="italic" fill="#1a1a2e">M</text>
+    <path d="M 50 295 Q 160 275 180 210 T 310 85" stroke="#3a86ff" stroke-width="2" fill="none"/>
+    <text x="212" y="168" font-family="serif" font-size="12" font-style="italic" fill="#3a86ff">F*(M)</text>
+    <circle cx="260" cy="105" r="5" fill="#1a1a2e"/>
+    <text x="210" y="95" font-family="sans-serif" font-size="11" fill="#1a1a2e">virtuous</text>
+    <circle cx="180" cy="210" r="5" fill="white" stroke="#1a1a2e" stroke-width="1.8"/>
+    <text x="190" y="228" font-family="sans-serif" font-size="11" fill="#1a1a2e">saddle</text>
+    <line x1="240" y1="260" x2="252" y2="125" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="300" y1="230" x2="267" y2="120" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="130" y1="250" x2="70" y2="295" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <line x1="100" y1="180" x2="60" y2="275" stroke="#1a1a2e" stroke-width="1.2" marker-end="url(#pp2-arr)"/>
+    <text x="160" y="350" font-family="sans-serif" font-size="11" fill="#555" text-anchor="middle" font-style="italic">three regimes separated by F*(M)</text>
+  </g>
+</svg>
+
+*Figure PP-2. How the shape of $\mu(\bar F)$ near the signal-quality floor changes the portrait. Left: Forms A, B, D (decoupled, linear, saturating) produce a single-basin topology with one virtuous attractor; no distinct managed-decline equilibrium appears. Right: Forms C and E (threshold-like and signed) produce three basins separated by a nonlinear separatrix, with a saddle at the managed-decline point. The framework's verbal three-regime description holds only under the right panel.*
+
+### The Irreversibility Frontier
+
+Under threshold-like or signed behavior of $\mu(\bar{F})$, a second geometric object appears: a region of the $(F, M)$ plane from which no feasible policy intervention returns the trajectory to the virtuous basin.
+
+$$\Omega_{\text{irreversible}} = \left\{ (F, M) \;:\; \forall \, (\alpha, \beta, \gamma) \in \Theta_{\text{feasible}}, \; (F(t), M(t)) \to \text{collapse} \right\} \qquad (36)$$
+
+$\Theta_{\text{feasible}}$ is the space of coefficient values that actual institutions can realize: $\alpha$ bounded above by the rate at which educational systems can supply productive struggle, $\beta$ bounded below by the reliance habits that any institutional design can suppress in practice, $\gamma$ bounded above by the deliberate engagement rates an organization can cultivate. The boundary $\partial \Omega_{\text{irreversible}}$ is the curve separating recoverable states from unrecoverable ones.
+
+Hysteresis (Eq. 14a) acquires a second geometric expression. Below the separatrix but above the irreversibility frontier, the trajectory is in the decay basin but policy can still push it back across. The intervention must be large but it exists. Below the irreversibility frontier, no feasible change in policy is sufficient. The trajectory is locked.
+
+The framework's longstanding warning, *intervene before the spiral, not after*, restates this fact. The window to act closes not at visible degradation but at the crossing of $\partial \Omega_{\text{irreversible}}$, which precedes visible degradation. Output is linear in $M$ and keeps rising; ***<small>FORCE</small>*** dynamics are convex in $M$ and deteriorate faster. The visible signal lags the structural one. By the time output is observably worse, the trajectory may already be inside $\Omega_{\text{irreversible}}$.
+
+**In plain language.** The separatrix divides the plane into basins. The irreversibility frontier divides the decay basin itself into a region from which feasible policy can still recover and a region from which it cannot. The difference between the two frontiers is the window for effective action.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" style="max-width:640px;display:block;margin:1.5em auto;" role="img" aria-labelledby="pp4-t pp4-d">
+  <title id="pp4-t">Irreversibility frontier on the phase plane</title>
+  <desc id="pp4-d">The canonical phase portrait with a second curve below the separatrix representing the boundary of the irreversibility region. Between the separatrix and the frontier, trajectories are recoverable under feasible policy intervention. Below the frontier, trajectories are locked into collapse.</desc>
+  <defs>
+    <marker id="pp4-axa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+    <pattern id="pp4-hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#d62828" stroke-width="1" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <line x1="60" y1="360" x2="560" y2="360" stroke="#333" stroke-width="1.5" marker-end="url(#pp4-axa)"/>
+  <line x1="60" y1="360" x2="60" y2="30" stroke="#333" stroke-width="1.5" marker-end="url(#pp4-axa)"/>
+  <text x="574" y="364" font-family="serif" font-size="16" font-style="italic" fill="#1a1a2e">F</text>
+  <text x="53" y="22" font-family="serif" font-size="16" font-style="italic" fill="#1a1a2e">M</text>
+  <path d="M 60 360 Q 170 350 210 305 T 400 220 Q 450 195 500 185 L 500 360 Z" fill="url(#pp4-hatch)" stroke="none"/>
+  <path d="M 60 360 Q 170 350 210 305 T 400 220 Q 450 195 500 185" stroke="#d62828" stroke-width="2" fill="none" stroke-dasharray="6 3"/>
+  <path d="M 70 335 Q 200 318 280 235 T 540 70" stroke="#3a86ff" stroke-width="2.5" fill="none"/>
+  <text x="395" y="155" font-family="serif" font-size="15" font-style="italic" fill="#3a86ff">F*(M)</text>
+  <text x="385" y="275" font-family="serif" font-size="13" font-style="italic" fill="#d62828">∂Ω</text>
+  <text x="410" y="278" font-family="sans-serif" font-size="11" fill="#d62828">(irreversibility frontier)</text>
+  <text x="405" y="315" font-family="sans-serif" font-size="12" fill="#1a1a2e" font-weight="600">Virtuous basin</text>
+  <text x="115" y="200" font-family="sans-serif" font-size="12" fill="#1a1a2e" font-weight="600">Recoverable decay</text>
+  <text x="155" y="345" font-family="sans-serif" font-size="12" fill="#d62828" font-weight="600">Irreversible region</text>
+  <circle cx="470" cy="100" r="6" fill="#1a1a2e"/>
+</svg>
+
+*Figure PP-4. The irreversibility frontier $\partial \Omega$ (dashed red curve) below the separatrix $F^*(M)$ (blue curve). The region between the two curves is the decay basin from which feasible policy can still return the trajectory to virtuous. The hatched region below $\partial \Omega$ is $\Omega_{\mathrm{irreversible}}$: no feasible change in $\alpha$, $\beta$, or $\gamma$ recovers a trajectory that has entered it. The window for effective action is the gap between the two curves.*
+
+### What the Portrait Shows
+
+The coupled system has a geometry. The scalar tipping point $F^*$ of Eq. 14 is a cross-section of a curve $F^*(M)$ that moves as $M$ grows. The trajectories of individuals, teams, firms, and nations are paths across a two-dimensional plane, each falling into a basin of attraction whose boundary is the separatrix. The three regimes of Terminal Dynamics correspond to three basins in the geometry, but only under a specific class of signal-quality dependence. Under other classes, the regimes collapse to two.
+
+The four futures of software engineering map onto regions of this plane. Each future is a basin of attraction under a specific configuration of the coefficients. Future 1 (the pilot model) holds the trajectory in the virtuous basin by institutional supply of $\alpha S$. Future 2 (permanent bifurcation) stabilizes on or near the saddle of managed decline while the pre-LLM cohort still holds the system above collapse. Future 3 (role dissolution) sends the middle of the profession into the collapse basin while boundary specialists carry the remainder. Future 4 (return to specification) depends on whether a substitute source of $\alpha S$ can hold the trajectory in the virtuous basin after implementation struggle is absorbed.
+
+What the geometry does not determine is where the coefficients come from. $\alpha$, $\beta$, $\gamma$, $\sigma$, and $\mu$ are supplied by institutional, educational, organizational, and technological conditions outside the mathematics. The portrait says which coefficient configurations produce which basins. It does not say which interventions produce which configurations, or by how much. That is the prescriptive question, and it is the question to which the rest of this paper turns.
 
 ---
 
@@ -775,13 +1027,13 @@ graph TD
     F4 --> OUT4["Eq 32: S_available substituted<br/>New struggle /  encoding"]
 ```
 
-The framework does not prescribe which future is preferable. It identifies the structural constraints each must satisfy and the equations that will determine whether each is stable. What it does say, with mathematical force, is that the window for choosing is finite. The pre-LLM cohort's deep ***<small>FORCE</small>*** is a non-renewable resource on a known depreciation schedule. The choices that matter are the ones made while that resource still exists.
+The framework does not prescribe which future is preferable. It identifies the structural constraints each must satisfy and the equations that will determine whether each is stable. What it does say, with mathematical force, is that the window for choosing is finite. The pre-LLM cohort's deep ***<small>FORCE</small>*** is a non-renewable resource on a known depreciation schedule. The choices that matter are the ones made while that resource still exists. Each of the four futures occupies a region of the $(F, M)$ plane derived in The Phase Portrait, and the separatrix and irreversibility frontier together define the conditions under which a given future is reachable from a given starting state.
 
 ---
 
 ## Open Questions and Testable Predictions
 
-The framework generates several lines of inquiry that it identifies but does not resolve. Each is stated with enough precision to be actionable.
+The framework generates several lines of inquiry that it identifies but does not resolve. Each is stated with enough precision to be actionable. Several of these lines are currently the subject of active investigation.
 
 ### Mirror Distortion and Conformity Pressure
 
@@ -821,32 +1073,6 @@ The cohort discontinuity (Eq. 32) implies that effective post-LLM technical educ
 
 The multiplicative ***<small>FORCE</small>*** model (Eq. 1) suggests that teams with complementary ***<small>FORCE</small>*** components, where each member's strengths cover another's zero-components, could produce higher aggregate output than teams of uniformly moderate engineers. The evaluation bottleneck (Eq. 7) requires high-force evaluators. Tacit knowledge transmission (Eq. 12a) requires shared work between seniors and juniors. The optimization would balance creation capacity, evaluation throughput, knowledge transmission, and component complementarity. This is a constrained optimization problem tractable enough to produce actionable org-design recommendations.
 
-### The Phase Diagram
-
-The terminal dynamics section describes three qualitative trajectories: virtuous, managed decline, and collapse. These descriptions are verbal and supported by a flowchart. They are not derived from the equations; they are inferred from them. A formal phase-plane analysis would close that gap.
-
-The system in question is the coupling of three equations. Eq. 11 governs how individual ***<small>FORCE</small>*** changes over time: growing through struggle ($\alpha S$) and deliberate engagement ($\gamma E F$), decaying through passive reliance ($\beta R$) and organizational de-investment ($\sigma M_{\text{absorbed}}$). Eq. 25 governs how the multiplier grows: exponentially at rate $\mu$, but subject to a constraint. That constraint is Eq. 31: the quality of the next-generation model is a function of the current model's quality and the average ***<small>FORCE</small>*** of the humans generating training signal. The coupling is circular. $F$ depends on $M$ because $M$ determines the reliance pressure ($\beta R$) and the compounding engagement term ($\gamma E F$). $M$ depends on $F$ because $F$ determines the quality of the signal that drives $M$'s improvement. Neither variable is independent. Both evolve over time.
-
-A phase-plane analysis plots $\bar{F}(t)$ on one axis and $M(t)$ on the other. At every point in this two-dimensional space, Eqs. 11, 25, and 31 together determine which direction the system moves next: $F$ increasing or decreasing, $M$ increasing or decreasing. Drawing arrows at each point produces a vector field, a map of the system's behavior across all possible states.
-
-Three features of this map would be significant for the framework.
-
-**Fixed points.** A fixed point is a state where both $dF/dt = 0$ and $dM/dt = 0$ simultaneously: the system, if it arrives there, stays. The terminal dynamics section implicitly claims at least two exist: the high-$F$, high-$M$ virtuous equilibrium, and the lower-$F$, lower-$M$ managed-decline equilibrium. The collapse spiral has no fixed point; it is a trajectory that diverges downward. A formal analysis would confirm whether these equilibria actually exist in the equation system, determine their stability (whether nearby trajectories converge toward them or drift away), and reveal whether additional equilibria emerge that the qualitative description missed.
-
-**Basins of attraction.** A basin of attraction is the region of the $M$-$F$ plane from which all trajectories converge to a given fixed point. If your starting conditions place you inside the virtuous basin, the system evolves toward the virtuous equilibrium regardless of small perturbations. If you start inside the collapse basin, you spiral downward regardless. The boundaries between basins, the separatrices, are the geometric expression of the tipping point (Eq. 14) generalized to the full $M$-$F$ plane. The tipping point as currently defined gives a threshold for $F$ in isolation. But when $M$ is also changing, the threshold is not a single number; it is a curve. The shape of that curve matters: is it roughly linear, so that $M$ and $F$ trade off proportionally? Is it convex, so that high $M$ can compensate for moderate $F$ loss up to a point, then cannot? Is there a cliff, a region where a small change in $F$ moves the system across the boundary?
-
-**Parameter sensitivity.** Small changes in the framework's coefficients, $\alpha$ (struggle), $\beta$ (reliance), $\gamma$ (engagement), $\mu$ ($M$ growth rate), shift the separatrices. A phase diagram parameterized by these values would show which interventions have the largest effect on moving the basin boundary, and which are second-order. This is the question that matters most for policy: if you can only change one thing, which coefficient moves the boundary the most?
-
-Several open questions follow directly from a formal analysis.
-
-First, does the managed-decline equilibrium actually exist as a stable attractor? The qualitative description assumes it does. But in coupled nonlinear systems, apparent equilibria can be unstable: the system passes through them on its way to collapse. If managed decline is a saddle point rather than a true attractor, then the practical choice is binary, virtuous or collapse, with no stable middle ground. That would sharpen every recommendation in the framework considerably.
-
-Second, how does the separatrix move as $M$ grows? Eq. 25 says $M$ grows exponentially. If the basin boundary shifts as $M$ increases, a firm or individual that is safely inside the virtuous basin today may find the boundary has moved past them tomorrow, not because their $F$ declined, but because the threshold rose. This would formalize the intuition in Eq. 30 (successful transfer raises the tipping point) as a dynamic property of the phase portrait itself.
-
-Third, are there irreversibility boundaries? A trajectory that crosses from the virtuous basin into the collapse basin may or may not be reversible. If the phase portrait contains regions from which no feasible change in $\alpha$, $\beta$, or $\gamma$ can return the system to the virtuous basin, those regions define a point of no return. The framework's qualitative warning, "intervene before the spiral starts, not after," would become a quantitative one: if $\bar{F}$ drops below this curve while $M$ is at this level, no achievable intervention restores the virtuous trajectory.
-
-The phase diagram is the framework's missing capstone. The terminal dynamics section says three trajectories exist. The phase diagram would provide the map of all trajectories, the boundaries between them, the conditions under which those boundaries shift, and the regions from which recovery is no longer possible.
-
 ### Empirical Predictions
 
 The framework generates falsifiable predictions that can be tested against data:
@@ -857,6 +1083,7 @@ The framework generates falsifiable predictions that can be tested against data:
 4. **Organizations with higher LLM adoption show declining performance on novel, out-of-distribution challenges** (layered decay, deep ***<small>FORCE</small>*** eroding). Measurable through incident response times, novel-problem resolution rates.
 5. **High-force engineers extract measurably higher effective $M$ from the same tool** (Eq. 4a). Measurable by comparing LLM-augmented output quality across engineers stratified by unassisted capability.
 6. **Evaluation bottleneck becomes the binding constraint on deployment velocity** (Eq. 7). Measurable as the ratio of code review wait time to code generation time, which should increase post-LLM adoption.
+7. **The separatrix $F^*(M)$ and the irreversibility frontier are measurable through longitudinal cohort-level tracking** (Eqs. 34, 36). Different monotone regimes of $\mu(\bar{F})$ predict distinct separatrix curvatures and distinct locations of the irreversibility frontier. Cross-cohort measurement of workforce capability against observed multiplier growth, controlling for policy and environmental differences, can in principle discriminate among the forms presented in the Phase Portrait. The shape of the phase portrait is an empirical object, not a theoretical assumption.
 
 The framework is strong enough to make these specific, non-obvious predictions. It should be held accountable to them.
 
@@ -913,6 +1140,11 @@ The framework is strong enough to make these specific, non-obvious predictions. 
 | (30) | $F^*_{\text{post}} > F^*_{\text{pre}}$ | F→M Transfer | Successful transfer raises tipping point |
 | (31) | Quality($M_{t+1}$) $= g($Quality$(M_t), \bar{F}_{\text{ann}})$ | F→M Transfer | Data quality spiral |
 | (32) | $F_{\text{init}}(c) = F_{\text{max}}(S_{\text{avail}}(c) / S_{\text{pre}})^\rho$ | Cohort Discontinuity | Force ceiling bounded by available struggle |
+| (33a) | $dF/dt = \alpha S + \gamma E F - \beta R - \sigma M_{\text{abs}}(M)$ | Phase Portrait | Coupled system: $F$ dynamics with explicit $M$-dependence |
+| (33b) | $dM/dt = \mu(\bar{F}) \cdot M$ | Phase Portrait | Coupled system: $M$ dynamics with signal-quality coupling |
+| (34) | $F^*(M) = (\beta R(M) + \sigma M_{\text{abs}}(M)) / (\gamma E)$ | Phase Portrait | Separatrix: tipping point as state-dependent curve |
+| (35) | $J(F^*, M^*)$ eigenvalue signs | Phase Portrait | Fixed-point classification (node, spiral, saddle, unstable) |
+| (36) | $\Omega_{\text{irreversible}}$ | Phase Portrait | Irreversibility frontier in the $(F, M)$ plane |
 
 ---
 
@@ -1188,6 +1420,8 @@ $$\left|\frac{dF}{dt}\right|_{\text{decay}} > \left|\frac{dF}{dt}\right|_{\text{
 
 **Captures:** Recovery from below the tipping point is harder than the descent that brought you there.
 
+**Cross-reference:** The irreversibility frontier of Eq. 36 gives this asymmetry a geometric expression: below the separatrix but above the frontier, recovery is possible but costly; below the frontier, recovery is unreachable under any feasible policy.
+
 ---
 
 ### The Accelerating Gap
@@ -1424,6 +1658,8 @@ $$F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}} \qquad (30)$$
 
 **Captures:** The paradox of successful transfer: it raises the tipping point, pushing more engineers into the atrophy basin.
 
+**Cross-reference:** Recovered as a corollary of Eq. 34: the statement $F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}}$ is the evaluation of the separatrix curve at two successive values of $M$.
+
 #### Eq. (31): Data Quality Spiral
 
 $$\text{Quality}(M_{t+1}) = g\!\left(\text{Quality}(M_t),\; \bar{F}_{\text{annotators}}(t)\right) \qquad (31)$$
@@ -1447,6 +1683,56 @@ $$F_{\text{initial}}(c) = F_{\text{max}} \cdot \left(\frac{S_{\text{available}}(
 **In plain language:** Each successive cohort enters with a lower ***<small>FORCE</small>*** ceiling, not because of individual deficiency but because the environmental conditions for building ***<small>FORCE</small>*** have been structurally altered. When $\rho = 1$, the relationship is linear. When $\rho > 1$, initial loss of struggle has a mild effect but further losses accelerate. When $\rho < 1$, even small losses significantly reduce the ceiling. This is different from atrophy; it is *stunted development*.
 
 **Captures:** Post-LLM cohorts face a structurally lower ***<small>FORCE</small>*** ceiling because the struggle that built capability has been smoothed away.
+
+---
+
+### The Phase Portrait
+
+#### Eq. (33a) and Eq. (33b): The Coupled $(F, M)$ System
+
+$$\frac{dF}{dt} = \alpha \cdot S + \gamma \cdot E \cdot F - \beta \cdot R - \sigma \cdot M_{\text{absorbed}}(M) \qquad (33a)$$
+
+$$\frac{dM}{dt} = \mu(\bar{F}) \cdot M \qquad (33b)$$
+
+**Notation:** $dF/dt$, $dM/dt$ = rates of change of ***<small>FORCE</small>*** and multiplier. $\alpha$, $\beta$, $\gamma$, $\sigma$ = learning and decay coefficients as in Eq. 11. $S$, $E$, $R$ = struggle, deliberate engagement, passive reliance. $M_{\text{absorbed}}(M)$ = model capability gained from F-to-M transfer, now explicit as a function of $M$. $\mu(\bar{F})$ = state-dependent growth rate of the multiplier; $\mu(\bar{F}) \to \mu_0$ when $\bar{F}$ is high and $\mu(\bar{F}) \to 0$ or negative when $\bar{F}$ is low. $\bar{F}$ = average ***<small>FORCE</small>*** across the signal-generating workforce, as in Eq. 31.
+
+Reliance, engagement, and struggle are themselves functions of $M$ and $F$ in practice. The paper commits to monotonicity only: $\partial R / \partial M > 0$, $\partial S / \partial M < 0$, $\partial E / \partial F \geq 0$. No specific functional form is prescribed.
+
+**In plain language:** Eq. 33a is Eq. 11 rewritten so the model-absorption term is explicit as a function of the multiplier's current value. Eq. 33b is Eq. 25 rewritten so the growth rate depends on signal quality (Eq. 31) rather than being a pure exogenous constant. Together they describe a coupled two-dimensional system: how ***<small>FORCE</small>*** changes depends on the multiplier, and how the multiplier changes depends on the ***<small>FORCE</small>*** of the workforce.
+
+**Captures:** ***<small>FORCE</small>*** and the multiplier evolve as a coupled two-dimensional system with circular dependence; neither variable is independent of the other.
+
+#### Eq. (34): The Separatrix
+
+$$F^*(M) = \frac{\beta \cdot R(M) + \sigma \cdot M_{\text{absorbed}}(M)}{\gamma \cdot E} \qquad (34)$$
+
+**Notation:** $F^*(M)$ = the tipping-point curve, a state-dependent generalization of the scalar $F^*$ of Eq. 14. Derived by setting $dF/dt = 0$ in Eq. 33a and solving for $F$ at each value of $M$. Numerator: decay pressures expressed as functions of $M$. Denominator: the growth pressure from deliberate engagement.
+
+**In plain language:** Eq. 14 gave the tipping point as a number, derived with the multiplier held fixed. When the multiplier is allowed to vary, the numerator and denominator of that expression vary with it, and the tipping point becomes a curve in the $(F, M)$ plane rather than a scalar. As $M$ grows, $R(M)$ and $M_{\text{absorbed}}(M)$ both rise, so the curve shifts upward. A trajectory that held $F$ roughly constant while $M$ grew may find that the separatrix has risen past it.
+
+**Captures:** The tipping point is a state-dependent curve in the $(F, M)$ plane, not a scalar threshold; as the multiplier grows, the curve rises.
+
+**Cross-reference:** Eq. 30 (successful transfer raises the tipping point) is recovered as a corollary: $F^*_{\text{post-transfer}} > F^*_{\text{pre-transfer}}$ is the statement that the separatrix curve has rising $F$-intercept at larger $M$.
+
+#### Eq. (35): Jacobian and Fixed-Point Classification
+
+$$J(F^*, M^*) = \begin{bmatrix} \dfrac{\partial \dot{F}}{\partial F} & \dfrac{\partial \dot{F}}{\partial M} \\[0.4em] \dfrac{\partial \dot{M}}{\partial F} & \dfrac{\partial \dot{M}}{\partial M} \end{bmatrix} \qquad (35)$$
+
+**Notation:** $J(F^*, M^*)$ = Jacobian matrix of the coupled system evaluated at a fixed point $(F^*, M^*)$. Each entry is a partial derivative of one of the time derivatives $\dot{F}$, $\dot{M}$ with respect to one of the state variables $F$, $M$, evaluated at the fixed point. The signs and magnitudes of the matrix's eigenvalues determine the local stability and qualitative behavior of trajectories near the fixed point.
+
+**In plain language:** A fixed point is where both state variables stop changing. The Jacobian captures how small deviations from that point grow or decay. Four outcomes are possible. Both eigenvalues negative: stable node; trajectories return. Both eigenvalues negative with complex parts: stable spiral; trajectories circle in. One positive, one negative: saddle; the fixed point is a crossing, not a resting place. Both positive: unstable; trajectories flee. The classification matters most at the middle equilibrium, where a stable node means managed decline is a real destination and a saddle means managed decline is a transit point the system passes through.
+
+**Captures:** The qualitative behavior of trajectories near each equilibrium, including whether managed decline is a true attractor or a saddle, is determined by the eigenvalues of the Jacobian.
+
+#### Eq. (36): The Irreversibility Frontier
+
+$$\Omega_{\text{irreversible}} = \left\{ (F, M) \;:\; \forall \, (\alpha, \beta, \gamma) \in \Theta_{\text{feasible}}, \; (F(t), M(t)) \to \text{collapse} \right\} \qquad (36)$$
+
+**Notation:** $\Omega_{\text{irreversible}}$ = the set of $(F, M)$ states from which no policy adjustment within the feasible coefficient space $\Theta_{\text{feasible}}$ returns the trajectory to the virtuous basin. $\Theta_{\text{feasible}}$ = the realizable range of the coefficients $\alpha$, $\beta$, $\gamma$ that institutions can actually implement (bounded above by educational capacity for $\alpha$, bounded below by suppressible reliance for $\beta$, bounded above by cultivatable engagement for $\gamma$). $\partial \Omega_{\text{irreversible}}$ = the boundary of this set, a curve in the phase plane.
+
+**In plain language:** Hysteresis (Eq. 14a) said that recovery is harder than descent. The irreversibility frontier says *how much* harder, geometrically. Some states below the separatrix are still recoverable under large but feasible policy intervention. Others are not. The frontier separates the two. Once a trajectory crosses the frontier, no achievable combination of coefficients restores the virtuous basin. The frontier precedes visible output degradation because output is linear in the multiplier while ***<small>FORCE</small>*** dynamics are convex in it; by the time output is observably worse, the trajectory may already be inside the irreversibility region.
+
+**Captures:** Irreversibility is a geometric locus in the phase plane. States inside $\Omega_{\text{irreversible}}$ cannot be recovered by any feasible policy; the window for effective intervention closes at the crossing of the frontier, which precedes visible degradation.
 
 ---
 
