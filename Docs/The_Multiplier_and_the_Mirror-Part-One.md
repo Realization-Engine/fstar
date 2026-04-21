@@ -8,6 +8,8 @@ category: "Whitepaper"
 folio: "Nº II, Part One of Three"
 project: "F-Star"
 source: "https://github.com/Realization-Engine/fstar"
+prev-url: "The_Multiplier_and_the_Mirror.html"
+prev-title: "Introduction"
 next-url: "The_Multiplier_and_the_Mirror-Part-Two.html"
 next-title: "Part Two, Ramifications"
 ---
