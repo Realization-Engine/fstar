@@ -1,6 +1,6 @@
 ---
 title: "The Multiplier, Mirror and *The Tipping Point*, Part Three: Response"
-subtitle: "A mathematical framework for human capability under AI amplification and the future of software engineering."
+subtitle: "The Multiplier-Mirror framework: a mathematical theory of human capability under AI amplification and the future of software engineering."
 author: "Dennis A. Landi"
 version: "0.06"
 date: "2026-04-19"

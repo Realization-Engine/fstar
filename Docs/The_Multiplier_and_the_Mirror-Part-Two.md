@@ -1,6 +1,6 @@
 ---
 title: "The Multiplier, Mirror and *The Tipping Point*, Part Two: Ramifications"
-subtitle: "A mathematical framework for human capability under AI amplification and the future of software engineering."
+subtitle: "The Multiplier-Mirror framework: a mathematical theory of human capability under AI amplification and the future of software engineering."
 author: "Dennis A. Landi"
 version: "0.06"
 date: "2026-04-19"
@@ -15,7 +15,7 @@ next-title: "Part Three, Response"
 ---
 # Part Two - Ramifications
 
-The F* story applies across several domains: labor-market structure, organizational practice, individual development, firm competition, and national resilience. Each section that follows instantiates the main-line framework in one such domain; none extends the mathematical structure of the story itself.
+The Multiplier-Mirror framework applies across several domains: labor-market structure, organizational practice, individual development, firm competition, and national resilience. Each section that follows instantiates the main-line framework in one such domain; none extends its mathematical structure.
 
 ---
 
